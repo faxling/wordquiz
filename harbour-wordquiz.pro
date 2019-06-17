@@ -16,11 +16,24 @@ QT += qml quick multimedia
 
 CONFIG += sailfishapp
 
-SOURCES += src/harbour-wordquiz.cpp
+SOURCES += src/harbour-wordquiz.cpp \
+src/filehelpers.cpp \
+src/speechdownloader.cpp
+
+HEADERS += \
+    src/speechdownloader.h \
+    src/filehelpers.h
+
 
 DISTFILES += qml/harbour-wordquiz.qml \
     qml/cover/CoverPage.qml \
     qml/pages/FirstPage.qml \
+    qml/pages/ButtonQuiz.qml \
+    qml/pages/CreateNewQuiz.qml \
+    qml/pages/EditQuiz.qml \
+    qml/pages/InputTextQuiz.qml \
+    qml/pages/TakeQuiz.qml \
+    qml/pages/TextList.qml \
     harbour-wordquiz.desktop \
     rpm/harbour-wordquiz.changes.in \
     rpm/harbour-wordquiz.changes.run.in \
@@ -33,5 +46,8 @@ SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 # to disable building translations every time, comment out the
 # following CONFIG line
 CONFIG += sailfishapp_i18n
+
+RESOURCES += \
+    qml.qrc
 
 

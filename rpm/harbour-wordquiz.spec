@@ -13,7 +13,7 @@ Version:    0.1
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
-URL:        http://example.org/
+URL:        http://faxling11.org/
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-wordquiz.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9

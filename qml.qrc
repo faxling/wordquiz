@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/pages/horn.png</file>
+        <file>qml/pages/left.png</file>
+        <file>qml/pages/r.png</file>
+        <file>qml/pages/rm.png</file>
+        <file>qml/pages/thumb.png</file>
+        <file>qml/pages/harbour-wordquiz.png</file>
+    </qresource>
+</RCC>

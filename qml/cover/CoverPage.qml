@@ -4,21 +4,19 @@ import Sailfish.Silica 1.0
 import QtQml.Models 2.2
 
 CoverBackground {
+
+
+
     Label {
         id: label
         anchors.centerIn: parent
-        text: qsTr("Word Quiz")
-    }
-
-    CoverActionList {
-        id: coverAction
-
-        CoverAction {
-            iconSource: "image://theme/icon-cover-next"
-        }
-
-        CoverAction {
-            iconSource: "image://theme/icon-cover-pause"
+        text: "Word Quiz"
+        Image
+        {
+            y:100
+            source: "qrc:qml/pages/harbour-wordquiz.png"
+            anchors.horizontalCenter: parent.horizontalCenter
         }
     }
+
 }
