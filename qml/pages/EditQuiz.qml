@@ -6,16 +6,22 @@ import Sailfish.Silica 1.0
 Item {
   id:idEditQuiz
 
-  function downloadDictOnWord(sUrl, sWord)
+  function downloadDictOnWord(sUrl, sWord, oBtn)
   {
     var doc = new XMLHttpRequest();
     doc.open("GET",sUrl+ sWord);
 
+    idErrorText.visible = false;
+
     doc.onreadystatechange = function() {
 
       if (doc.readyState === XMLHttpRequest.DONE) {
+
+        oBtn.bProgVisible = false;
+
+
         if (doc.status === 200) {
-          idErrorText.visible = false;
+
           idTrSynModel.xml = doc.responseText
           idTrTextModel.xml = doc.responseText
           idTrMeanModel.xml = doc.responseText
@@ -47,8 +53,10 @@ Item {
 
 
   property int nLastSearch : 0
+
   Column
   {
+    id: idMainColumn
     spacing:20
     anchors.topMargin: 20
     anchors.fill: parent
@@ -58,7 +66,7 @@ Item {
 
       Row {
         TextList {
-          width:50
+          width:n3BtnWidth / 2
           text:  "No"
         }
         TextList {
@@ -73,7 +81,6 @@ Item {
         }
       }
     }
-
 
     XmlListModel {
       id: idTrTextModel
@@ -150,41 +157,43 @@ Item {
       id:idTextInput
     }
 
-
-
     Row
     {
       spacing:10
 
       ButtonQuiz {
+        id:idBtn1
         width:n4BtnWidth
         text:  sLangLang
         onClicked: {
           nLastSearch = 0
-          downloadDictOnWord(sReqDictUrl , idTextInput.text)
-
+          bProgVisible = true
+          downloadDictOnWord(sReqDictUrl , idTextInput.text,idBtn1 )
           idTranslateModel.source = sReqUrl + idTextInput.text
-
         }
       }
 
 
       ButtonQuiz {
+        id:idBtn2
         width:n4BtnWidth
         text:  sLangLangRev
         onClicked: {
           nLastSearch = 1
-          downloadDictOnWord(sReqDictUrlRev , idTextInput.text)
+          bProgVisible = true
+          downloadDictOnWord(sReqDictUrlRev , idTextInput.text,idBtn2)
+          idTranslateModel.source = sReqUrlRev + idTextInput.text
         }
       }
 
-
       ButtonQuiz {
+        id:idBtn3
         width:n4BtnWidth
         text:  sLangLangEn
         onClicked: {
           nLastSearch = 2
-          downloadDictOnWord(sReqDictUrlEn , idTextInput.text)
+          bProgVisible = true
+          downloadDictOnWord(sReqDictUrlEn , idTextInput.text,idBtn3)
         }
       }
 
@@ -219,18 +228,18 @@ Item {
 
     }
 
+    TextList
+    {
+      visible:false
+      id:idErrorText
+      color: "red"
+
+    }
+
     Row
     {
-      height:150
+      height: n3BtnWidth
       width:parent.width
-
-      Text
-      {
-        visible:false
-        id:idErrorText
-        color: "red"
-        font.pointSize: 16
-      }
 
       ListViewHi {
         id:idDicList
@@ -293,9 +302,10 @@ Item {
 
     ListView {
       id:idGlosList
+      height:n3BtnWidth * 2
       clip: true
       width:parent.width
-      height:n3BtnWidth
+
       spacing: 3
 
       header:idHeaderGlos
@@ -305,7 +315,7 @@ Item {
         spacing:5
         TextList {
           id:idNumberText
-          width:50
+          width:n3BtnWidth / 2
           text:  number
         }
 
@@ -337,7 +347,14 @@ Item {
           }
 
         }
-
+        ButtonQuizImg
+        {
+          height:idAnswer.height
+          width:idAnswer.height
+          visible:bHasSpeechFrom
+          source:"qrc:qml/pages/horn.png"
+          onClicked: MyDownloader.playWord(question,sFromLang)
+        }
         ButtonQuizImg
         {
           height:idAnswer.height
@@ -391,23 +408,15 @@ Item {
         text : "Reverse"
         onClicked:
         {
-          db.transaction(
-                function(tx) {
-                  tx.executeSql('UPDATE Glosa'+nDbNumber+' SET state=0');
-                })
-
-
+          bIsReverse =  !bIsReverse
           glosModelWorking.clear()
           var nC = glosModel.count
-
-          sScoreText = nC + "/" + nC
           for ( var i = 0; i < nC;++i) {
-            glosModel.get(i).state1=0;
-
+            var nState = glosModel.get(i).state1;
             var squestion = glosModel.get(i).answer
             var sanswer = glosModel.get(i).question
             var nnC  = glosModel.get(i).number
-            glosModelWorking.append({"number": nnC, "question": squestion , "answer": sanswer, "state1":0})
+            glosModelWorking.append({"number": nnC, "question": squestion , "answer": sanswer, "state1":nState})
           }
 
           var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);

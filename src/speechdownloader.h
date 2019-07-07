@@ -26,8 +26,8 @@ private:
     QString m_sWord;
     QString m_sStoragePath;
     QNetworkAccessManager m_oWebCtrl;
-    QEventLoop m_oLoop;
     QByteArray m_oDownloadedData;
+    bool m_bPlayAfterDownload = false;
 };
 
 #endif // SPEECHDOWNLOADER_H

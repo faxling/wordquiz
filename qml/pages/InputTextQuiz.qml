@@ -8,7 +8,15 @@ Rectangle
   height: Theme.fontSizeLarge
   TextInput
   {
-    font.pointSize: Theme.fontSizeMedium
+    cursorDelegate : Rectangle
+    {
+      height : parent.height
+      width: 5
+      color: Theme.highlightColor
+    }
+
+    anchors.topMargin: 2
+    font.pixelSize: Theme.fontSizeMedium
     anchors.fill: parent
     id:idTextInput
   }

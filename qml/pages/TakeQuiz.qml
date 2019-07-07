@@ -3,8 +3,8 @@ import Sailfish.Silica 1.0
 
 Rectangle {
   id:idRectTakeQuiz
-  width:400
-  height:400
+  color:"transparent"
+
   // May be the filler is calculated (PathLen - NoElem*sizeElem) /  (NoElem )
   Component
   {
@@ -15,17 +15,25 @@ Rectangle {
       property alias answerVisible: idTextAnswer.visible
       radius:10
       width:idView.width
-      height:idView.height
-      color:"mediumspringgreen"
+      height:idRectTakeQuiz.height - 200
+      color:Theme.darkSecondaryColor
       Column
       {
-        height:200
         spacing: 20
-        anchors.centerIn: parent
+        width:parent.width
+        y:parent.height / 3
+        ButtonQuizImg
+        {
+          anchors.horizontalCenter: parent.horizontalCenter
+          visible:bIsReverse ? bHasSpeech : bHasSpeechFrom
+          source:"qrc:qml/pages/hornbig.png"
+          onClicked: MyDownloader.playWord(question,sFromLang)
+        }
+
         Text
         {
           color:Theme.highlightColor
-          font.pointSize: Theme.fontSizeLarge
+          font.pixelSize: Theme.fontSizeExtraLarge
           font.bold: true
           anchors.horizontalCenter: parent.horizontalCenter
           id:idTextQuestion
@@ -43,26 +51,24 @@ Rectangle {
             idQuizModel.setProperty(index,"visible1",true)
           }
         }
-        Item
+
+        Text
         {
-          height:50
-          width:parent.width
-          //   color:"yellow"
-          Text
-          {
-            id:idTextAnswer
-            visible:visible1
-            anchors.horizontalCenter: parent.horizontalCenter
-            horizontalAlignment: Text.AlignHCenter
-            font.pointSize: Theme.fontSizeMedium
-            text : answer
-          }
+          color:Theme.highlightColor
+          font.pixelSize: Theme.fontSizeExtraLarge
+          font.bold: true
+          id:idTextAnswer
+          visible:visible1
+          anchors.horizontalCenter: parent.horizontalCenter
+          horizontalAlignment: Text.AlignHCenter
+          text : answer
         }
+
         ButtonQuizImg
         {
           anchors.horizontalCenter: parent.horizontalCenter
-          visible:bHasSpeech && visible1
-          source:"qrc:qml/pages/horn.png"
+          visible: (bIsReverse ? bHasSpeechFrom : bHasSpeech) && visible1
+          source:"qrc:qml/pages/hornbig.png"
           onClicked: MyDownloader.playWord(answer,sToLang)
         }
 
@@ -93,7 +99,9 @@ Rectangle {
   PathView
   {
     id:idView
-
+    clip:true
+    width:idRectTakeQuiz.width
+    height:idRectTakeQuiz.height
     property int nLastIndex : 1
     onCurrentIndexChanged:
     {
@@ -189,10 +197,6 @@ Rectangle {
     }
 
 
-    y:100
-    clip:true
-    width:idRectTakeQuiz.width
-    height:idRectTakeQuiz.height
     model : idQuizModel
     delegate:idQuestionComponent
     snapMode: ListView.SnapOneItem

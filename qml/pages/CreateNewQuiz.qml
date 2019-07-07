@@ -4,6 +4,7 @@ import Sailfish.Silica 1.0
 
 Item
 {
+  property alias nQuizListCurrentIndex: idQuizList.currentIndex
 
   ListModel {
     id:idLangModel
@@ -39,9 +40,16 @@ Item
       lang: "Spanish"
       code:"es"
     }
+
+    ListElement {
+      lang: "Polish"
+      code:"pl"
+    }
   }
+
   Column
   {
+    id:idTopColumn
     spacing:20
     anchors.topMargin: 20
     anchors.bottomMargin: 50
@@ -107,7 +115,7 @@ Item
 
       Text
       {
-        font.pointSize:Theme.fontSizeMedium
+        font.pixelSize:Theme.fontSizeLarge
         height:idBtnRename.height
         width: n3BtnWidth
         id:idLangPair
@@ -132,8 +140,6 @@ Item
       ListViewHi
       {
         id:idLangList1
-        clip: true
-
         onCurrentIndexChanged:
         {
           idLangListRow.doCurrentIndexChanged()
@@ -153,7 +159,6 @@ Item
       ListViewHi
       {
         id:idLangList2
-        clip: true
         width:Theme.buttonWidthMedium
         height:parent.height
         model: idLangModel
@@ -172,6 +177,7 @@ Item
 
     TextList
     {
+      id:idTextAvailable
       color: "steelblue"
       text:"Available Quiz's:"
     }
@@ -181,21 +187,25 @@ Item
     {
       id:idQuizList
       width:parent.width
-      height:Theme.itemSizeMedium * 3
+      height:Theme.itemSizeMedium * 6
       model:glosModelIndex
       spacing:5
 
       onCurrentIndexChanged:
       {
 
+        var nTheIndex = currentIndex;
+
         getDb().transaction(
+
               function(tx) {
-                tx.executeSql('UPDATE GlosaDbLastIndex SET dbindex=?',[currentIndex]);
+                tx.executeSql('UPDATE GlosaDbLastIndex SET dbindex=?',[nTheIndex]);
               }
               )
 
         if (glosModelIndex.count === 0)
           return;
+
         sQuizName = glosModelIndex.get(currentIndex).quizname;
         sLangLang = glosModelIndex.get(currentIndex).langpair;
         nDbNumber  = glosModelIndex.get(currentIndex).dbnumber;
@@ -204,13 +214,14 @@ Item
         var res = sLangLang.split("-");
         sLangLangRev = res[1] + "-" + res[0];
         sToLang = res[1]
+        sFromLang = res[0]
         sLangLangEn = "en"+ "-" + res[1];
         sReqDictUrl = sReqDictUrlBase +  sLangLang + "&text=";
         sReqDictUrlRev = sReqDictUrlBase + sLangLangRev + "&text=";
         sReqDictUrlEn= sReqDictUrlBase + sLangLangEn + "&text=";
 
         sReqUrl = sReqUrlBase +  sLangLang + "&text=";
-
+        sReqUrlRev = sReqUrlBase +  sLangLangRev + "&text=";
         db.transaction(
               function(tx) {
                 // tx.executeSql('DROP TABLE Glosa');
@@ -296,9 +307,7 @@ Item
         }
       }
     }
-    Component.onCompleted: {
-      idQuizList.currentIndex = nGlosaDbLastIndex
-    }
+
   }
 }
 

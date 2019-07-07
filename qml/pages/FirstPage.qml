@@ -12,24 +12,25 @@ Page {
 
   property string sReqUrlBase: "https://translate.yandex.net/api/v1.5/tr/translate?key=trnsl.1.1.20190526T164138Z.e99d5807bb2acb8d.d11f94738ea722cfaddf111d2e8f756cb3b71f4f&lang="
   property string sReqUrl
+  property string sReqUrlRev
+
   property variant db
   property string sLangLangSelected
   property string sLangLang
   property string sLangLangRev
   property string sToLang
+  property string sFromLang
+  property bool bIsReverse
   property bool bHasSpeech : sToLang ==="ru" || sToLang ==="en"
+  property bool bHasSpeechFrom : sFromLang ==="ru" || sFromLang ==="en"
+
   property string sLangLangEn
   property string sQuizName : "-"
   property string sScoreText : "-"
   property int nDbNumber : 0;
   property int nQuizIndex: 1
-  property int nGlosaDbLastIndex
   property int n3BtnWidth: idTabMain.width / 3 - 7
   property int n4BtnWidth: idTabMain.width / 4 - 7
-
-  // The effective value will be restricted by ApplicationWindow.allowedOrientations
-  allowedOrientations: Orientation.All
-
 
 
   onSScoreTextChanged:
@@ -56,6 +57,7 @@ Page {
       return;
     var nC = glosModel.count
     glosModelWorking.clear();
+    bIsReverse = false
 
     for ( var i = 0; i < nC;++i) {
       if (glosModel.get(i).state1 === 0)
@@ -137,16 +139,18 @@ Page {
           function(tx) {
 
             // tx.executeSql('DROP TABLE GlosaDbIndex');
-
+            var nGlosaDbLastIndex;
             tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbLastIndex( dbindex INT )');
             var rs = tx.executeSql('SELECT * FROM GlosaDbLastIndex')
             if (rs.rows.length===0)
             {
               tx.executeSql('INSERT INTO GlosaDbLastIndex VALUES(0)')
+              console.log("create")
             }
             else
             {
               nGlosaDbLastIndex = rs.rows.item(0).dbindex
+              console.log("dbindex " + nGlosaDbLastIndex)
             }
 
 
@@ -158,6 +162,8 @@ Page {
               glosModelIndex.append({"dbnumber": rs.rows.item(i).dbnumber, "quizname": rs.rows.item(i).quizname , "state1": rs.rows.item(i).state1, "langpair" : rs.rows.item(i).langpair })
             }
 
+            idTab1.nQuizListCurrentIndex = nGlosaDbLastIndex;
+
           }
           )
     return db;
@@ -168,14 +174,13 @@ Page {
     anchors.fill : parent
     anchors.leftMargin : 50
     anchors.rightMargin : 50
-    anchors.bottomMargin: 150
     anchors.topMargin : 50
     spacing :10
 
     Label {
       anchors.horizontalCenter: parent.horizontalCenter
       id: idTitle
-      text: sQuizName + " " + sLangLang + " " + sScoreText
+      text: sQuizName + " " + sFromLang + (bIsReverse ? "<-" : "->") +  sToLang + " " + sScoreText
     }
 
     Row {
@@ -203,32 +208,33 @@ Page {
         text:"Quiz"
         onClicked:  idWindow.state ="idTab3"
       }
-
     }
 
     CreateNewQuiz
     {
       width: idTabMain.width
-      height: idAppWnd.height - 100
+      height: idWindow.height
       visible:false
       id:idTab1
     }
     EditQuiz
     {
       width: idTabMain.width
-      height: idAppWnd.height - 100
+      height: idWindow.height
       id:idTab2
       visible:false
     }
     TakeQuiz
     {
       width: idTabMain.width
-      height: idAppWnd.height - 100
+      height: idWindow.height - 300
       id:idTab3
       visible:false
     }
+  }
 
-
+  Component.onCompleted: {
+    getDb();
   }
   states: [
     State {
@@ -272,4 +278,5 @@ Page {
     }
 
   ]
+
 }
