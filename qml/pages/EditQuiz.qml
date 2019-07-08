@@ -93,7 +93,12 @@ Item {
             idText.text = "-"
             return
           }
-          idText.text =  idTrTextModel.get(0).text1
+
+          if (nLastSearch===0)
+            idText.text =  idTrTextModel.get(0).text1
+          else
+            idTextInput.text =  idTrTextModel.get(0).text1
+
           idTrSynModel.query = "/DicResult/def/tr[1]/syn"
           idTrMeanModel.query = "/DicResult/def/tr[1]/mean"
         }
@@ -126,6 +131,7 @@ Item {
             idTextTrans.text = "-"
             return
           }
+
           idTextTrans.text =  idTranslateModel.get(0).trans
 
 
@@ -133,34 +139,44 @@ Item {
       }
     }
 
+    TextList
+    {
+      id:idTextTrans
+      text :"-"
+      onClick:
+      {
+        if (nLastSearch === 0)
+          idText.text = idTextTrans.text
+        else
+          idTextInput.text = idTextTrans.text
+      }
+    }
+
+
     Row
     {
+      spacing : 20
       width:parent.width
-
-      TextList
+      height: Theme.fontSizeLarge
+      InputTextQuiz
       {
-        width:n3BtnWidth*2
+        width: parent.width / 2 - 10
+        text:""
+        id:idTextInput
+      }
+      InputTextQuiz
+      {
         id:idText
-        text :"-"
+        width: parent.width / 2 - 10
+        text:""
       }
-      TextList
-      {
-        id:idTextTrans
-        text :"-"
-        onClick: idText.text = idTextTrans.text
-      }
-    }
-
-    InputTextQuiz
-    {
-      text:""
-      id:idTextInput
     }
 
     Row
     {
+      id:idBtnRow
       spacing:10
-
+      height: idBtn1.height
       ButtonQuiz {
         id:idBtn1
         width:n4BtnWidth
@@ -181,8 +197,8 @@ Item {
         onClicked: {
           nLastSearch = 1
           bProgVisible = true
-          downloadDictOnWord(sReqDictUrlRev , idTextInput.text,idBtn2)
-          idTranslateModel.source = sReqUrlRev + idTextInput.text
+          downloadDictOnWord(sReqDictUrlRev , idText.text,idBtn2)
+          idTranslateModel.source = sReqUrlRev + idText.text
         }
       }
 
@@ -193,7 +209,7 @@ Item {
         onClicked: {
           nLastSearch = 2
           bProgVisible = true
-          downloadDictOnWord(sReqDictUrlEn , idTextInput.text,idBtn3)
+          downloadDictOnWord(sReqDictUrlEn , idText.text,idBtn3)
         }
       }
 
@@ -211,17 +227,12 @@ Item {
 
           nC += 1;
 
-          if (nLastSearch !== 1)
-          {
-            insertGlosa(nDbNumber,nC, idTextInput.text, idText.text)
-          }
-          else
-          {
-            insertGlosa(nDbNumber, nC, idText.text, idTextInput.text)
-          }
-
           if (bHasSpeech)
             MyDownloader.downloadWord(idText.text,sToLang)
+          if (bHasSpeechFrom)
+            MyDownloader.downloadWord(idTextInput.text,sFromLang)
+
+          insertGlosa(nDbNumber,nC, idTextInput.text, idText.text)
 
         }
       }
@@ -238,12 +249,13 @@ Item {
 
     Row
     {
+      id:idDictRow
       height: n3BtnWidth
       width:parent.width
 
       ListViewHi {
         id:idDicList
-        width:n3BtnWidth
+        width:n3BtnWidth + 60
         height : parent.height
         model:idTrTextModel
         highlightFollowsCurrentItem: true
@@ -260,7 +272,13 @@ Item {
               onClicked:
               {
                 idDicList.currentIndex = index
-                idText.text = idSearchItem.text;
+
+
+                if (nLastSearch === 0)
+                  idText.text = idSearchItem.text.replace("...","");
+                else
+                  idTextInput.text = idSearchItem.text.replace("...","");
+
                 idTrSynModel.query = "/DicResult/def/tr["  +(index + 1) + "]/syn"
                 idTrMeanModel.query = "/DicResult/def/tr["  +(index + 1) + "]/mean"
               }
@@ -281,9 +299,11 @@ Item {
             anchors.fill: parent
             onClicked:
             {
-              idText.text = idSynText.text;
+              if (nLastSearch === 0)
+                idText.text = idSynText.text;
+              else
+                idTextInput.text = idSynText.text;
             }
-
           }
         }
       }
@@ -302,8 +322,9 @@ Item {
 
     ListView {
       id:idGlosList
-      height:n3BtnWidth * 2
-      clip: true
+      height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6 - idTextInput.height  - 80
+      clip:true
+
       width:parent.width
 
       spacing: 3
@@ -330,6 +351,9 @@ Item {
           id:idAnswer
           text: answer
         }
+
+
+
         ButtonQuizImg
         {
           height:idAnswer.height
@@ -366,74 +390,83 @@ Item {
 
       }
     }
-    Row
+
+  }
+  Row
+  {
+    y: idAppWnd.height- 480
+    spacing:10
+    ButtonQuiz
     {
-      spacing:10
-      ButtonQuiz
+      text : "Reset"
+      onClicked:
       {
-        text : "Reset"
-        onClicked:
-        {
-          db.transaction(
-                function(tx) {
-                  tx.executeSql('UPDATE Glosa'+nDbNumber+' SET state=0');
-                })
+        db.transaction(
+              function(tx) {
+                tx.executeSql('UPDATE Glosa'+nDbNumber+' SET state=0');
+              })
 
 
-          glosModelWorking.clear()
-          var nC = glosModel.count
+        glosModelWorking.clear()
+        var nC = glosModel.count
 
-          sScoreText = nC + "/" + nC
-          for ( var i = 0; i < nC;++i) {
-            glosModel.get(i).state1=0;
-            glosModelWorking.append(glosModel.get(i))
-          }
-
-          var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
-
-          i =  nQuizIndex
-
-          idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question
-          idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer
-          idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number
-          idQuizModel.get(i).visible1 = false
-          idQuizModel.get(i).allok = false
-
+        sScoreText = nC + "/" + nC
+        for ( var i = 0; i < nC;++i) {
+          glosModel.get(i).state1=0;
+          glosModelWorking.append(glosModel.get(i))
         }
 
-      }
+        var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
 
-      ButtonQuiz
-      {
-        text : "Reverse"
-        onClicked:
-        {
-          bIsReverse =  !bIsReverse
-          glosModelWorking.clear()
-          var nC = glosModel.count
-          for ( var i = 0; i < nC;++i) {
-            var nState = glosModel.get(i).state1;
-            var squestion = glosModel.get(i).answer
-            var sanswer = glosModel.get(i).question
-            var nnC  = glosModel.get(i).number
-            glosModelWorking.append({"number": nnC, "question": squestion , "answer": sanswer, "state1":nState})
-          }
+        i =  nQuizIndex
 
-          var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
-
-          i =  nQuizIndex
-
-          idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question
-          idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer
-          idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number
-          idQuizModel.get(i).visible1 = false
-          idQuizModel.get(i).allok = false
-
-        }
+        idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question
+        idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer
+        idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number
+        idQuizModel.get(i).visible1 = false
+        idQuizModel.get(i).allok = false
 
       }
 
     }
+
+    ButtonQuiz
+    {
+      text : "Reverse"
+      onClicked:
+      {
+        bIsReverse =  !bIsReverse
+        glosModelWorking.clear()
+        var nC = glosModel.count
+        for ( var i = 0; i < nC;++i) {
+          var nState = glosModel.get(i).state1;
+          var squestion = glosModel.get(i).answer
+          var sanswer = glosModel.get(i).question
+          var nnC  = glosModel.get(i).number
+          glosModelWorking.append({"number": nnC, "question": squestion , "answer": sanswer, "state1":nState})
+        }
+
+        var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
+
+        i =  nQuizIndex
+
+        idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question
+        idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer
+        idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number
+        idQuizModel.get(i).visible1 = false
+        idQuizModel.get(i).allok = false
+
+      }
+
+    }
+
   }
+
+  Text {
+    color:Theme.primaryColor
+    y: idAppWnd.height- 330
+    text: "Powered by Yandex.Translate"
+  }
+
 }
 

@@ -10,6 +10,7 @@ Rectangle
   {
     cursorDelegate : Rectangle
     {
+      visible: idTextInput.focus
       height : parent.height
       width: 5
       color: Theme.highlightColor

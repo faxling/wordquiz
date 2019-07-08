@@ -19,8 +19,11 @@ void Speechdownloader::fileDownloaded(QNetworkReply* pReply)
     QFile oWav(sFileName);
     oWav.open(QIODevice::ReadWrite);
     oWav.write(m_oDownloadedData);
-    emit downloaded();
+
     oWav.close();
+
+    emit downloaded();
+
 
     if (m_bPlayAfterDownload == true)
     {

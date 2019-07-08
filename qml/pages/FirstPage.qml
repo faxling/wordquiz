@@ -145,14 +145,11 @@ Page {
             if (rs.rows.length===0)
             {
               tx.executeSql('INSERT INTO GlosaDbLastIndex VALUES(0)')
-              console.log("create")
             }
             else
             {
               nGlosaDbLastIndex = rs.rows.item(0).dbindex
-              console.log("dbindex " + nGlosaDbLastIndex)
             }
-
 
             tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbIndex( dbnumber INT , quizname TEXT, state1 TEXT, langpair TEXT )');
 
@@ -184,13 +181,14 @@ Page {
     }
 
     Row {
+      id:idTabRow
       width:parent.width
       spacing :10
       Button
       {
         id:idTab1Btn
         width: n3BtnWidth
-        text:"Create"
+        text:"File"
         onClicked: idWindow.state = "idTab1"
       }
 
@@ -212,22 +210,22 @@ Page {
 
     CreateNewQuiz
     {
-      width: idTabMain.width
-      height: idWindow.height
+      width:parent.width
+      height: idTabMain.height - idTabRow.height - idTitle.height - 20
       visible:false
       id:idTab1
     }
     EditQuiz
     {
-      width: idTabMain.width
-      height: idWindow.height
+      width:parent.width
+      height: idTabMain.height - idTabRow.height - idTitle.height - 20
       id:idTab2
       visible:false
     }
     TakeQuiz
     {
-      width: idTabMain.width
-      height: idWindow.height - 300
+      width:parent.width
+      height: idTabMain.height - idTabRow.height - idTitle.height - 20
       id:idTab3
       visible:false
     }

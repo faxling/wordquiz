@@ -27,7 +27,7 @@ Rectangle {
           anchors.horizontalCenter: parent.horizontalCenter
           visible:bIsReverse ? bHasSpeech : bHasSpeechFrom
           source:"qrc:qml/pages/hornbig.png"
-          onClicked: MyDownloader.playWord(question,sFromLang)
+          onClicked: MyDownloader.playWord(question,bIsReverse ? sToLang : sFromLang )
         }
 
         Text
@@ -69,7 +69,7 @@ Rectangle {
           anchors.horizontalCenter: parent.horizontalCenter
           visible: (bIsReverse ? bHasSpeechFrom : bHasSpeech) && visible1
           source:"qrc:qml/pages/hornbig.png"
-          onClicked: MyDownloader.playWord(answer,sToLang)
+          onClicked: MyDownloader.playWord(answer,bIsReverse ? sFromLang : sToLang )
         }
 
         Image {

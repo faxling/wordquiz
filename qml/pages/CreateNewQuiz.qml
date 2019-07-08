@@ -60,12 +60,14 @@ Item
       id:idTextSelected
       onClick: idTextInputQuizName.text = idTextSelected.text
     }
+
     InputTextQuiz
     {
       width:parent.width
       id:idTextInputQuizName
       text:"new"
     }
+
     Row
     {
       spacing:20
@@ -112,23 +114,36 @@ Item
                 )
         }
       }
-
-      Text
+      ButtonQuiz
       {
-        font.pixelSize:Theme.fontSizeLarge
-        height:idBtnRename.height
+        id:idBtnDelete
         width: n3BtnWidth
-        id:idLangPair
-        text:sLangLangSelected
-        color:Theme.primaryColor
+        text:"Delete"
+        onClicked:
+        {
+
+          db.transaction(
+                function(tx) {
+
+                  tx.executeSql('DELETE FROM GlosaDbIndex WHERE dbnumber = ?',[nDbNumber]);
+                  tx.executeSql('DROP TABLE Glosa'+nDbNumber);
+
+                }
+                )
+
+          glosModelIndex.remove(idQuizList.currentIndex)
+        }
       }
+
+
 
     }
 
     Row
     {
       width:parent.width
-      height : Theme.itemSizeMedium
+      height : n3BtnWidth
+      spacing:20
       id:idLangListRow
       function doCurrentIndexChanged()
       {
@@ -146,7 +161,7 @@ Item
         }
 
 
-        width:Theme.buttonWidthMedium
+        width:n3BtnWidth
         height:parent.height
         model: idLangModel
         delegate: TextList {
@@ -155,11 +170,20 @@ Item
         }
       }
 
+      Text
+      {
+        font.pixelSize:Theme.fontSizeLarge
+        height:idBtnRename.height
+        width: n3BtnWidth
+        id:idLangPair
+        text:sLangLangSelected
+        color:Theme.primaryColor
+      }
 
       ListViewHi
       {
         id:idLangList2
-        width:Theme.buttonWidthMedium
+        width:n3BtnWidth
         height:parent.height
         model: idLangModel
         onCurrentIndexChanged:
@@ -251,16 +275,8 @@ Item
         {
           id:idCol1
           width:Theme.itemSizeSmall
-
           text:dbnumber
-          MouseArea
-          {
-            anchors.fill :  parent
-            onClicked:
-            {
-              idQuizList.currentIndex = index
-            }
-          }
+          onClick: idQuizList.currentIndex = index
         }
         TextList
         {
@@ -278,36 +294,16 @@ Item
         }
         TextList
         {
-
           id:idCol4
           width: Theme.itemSizeMedium
           text:state1
-
           onClick: idQuizList.currentIndex = index
-        }
-
-        ButtonQuizImg
-        {
-          height:idCol4.height
-          width:idCol4.height
-          source: "image://theme/icon-m-clear"
-          onClicked:
-          {
-            db.transaction(
-                  function(tx) {
-
-                    tx.executeSql('DELETE FROM GlosaDbIndex WHERE dbnumber = ?',[dbnumber]);
-                    tx.executeSql('DROP TABLE Glosa'+dbnumber);
-
-                  }
-                  )
-
-            glosModelIndex.remove(index)
-          }
         }
       }
     }
 
   }
+
+
 }
 
