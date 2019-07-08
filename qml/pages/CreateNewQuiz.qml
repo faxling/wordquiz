@@ -258,6 +258,7 @@ Item
                 for(var i = 0; i < rs.rows.length; i++) {
                   glosModel.append({"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": rs.rows.item(i).answer, "state1" : rs.rows.item(i).state })
                 }
+
                 loadQuiz();
 
               }

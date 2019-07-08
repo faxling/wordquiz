@@ -68,17 +68,20 @@ Page {
 
     // sScoreText =  glosModelWorking.count + "/" + nC
 
-    if (glosModelWorking.count < 1)
+    if (glosModelWorking.count === 0)
     {
-      idQuizModel.get(1).question =  "-";
-      idQuizModel.get(1).answer = "-";
-      idQuizModel.get(1).number = -1;
+      for (  i = 0; i < 3;++i) {
+        idQuizModel.get(i).allok = true;
+      }
     }
     else
     {
-      idQuizModel.get(1).question =  glosModelWorking.get(nIndexOwNewWord).question;
-      idQuizModel.get(1).answer = glosModelWorking.get(nIndexOwNewWord).answer;
-      idQuizModel.get(1).number = glosModelWorking.get(nIndexOwNewWord).number;
+      for (  i = 0; i < 3;++i) {
+        idQuizModel.get(i).allok = false;
+      }
+      idQuizModel.get(nQuizIndex).question = glosModelWorking.get(nIndexOwNewWord).question;
+      idQuizModel.get(nQuizIndex).answer = glosModelWorking.get(nIndexOwNewWord).answer;
+      idQuizModel.get(nQuizIndex).number = glosModelWorking.get(nIndexOwNewWord).number;
     }
 
   }

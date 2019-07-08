@@ -22,21 +22,22 @@ Rectangle {
         spacing: 20
         width:parent.width
         y:parent.height / 3
+        visible: !allok
         ButtonQuizImg
         {
           anchors.horizontalCenter: parent.horizontalCenter
-          visible:bIsReverse ? bHasSpeech : bHasSpeechFrom
+          visible:(bIsReverse ? bHasSpeech : bHasSpeechFrom)
           source:"qrc:qml/pages/hornbig.png"
           onClicked: MyDownloader.playWord(question,bIsReverse ? sToLang : sFromLang )
         }
 
         Text
         {
+          id:idTextQuestion
           color:Theme.highlightColor
           font.pixelSize: Theme.fontSizeExtraLarge
           font.bold: true
           anchors.horizontalCenter: parent.horizontalCenter
-          id:idTextQuestion
           text : question
         }
 
@@ -44,7 +45,6 @@ Rectangle {
         {
           id:idBtnAnswer
           anchors.horizontalCenter: parent.horizontalCenter
-
           text:"Show Answer"
           onClicked:
           {
@@ -54,10 +54,10 @@ Rectangle {
 
         Text
         {
+          id:idTextAnswer
           color:Theme.highlightColor
           font.pixelSize: Theme.fontSizeExtraLarge
           font.bold: true
-          id:idTextAnswer
           visible:visible1
           anchors.horizontalCenter: parent.horizontalCenter
           horizontalAlignment: Text.AlignHCenter
@@ -71,12 +71,14 @@ Rectangle {
           source:"qrc:qml/pages/hornbig.png"
           onClicked: MyDownloader.playWord(answer,bIsReverse ? sFromLang : sToLang )
         }
-
-        Image {
-          visible:allok
-          source: "qrc:qml/pages/thumb.png"
-        }
       }
+
+      Image {
+        visible:allok
+        anchors.centerIn:  parent
+        source: "qrc:qml/pages/thumb.png"
+      }
+
       Image
       {
         anchors.bottomMargin: 20
@@ -110,15 +112,11 @@ Rectangle {
 
       nQuizIndex = nI
 
-      if (glosModelWorking.count<1)
+      if (glosModelWorking.count === 0 )
       {
         for (var j = 0; j < 3 ;++j)
         {
-          idQuizModel.get(j).question =  "-"
-          idQuizModel.get(j).answer =  "-"
-          idQuizModel.get(j).number =  -1
-          idQuizModel.get(j).visible1 = false
-          idQuizModel.get(j).allok = false
+          idQuizModel.get(j).allok = true
         }
 
         return;
@@ -160,6 +158,7 @@ Rectangle {
               for ( i = 0; i < 3 ;++i)
               {
                 idQuizModel.get(i).question =  ""
+                idQuizModel.get(i).answer =  ""
                 idQuizModel.get(i).allok = true
               }
             }

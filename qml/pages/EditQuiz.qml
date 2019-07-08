@@ -133,8 +133,6 @@ Item {
           }
 
           idTextTrans.text =  idTranslateModel.get(0).trans
-
-
         }
       }
     }
@@ -220,7 +218,16 @@ Item {
 
           // Find a new Id
           var nC = 0;
+          idErrorText2.visible = false
+
           for(var i = 0; i < glosModel.count; i++) {
+            if (glosModel.get(i).question === idTextInput.text && glosModel.get(i).answer === idText.text)
+            {
+              idErrorText2.visible = true
+              idErrorText2.text = idTextInput.text + " Already in quiz!"
+              return;
+            }
+
             if (glosModel.get(i).number > nC)
               nC = glosModel.get(i).number;
           }
@@ -244,9 +251,15 @@ Item {
       visible:false
       id:idErrorText
       color: "red"
-
+      onClick: visible = false
     }
-
+    TextList
+    {
+      visible:false
+      id:idErrorText2
+      color: "red"
+      onClick: visible = false
+    }
     Row
     {
       id:idDictRow
@@ -368,6 +381,18 @@ Item {
                   }
                   )
             glosModel.remove(index)
+
+            var nC = glosModelWorking.count;
+            for ( var i = 0; i < nC;++i) {
+              if (glosModelWorking.get(i).number === number)
+              {
+                glosModelWorking.remove(i);
+                break;
+              }
+            }
+
+            sScoreText = glosModelWorking.count + "/" + glosModel.count
+
           }
 
         }
@@ -407,6 +432,7 @@ Item {
               })
 
 
+
         glosModelWorking.clear()
         var nC = glosModel.count
 
@@ -443,7 +469,8 @@ Item {
           var squestion = glosModel.get(i).answer
           var sanswer = glosModel.get(i).question
           var nnC  = glosModel.get(i).number
-          glosModelWorking.append({"number": nnC, "question": squestion , "answer": sanswer, "state1":nState})
+          if (nState === 0 )
+            glosModelWorking.append({"number": nnC, "question": squestion , "answer": sanswer})
         }
 
         var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
