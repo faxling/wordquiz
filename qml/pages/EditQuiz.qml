@@ -90,12 +90,11 @@ Item {
         {
           if (idTrTextModel.count <= 0)
           {
-            idText.text = "-"
             return
           }
 
-          if (nLastSearch===0)
-            idText.text =  idTrTextModel.get(0).text1
+          if (nLastSearch != 1)
+            idTextInput2.text =  idTrTextModel.get(0).text1
           else
             idTextInput.text =  idTrTextModel.get(0).text1
 
@@ -118,6 +117,8 @@ Item {
       id: idTrMeanModel
       XmlRole { name: "mean"; query: "text/string()" }
     }
+
+    // From the translation API
     XmlListModel {
       id: idTranslateModel
       query: "/Translation"
@@ -143,10 +144,11 @@ Item {
       text :"-"
       onClick:
       {
-        if (nLastSearch === 0)
-          idText.text = idTextTrans.text
+        if (nLastSearch != 1)
+          idTextInput2.text = idTextTrans.text
         else
           idTextInput.text = idTextTrans.text
+
       }
     }
 
@@ -164,7 +166,7 @@ Item {
       }
       InputTextQuiz
       {
-        id:idText
+        id:idTextInput2
         width: parent.width / 2 - 10
         text:""
       }
@@ -195,8 +197,8 @@ Item {
         onClicked: {
           nLastSearch = 1
           bProgVisible = true
-          downloadDictOnWord(sReqDictUrlRev , idText.text,idBtn2)
-          idTranslateModel.source = sReqUrlRev + idText.text
+          downloadDictOnWord(sReqDictUrlRev , idTextInput2.text,idBtn2)
+          idTranslateModel.source = sReqUrlRev + idTextInput2.text
         }
       }
 
@@ -207,7 +209,8 @@ Item {
         onClicked: {
           nLastSearch = 2
           bProgVisible = true
-          downloadDictOnWord(sReqDictUrlEn , idText.text,idBtn3)
+          downloadDictOnWord(sReqDictUrlEn , idTextInput.text,idBtn3)
+          idTranslateModel.source = sReqUrlEn + idTextInput.text
         }
       }
 
@@ -221,7 +224,7 @@ Item {
           idErrorText2.visible = false
 
           for(var i = 0; i < glosModel.count; i++) {
-            if (glosModel.get(i).question === idTextInput.text && glosModel.get(i).answer === idText.text)
+            if (glosModel.get(i).question === idTextInput.text && glosModel.get(i).answer === idTextInput2.text)
             {
               idErrorText2.visible = true
               idErrorText2.text = idTextInput.text + " Already in quiz!"
@@ -235,11 +238,11 @@ Item {
           nC += 1;
 
           if (bHasSpeech)
-            MyDownloader.downloadWord(idText.text,sToLang)
+            MyDownloader.downloadWord(idTextInput2.text,sToLang)
           if (bHasSpeechFrom)
             MyDownloader.downloadWord(idTextInput.text,sFromLang)
 
-          insertGlosa(nDbNumber,nC, idTextInput.text, idText.text)
+          insertGlosa(nDbNumber,nC, idTextInput.text, idTextInput2.text)
 
         }
       }
@@ -286,14 +289,14 @@ Item {
               {
                 idDicList.currentIndex = index
 
-
-                if (nLastSearch === 0)
-                  idText.text = idSearchItem.text.replace("...","");
+                if (nLastSearch != 1)
+                  idTextInput2.text = idSearchItem.text.replace("...","");
                 else
                   idTextInput.text = idSearchItem.text.replace("...","");
 
                 idTrSynModel.query = "/DicResult/def/tr["  +(index + 1) + "]/syn"
                 idTrMeanModel.query = "/DicResult/def/tr["  +(index + 1) + "]/mean"
+
               }
             }
           }
@@ -312,8 +315,8 @@ Item {
             anchors.fill: parent
             onClicked:
             {
-              if (nLastSearch === 0)
-                idText.text = idSynText.text;
+              if (nLastSearch != 1)
+                idTextInput2.text = idSynText.text;
               else
                 idTextInput.text = idSynText.text;
             }

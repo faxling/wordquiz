@@ -5,18 +5,22 @@ import QtQml.Models 2.2
 
 CoverBackground {
 
-
-
+  Column {
+    spacing: 40
+    anchors.centerIn: parent
     Label {
-        id: label
-        anchors.centerIn: parent
-        text: "Word Quiz"
-        Image
-        {
-            y:100
-            source: "qrc:qml/pages/harbour-wordquiz.png"
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
+      anchors.horizontalCenter: parent.horizontalCenter
+      text: "Word Quiz"
     }
+    Image
+    {
+      source: "qrc:qml/pages/harbour-wordquiz.png"
+      anchors.horizontalCenter: parent.horizontalCenter
+    }
+    Label {
+      text: sAppTitle
+      font.pixelSize: Theme.fontSizeSmall
+    }
+  }
 
 }

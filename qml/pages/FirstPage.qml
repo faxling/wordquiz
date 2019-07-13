@@ -13,6 +13,8 @@ Page {
   property string sReqUrlBase: "https://translate.yandex.net/api/v1.5/tr/translate?key=trnsl.1.1.20190526T164138Z.e99d5807bb2acb8d.d11f94738ea722cfaddf111d2e8f756cb3b71f4f&lang="
   property string sReqUrl
   property string sReqUrlRev
+  property string sReqUrlEn
+
 
   property variant db
   property string sLangLangSelected
@@ -82,6 +84,7 @@ Page {
       idQuizModel.get(nQuizIndex).question = glosModelWorking.get(nIndexOwNewWord).question;
       idQuizModel.get(nQuizIndex).answer = glosModelWorking.get(nIndexOwNewWord).answer;
       idQuizModel.get(nQuizIndex).number = glosModelWorking.get(nIndexOwNewWord).number;
+      idQuizModel.get(nQuizIndex).visible1 = false
     }
 
   }
@@ -92,12 +95,18 @@ Page {
   ListModel {
     id: glosModelWorkingRev
   }
+
   ListModel {
     id: glosModelWorking
   }
+
+
+  // Used by idQuizList
   ListModel {
     id: glosModelIndex
   }
+
+// Used by idView in TakeQuiz
 
   ListModel {
     id:idQuizModel
@@ -181,6 +190,7 @@ Page {
       anchors.horizontalCenter: parent.horizontalCenter
       id: idTitle
       text: sQuizName + " " + sFromLang + (bIsReverse ? "<-" : "->") +  sToLang + " " + sScoreText
+      onTextChanged: sAppTitle = sQuizName
     }
 
     Row {
@@ -232,8 +242,17 @@ Page {
       id:idTab3
       visible:false
     }
+
   }
 
+  /*
+  Image
+  {
+    anchors.left: idTabMain.left
+    anchors.bottom: idTabMain.top
+    source: "qrc:qml/pages/harbour-wordquiz.png"
+  }
+  */
   Component.onCompleted: {
     getDb();
   }

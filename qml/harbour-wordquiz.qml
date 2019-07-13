@@ -1,11 +1,13 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "pages"
+import "cover"
 
 ApplicationWindow
 {
     id: idAppWnd
+    property string sAppTitle
     initialPage: Component { FirstPage { } }
-    cover: Qt.resolvedUrl("cover/CoverPage.qml")
+    cover:  Component {CoverPage {} }
     allowedOrientations: defaultAllowedOrientations
 }

@@ -74,8 +74,9 @@ Item
       width:parent.width
       ButtonQuiz
       {
-        width: n3BtnWidth
         text:"New Quiz"
+        width: n3BtnWidth
+
         onClicked:
         {
 
@@ -90,7 +91,11 @@ Item
                   }
                   tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',[nNr, idTextInputQuizName.text,"0/0",sLangLangSelected  ]);
 
-                  glosModelIndex.append({"dbnumber": nNr, "quizname": idTextInputQuizName.text , "state1": "0/0", "langpair" : sLangLangSelected })
+                  glosModelIndex.append({"dbnumber": nNr, "quizname": idTextInputQuizName.text , "state1": "0/0", "langpair" : sLangLangSelected });
+
+                  idQuizList.positionViewAtEnd();
+                  idQuizList.currentIndex = glosModelIndex.count -1;
+
                 }
                 )
 
@@ -99,8 +104,9 @@ Item
       ButtonQuiz
       {
         id:idBtnRename
-        width: n3BtnWidth
         text:"Rename"
+        width: n3BtnWidth
+
         onClicked:
         {
           glosModelIndex.setProperty(idQuizList.currentIndex,"quizname", idTextInputQuizName.text)
@@ -117,8 +123,8 @@ Item
       ButtonQuiz
       {
         id:idBtnDelete
-        width: n3BtnWidth
         text:"Delete"
+        width: n3BtnWidth
         onClicked:
         {
 
@@ -132,19 +138,23 @@ Item
                 )
 
           glosModelIndex.remove(idQuizList.currentIndex)
+
+          if(idQuizList.currentIndex > 0)
+            idQuizList.currentIndex = idQuizList.currentIndex -1;
+
+
         }
       }
-
-
 
     }
 
     Row
     {
+      id:idLangListRow
       width:parent.width
       height : n3BtnWidth
       spacing:20
-      id:idLangListRow
+
       function doCurrentIndexChanged()
       {
         if (idLangList1.currentIndex < 0 || idLangList1.currentIndex < 0)
@@ -172,10 +182,11 @@ Item
 
       Text
       {
+        id:idLangPair
         font.pixelSize:Theme.fontSizeLarge
         height:idBtnRename.height
         width: n3BtnWidth
-        id:idLangPair
+
         text:sLangLangSelected
         color:Theme.primaryColor
       }
@@ -246,6 +257,7 @@ Item
 
         sReqUrl = sReqUrlBase +  sLangLang + "&text=";
         sReqUrlRev = sReqUrlBase +  sLangLangRev + "&text=";
+        sReqUrlEn = sReqUrlBase +  sLangLangEn + "&text=";
         db.transaction(
               function(tx) {
                 // tx.executeSql('DROP TABLE Glosa');

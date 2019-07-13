@@ -1,6 +1,7 @@
 #include "speechdownloader.h"
 #include <QDebug>
 #include <QFile>
+#include <QFileInfo>
 #include "filehelpers.h"
 #include <QSound>
 
@@ -15,9 +16,14 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath) : QObject(nullpt
 void Speechdownloader::fileDownloaded(QNetworkReply* pReply)
 {
     m_oDownloadedData = pReply->readAll();
+
+    if (m_oDownloadedData.size() < 10000)
+        return;
+
     QString sFileName = (m_sStoragePath ^ m_sWord) + ".wav";
+
     QFile oWav(sFileName);
-    oWav.open(QIODevice::ReadWrite);
+    oWav.open(QIODevice::WriteOnly);
     oWav.write(m_oDownloadedData);
 
     oWav.close();
@@ -38,8 +44,11 @@ QString sVoicetechEn(QStringLiteral("http://tts.voicetech.yandex.net/generate?la
 void Speechdownloader::playWord(QString sWord,QString sLang)
 {
     QString sFileName = (m_sStoragePath ^ sWord) + ".wav";
-    if (QFile::exists(sFileName) == true)
+    QFileInfo oWavFile(sFileName);
+    if (oWavFile.size() > 10000)
+    {
         QSound::play(sFileName);
+    }
     else
     {
         downloadWord(sWord,sLang);
@@ -51,6 +60,7 @@ void Speechdownloader::downloadWord(QString sWord, QString sLang)
 {
     m_bPlayAfterDownload = false;
     m_sWord = sWord;
+    qDebug() << sWord;
     QString sUrl = sLang == "ru" ? sVoicetechRu : sVoicetechEn;
     QNetworkRequest request(sUrl+sWord);
     m_oWebCtrl.get(request);
