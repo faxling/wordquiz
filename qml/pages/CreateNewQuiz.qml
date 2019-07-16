@@ -125,7 +125,7 @@ Item
         id:idBtnDelete
         text:"Delete"
         width: n3BtnWidth
-        onClicked:
+        onClicked: Remorse.popupAction(idTopColumn,"Delete Quiz " + idTextSelected.text, function()
         {
 
           db.transaction(
@@ -144,6 +144,8 @@ Item
 
 
         }
+
+        )
       }
 
     }
@@ -316,7 +318,5 @@ Item
     }
 
   }
-
-
 }
 
