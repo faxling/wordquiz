@@ -160,9 +160,9 @@ Item {
       height: Theme.fontSizeLarge
       InputTextQuiz
       {
+        id:idTextInput
         width: parent.width / 2 - 10
         text:""
-        id:idTextInput
       }
       InputTextQuiz
       {
@@ -360,15 +360,15 @@ Item {
           width: n3BtnWidth
           text:  question
           color: state1 === 0 ? idNumberText.color : "green"
+          onPressAndHold: idTextInput.text = question
         }
 
         TextList {
           width: n3BtnWidth
           id:idAnswer
           text: answer
+          onPressAndHold: idTextInput2.text = answer
         }
-
-
 
         ButtonQuizImg
         {

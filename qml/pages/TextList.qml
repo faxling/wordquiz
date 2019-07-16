@@ -4,11 +4,13 @@ import Sailfish.Silica 1.0
 Text {
   id:idText
   signal click
+  signal pressAndHold
   color:Theme.highlightColor
   font.pixelSize: Theme.fontSizeMedium
   MouseArea{
     anchors.fill: parent
     onClicked: idText.click()
+    onPressAndHold:idText.pressAndHold()
   }
 }
 
