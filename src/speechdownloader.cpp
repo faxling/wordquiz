@@ -5,7 +5,7 @@
 #include "filehelpers.h"
 #include <QSound>
 
-Speechdownloader::Speechdownloader(const QString& sStoragePath) : QObject(nullptr)
+Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject *pParent ) :  QObject(pParent)
 {
     connect(&m_oWebCtrl, SIGNAL(finished(QNetworkReply*)),
             SLOT(fileDownloaded(QNetworkReply*)));

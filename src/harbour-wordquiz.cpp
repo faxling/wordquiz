@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     QQuickView* view =  SailfishApp::createView();
 
     QQmlContext *pContext = view->rootContext();
-    pContext->setContextProperty("MyDownloader", new Speechdownloader( view->engine()->offlineStoragePath()));
+    pContext->setContextProperty("MyDownloader", new Speechdownloader( view->engine()->offlineStoragePath(),app));
     view->setSource(SailfishApp::pathTo("qml/harbour-wordquiz.qml"));
 
     view->showFullScreen();

@@ -12,7 +12,7 @@ class Speechdownloader : public QObject
 {
     Q_OBJECT
 public:
-    explicit Speechdownloader(const QString& sStoragePath);
+    explicit Speechdownloader(const QString& sStoragePath, QObject *pParent);
 
     Q_INVOKABLE void downloadWord(QString sWord, QString sLang);
     Q_INVOKABLE void playWord(QString sWord, QString sLang);

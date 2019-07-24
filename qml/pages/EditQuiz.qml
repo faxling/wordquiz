@@ -28,7 +28,7 @@ Item {
         }
         else
         {
-          idErrorText.text = "error from translation server"
+          idErrorText.text = "error from dictionary server"
           idErrorText.visible = true;
         }
       }
@@ -162,13 +162,23 @@ Item {
       {
         id:idTextInput
         width: parent.width / 2 - 10
-        text:""
+        ButtonQuizImg {
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.right: parent.right
+          source: "image://theme/icon-s-clear-opaque-cross"
+          onClicked: idTextInput.text = ""
+        }
       }
       InputTextQuiz
       {
         id:idTextInput2
         width: parent.width / 2 - 10
-        text:""
+        ButtonQuizImg {
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.right: parent.right
+          source: "image://theme/icon-s-clear-opaque-cross"
+          onClicked: idTextInput2.text = ""
+        }
       }
     }
 
@@ -177,15 +187,34 @@ Item {
       id:idBtnRow
       spacing:10
       height: idBtn1.height
+      function getTextFromInput(oTextInput)
+      {
+        var oInText  = oTextInput.displayText.trim()
+        if (oInText.length < 1 )
+        {
+          idErrorText.visible = true
+          idErrorText.text = "No input to lookup in dictionary"
+          return "";
+        }
+        return oInText;
+      }
+
       ButtonQuiz {
         id:idBtn1
         width:n4BtnWidth
         text:  sLangLang
         onClicked: {
           nLastSearch = 0
+
+          var oInText  = idBtnRow.getTextFromInput(idTextInput)
+          if (oInText.length < 1 )
+          {
+            return
+          }
+
           bProgVisible = true
-          downloadDictOnWord(sReqDictUrl , idTextInput.text,idBtn1 )
-          idTranslateModel.source = sReqUrl + idTextInput.text
+          downloadDictOnWord(sReqDictUrl , oInText,idBtn1 )
+          idTranslateModel.source = sReqUrl + oInText
         }
       }
 
@@ -196,9 +225,14 @@ Item {
         text:  sLangLangRev
         onClicked: {
           nLastSearch = 1
+          var oInText  = idBtnRow.getTextFromInput(idTextInput2)
+          if (oInText.length < 1 )
+          {
+            return
+          }
           bProgVisible = true
-          downloadDictOnWord(sReqDictUrlRev , idTextInput2.text,idBtn2)
-          idTranslateModel.source = sReqUrlRev + idTextInput2.text
+          downloadDictOnWord(sReqDictUrlRev , oInText,idBtn2)
+          idTranslateModel.source = sReqUrlRev + oInText
         }
       }
 
@@ -208,9 +242,15 @@ Item {
         text:  sLangLangEn
         onClicked: {
           nLastSearch = 2
+          var oInText  = idBtnRow.getTextFromInput(idTextInput)
+          if (oInText.length < 1 )
+          {
+            return
+          }
+
           bProgVisible = true
-          downloadDictOnWord(sReqDictUrlEn , idTextInput.text,idBtn3)
-          idTranslateModel.source = sReqUrlEn + idTextInput.text
+          downloadDictOnWord(sReqDictUrlEn , oInText,idBtn3)
+          idTranslateModel.source = sReqUrlEn + oInText
         }
       }
 
@@ -221,8 +261,8 @@ Item {
 
           // Find a new Id
           var nC = 0;
-          idErrorText2.visible = false
 
+          idTextInput2.text = idTextInput2.text.trim()
           for(var i = 0; i < glosModel.count; i++) {
             if (glosModel.get(i).question === idTextInput.text && glosModel.get(i).answer === idTextInput2.text)
             {
@@ -336,7 +376,7 @@ Item {
     }
 
 
-    ListView {
+    SilicaListView {
       id:idGlosList
       height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6 - idTextInput.height  - 80
       clip:true
@@ -344,7 +384,7 @@ Item {
       width:parent.width
 
       spacing: 3
-
+      VerticalScrollDecorator { flickable: idGlosList }
       header:idHeaderGlos
 
       model: glosModel
