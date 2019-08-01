@@ -9,11 +9,11 @@ Name:       harbour-wordquiz
 # << macros
 
 Summary:    Word quiz
-Version:    0.1
+Version:    1.0
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
-URL:        http://faxling11.org/
+URL:        https://github.com/faxling
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-wordquiz.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
