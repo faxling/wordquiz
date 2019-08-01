@@ -35,6 +35,8 @@ Page {
   property int n4BtnWidth: idTabMain.width / 4 - 7
   property int n25BtnWidth: idTabMain.width / 2.4 - 7
   property bool bQSort : true
+  property string sQSort : bQSort ? "quizword COLLATE NOCASE" : "answer COLLATE NOCASE"
+
   onSScoreTextChanged:
   {
     db.transaction(
@@ -55,13 +57,24 @@ Page {
 
   function loadQuiz()
   {
-    if (glosModel.count < 1)
-      return;
-    var nC = glosModel.count
     glosModelWorking.clear();
+    if (glosModel.count < 1)
+    {
+      for (var  i = 0; i < 3;++i) {
+        idQuizModel.get(i).allok = false;
+        idQuizModel.get(i).question = "-";
+        idQuizModel.get(i).answer = "-";
+        idQuizModel.get(i).number = "-";
+        idQuizModel.get(i).visible1 = false
+      }
+      return;
+    }
+
+    var nC = glosModel.count
+
     bIsReverse = false
 
-    for ( var i = 0; i < nC;++i) {
+    for (  i = 0; i < nC;++i) {
       if (glosModel.get(i).state1 === 0)
         glosModelWorking.append(glosModel.get(i))
     }
@@ -101,7 +114,7 @@ Page {
             function(tx) {
               glosModel.clear();
 
-              var rs = tx.executeSql("SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + bQSort ? "quizword" : "answer");
+              var rs = tx.executeSql("SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + sQSort);
 
               for(var i = 0; i < rs.rows.length; i++) {
                 glosModel.append({"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": rs.rows.item(i).answer, "state1" : rs.rows.item(i).state })

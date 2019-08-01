@@ -50,6 +50,20 @@ Item {
     glosModelWorking.append({"number": nC, "question": question , "answer": answer, "state1":0})
     idGlosList.positionViewAtEnd()
     sScoreText = glosModelWorking.count + "/" + glosModel.count
+
+
+    if (glosModel.count === 1)
+    {
+      for (var  i = 0; i < 3;++i) {
+        idQuizModel.get(i).allok = false;
+        idQuizModel.get(i).question = question;
+        idQuizModel.get(i).answer = answer;
+        idQuizModel.get(i).number = nC;
+        idQuizModel.get(i).visible1 = false
+      }
+
+      return;
+    }
   }
 
 
@@ -61,34 +75,6 @@ Item {
     spacing:20
     anchors.topMargin: 20
     anchors.fill: parent
-    Component
-    {
-      id:idHeaderGlos
-
-      Row {
-        spacing: 5
-        TextList {
-          font.bold:bQSort
-          width:n25BtnWidth
-          text:  "Question"
-          onClick: {
-
-            bQSort = true
-            glosModel.sortModel()
-          }
-        }
-
-        TextList {
-          font.bold:!bQSort
-          width:n25BtnWidth
-          text: "Answer"
-          onClick: {
-            bQSort = false
-            glosModel.sortModel()
-          }
-        }
-      }
-    }
 
     XmlListModel {
       id: idTrTextModel
@@ -385,17 +371,41 @@ Item {
       }
     }
 
+    Row {
+      spacing: 5
+      TextList {
+        id:idHeader1Text
+        color:"steelblue"
+        font.bold:bQSort
+        width:n25BtnWidth
+        text:  "Question"
+        onClick: {
+          bQSort = true
+          glosModel.sortModel()
+        }
+      }
 
+      TextList {
+        color:"steelblue"
+        font.bold:!bQSort
+        width:n25BtnWidth
+        text: "Answer"
+        onClick: {
+          bQSort = false
+          glosModel.sortModel()
+        }
+      }
+    }
     SilicaListView {
       id:idGlosList
-      height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6 - idTextInput.height  - 80
+      height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6 - idTextInput.height - idHeader1Text.height - 80
       clip:true
       width:parent.width
 
       spacing: 3
       VerticalScrollDecorator { flickable: idGlosList }
-      header:idHeaderGlos
-      headerPositioning :ListView.OverlayHeader
+      //   header:idHeaderGlos
+      //   headerPositioning :ListView.OverlayHeader
       model: glosModel
       delegate: Row {
         spacing:5
