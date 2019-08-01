@@ -44,6 +44,7 @@ Item {
           })
 
 
+
     glosModel.append({"number": nC, "question": question , "answer": answer, "state1":0})
 
     glosModelWorking.append({"number": nC, "question": question , "answer": answer, "state1":0})
@@ -65,19 +66,26 @@ Item {
       id:idHeaderGlos
 
       Row {
+        spacing: 5
         TextList {
-          width:n3BtnWidth / 2
-          text:  "No"
-        }
-        TextList {
+          font.bold:bQSort
+          width:n25BtnWidth
+          text:  "Question"
+          onClick: {
 
-          width:n3BtnWidth
-          text:  "word"
+            bQSort = true
+            glosModel.sortModel()
+          }
         }
 
         TextList {
-          width:n3BtnWidth
-          text: "answer"
+          font.bold:!bQSort
+          width:n25BtnWidth
+          text: "Answer"
+          onClick: {
+            bQSort = false
+            glosModel.sortModel()
+          }
         }
       }
     }
@@ -262,9 +270,11 @@ Item {
           // Find a new Id
           var nC = 0;
 
-          idTextInput2.text = idTextInput2.text.trim()
+          var sNewWordFrom = idTextInput.displayText.trim()
+          var sNewWordTo = idTextInput2.displayText.trim()
+
           for(var i = 0; i < glosModel.count; i++) {
-            if (glosModel.get(i).question === idTextInput.text && glosModel.get(i).answer === idTextInput2.text)
+            if (glosModel.get(i).question === sNewWordFrom && glosModel.get(i).answer === sNewWordTo)
             {
               idErrorText2.visible = true
               idErrorText2.text = idTextInput.text + " Already in quiz!"
@@ -278,11 +288,11 @@ Item {
           nC += 1;
 
           if (bHasSpeech)
-            MyDownloader.downloadWord(idTextInput2.text,sToLang)
+            MyDownloader.downloadWord(sNewWordTo,sToLang)
           if (bHasSpeechFrom)
-            MyDownloader.downloadWord(idTextInput.text,sFromLang)
+            MyDownloader.downloadWord(sNewWordFrom,sFromLang)
 
-          insertGlosa(nDbNumber,nC, idTextInput.text, idTextInput2.text)
+          insertGlosa(nDbNumber,nC, sNewWordFrom, sNewWordTo)
 
         }
       }
@@ -380,33 +390,29 @@ Item {
       id:idGlosList
       height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6 - idTextInput.height  - 80
       clip:true
-
       width:parent.width
 
       spacing: 3
       VerticalScrollDecorator { flickable: idGlosList }
       header:idHeaderGlos
-
+      headerPositioning :ListView.OverlayHeader
       model: glosModel
       delegate: Row {
         spacing:5
-        TextList {
-          id:idNumberText
-          width:n3BtnWidth / 2
-          text:  number
-        }
 
         TextList {
-          width: n3BtnWidth
+          id: idQuestionText
+          width: n25BtnWidth
           text:  question
-          color: state1 === 0 ? idNumberText.color : "green"
+          color: state1 === 0 ? Theme.primaryColor : "green"
           onPressAndHold: idTextInput.text = question
         }
 
         TextList {
-          width: n3BtnWidth
+          width: n25BtnWidth
           id:idAnswer
           text: answer
+          color: state1 === 0 ? Theme.primaryColor : "green"
           onPressAndHold: idTextInput2.text = answer
         }
 
@@ -464,15 +470,17 @@ Item {
   {
     y: idAppWnd.height- 480
     spacing:10
-    ButtonQuiz
+    Button
     {
+
       text : "Reset"
       onClicked:
       {
         db.transaction(
               function(tx) {
                 tx.executeSql('UPDATE Glosa'+nDbNumber+' SET state=0');
-              })
+              }
+              )
 
 
 
@@ -499,8 +507,9 @@ Item {
 
     }
 
-    ButtonQuiz
+    Button
     {
+
       text : "Reverse"
       onClicked:
       {
@@ -529,6 +538,7 @@ Item {
       }
 
     }
+
 
   }
 

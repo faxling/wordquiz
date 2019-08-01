@@ -6,8 +6,8 @@ Button
   property alias bProgVisible : idProgres.visible
   Rectangle
   {
-    y: parent.height / 8
     id:idProgres
+    y: parent.height / 8
     visible: false
     anchors.horizontalCenter: parent.horizontalCenter
     color: Theme.secondaryHighlightColor

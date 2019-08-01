@@ -33,8 +33,8 @@ Page {
   property int nQuizIndex: 1
   property int n3BtnWidth: idTabMain.width / 3 - 7
   property int n4BtnWidth: idTabMain.width / 4 - 7
-
-
+  property int n25BtnWidth: idTabMain.width / 2.4 - 7
+  property bool bQSort : true
   onSScoreTextChanged:
   {
     db.transaction(
@@ -91,6 +91,33 @@ Page {
 
   ListModel {
     id: glosModel
+
+
+
+    function sortModel()
+    {
+
+      db.transaction(
+            function(tx) {
+
+              glosModel.clear();
+              tx.executeSql('CREATE TABLE IF NOT EXISTS Glosa' + nDbNumber + '( number INT , quizword TEXT, answer TEXT, state INT)');
+              var rs
+              if (bQSort)
+                rs = tx.executeSql("SELECT * FROM Glosa" + nDbNumber + " ORDER BY quizword");
+              else
+                rs = tx.executeSql("SELECT * FROM Glosa" + nDbNumber + " ORDER BY answer");
+
+              for(var i = 0; i < rs.rows.length; i++) {
+                glosModel.append({"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": rs.rows.item(i).answer, "state1" : rs.rows.item(i).state })
+              }
+
+
+            }
+            )
+
+    }
+
   }
   ListModel {
     id: glosModelWorkingRev
@@ -103,10 +130,12 @@ Page {
 
   // Used by idQuizList
   ListModel {
+
+
     id: glosModelIndex
   }
 
-// Used by idView in TakeQuiz
+  // Used by idView in TakeQuiz
 
   ListModel {
     id:idQuizModel
@@ -142,7 +171,7 @@ Page {
     if (db !== undefined)
       return db;
 
-    console.log("initDb")
+    console.log("init Word Quiz")
     db = Sql.LocalStorage.openDatabaseSync("GlosDB", "1.0", "Glos Databas!", 1000000);
 
     Sql.LocalStorage.openDatabaseSync()

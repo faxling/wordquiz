@@ -11,6 +11,7 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject *pParent
             SLOT(fileDownloaded(QNetworkReply*)));
 
     m_sStoragePath = sStoragePath;
+
 }
 
 void Speechdownloader::fileDownloaded(QNetworkReply* pReply)
