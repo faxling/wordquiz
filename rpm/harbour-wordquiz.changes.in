@@ -12,7 +12,6 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
-* Sun Jun 16 2019 Fredrik Axling <faxling11@gmail.com> 0.0.1-1
-- Initial Version
-- Hoisted the sails
+* Wed Aug 1 2019 Fredrik Axling <faxling11@gmail.com> 1.0-1
+- Initial released Version of Word Quiz
 

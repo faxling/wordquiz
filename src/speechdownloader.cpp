@@ -61,7 +61,6 @@ void Speechdownloader::downloadWord(QString sWord, QString sLang)
 {
     m_bPlayAfterDownload = false;
     m_sWord = sWord;
-    qDebug() << sWord;
     QString sUrl = sLang == "ru" ? sVoicetechRu : sVoicetechEn;
     QNetworkRequest request(sUrl+sWord);
     m_oWebCtrl.get(request);
