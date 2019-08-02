@@ -35,7 +35,7 @@ Page {
   property int n4BtnWidth: idTabMain.width / 4 - 7
   property int n25BtnWidth: idTabMain.width / 2.4 - 7
   property bool bQSort : true
-  property string sQSort : bQSort ? "quizword COLLATE NOCASE" : "answer COLLATE NOCASE"
+  property string sQSort : bQSort ? "UPPER(quizword)" : "UPPER(answer)"
 
   onSScoreTextChanged:
   {

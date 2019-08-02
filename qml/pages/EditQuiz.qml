@@ -398,7 +398,7 @@ Item {
     }
     SilicaListView {
       id:idGlosList
-      height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6 - idTextInput.height - idHeader1Text.height - 80
+      height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6 - idTextInput.height - idHeader1Text.height - Theme.itemSizeExtraSmall
       clip:true
       width:parent.width
 
@@ -428,6 +428,7 @@ Item {
 
         ButtonQuizImg
         {
+          id:idRmBtn
           height:idAnswer.height
           width:idAnswer.height
           //    y:-5
@@ -449,9 +450,33 @@ Item {
                 break;
               }
             }
+            if (glosModel.count > 0)
+            {
+              for (  i = 0; i < 3;++i) {
+                if (idQuizModel.get(i).number === number)
+                {
+                  // The removed word is displayed in the Quiz tab
+                  var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
 
+                  idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question;
+                  idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer;
+                  idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number;
+                  idQuizModel.get(i).visible1 = false
+                  break;
+                }
+              }
+            }
+            else
+            {
+              for (  i = 0; i < 3;++i) {
+                idQuizModel.get(i).allok = false;
+                idQuizModel.get(i).question = "-";
+                idQuizModel.get(i).answer = "-";
+                idQuizModel.get(i).number = "-";
+                idQuizModel.get(i).visible1 = false
+              }
+            }
             sScoreText = glosModelWorking.count + "/" + glosModel.count
-
           }
 
         }
@@ -478,10 +503,11 @@ Item {
   }
   Row
   {
-    y: idAppWnd.height- 480
+    y: idTab2.height - (Theme.itemSizeExtraSmall*1.6)
     spacing:10
     Button
     {
+      id:idResetBtn
 
       text : "Reset"
       onClicked:
@@ -546,16 +572,14 @@ Item {
         idQuizModel.get(i).allok = false
 
       }
-
     }
-
-
   }
 
   Text {
+    font.pixelSize: Theme.fontSizeTiny
     color:Theme.primaryColor
-    y: idAppWnd.height- 330
-    text: "Powered by Yandex.Translate"
+    y: idTab2.height - Theme.itemSizeExtraSmall / 2
+    text: "Powered by Yandex.Translate "
   }
 
 }

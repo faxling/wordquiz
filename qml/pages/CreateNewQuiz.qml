@@ -89,9 +89,9 @@ Item
                   {
                     nNr = rs.rows.item(0).newnr + 1
                   }
-                  tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',[nNr, idTextInputQuizName.text,"0/0",sLangLangSelected  ]);
+                  tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',[nNr, idTextInputQuizName.displayText,"0/0",sLangLangSelected  ]);
 
-                  glosModelIndex.append({"dbnumber": nNr, "quizname": idTextInputQuizName.text , "state1": "0/0", "langpair" : sLangLangSelected });
+                  glosModelIndex.append({"dbnumber": nNr, "quizname": idTextInputQuizName.displayText , "state1": "0/0", "langpair" : sLangLangSelected });
 
                   idQuizList.positionViewAtEnd();
                   idQuizList.currentIndex = glosModelIndex.count -1;
@@ -109,12 +109,12 @@ Item
 
         onClicked:
         {
-          glosModelIndex.setProperty(idQuizList.currentIndex,"quizname", idTextInputQuizName.text)
+          glosModelIndex.setProperty(idQuizList.currentIndex,"quizname", idTextInputQuizName.displayText)
           db.transaction(
                 function(tx) {
                   var nId = glosModelIndex.get(idQuizList.currentIndex).dbnumber;
-                  tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',[idTextInputQuizName.text, nId]);
-                  idTextSelected.text = idTextInputQuizName.text
+                  tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',[idTextInputQuizName.displayText, nId]);
+                  idTextSelected.text = idTextInputQuizName.displayText
                 }
 
                 )
