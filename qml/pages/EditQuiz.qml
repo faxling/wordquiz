@@ -16,12 +16,8 @@ Item {
     doc.onreadystatechange = function() {
 
       if (doc.readyState === XMLHttpRequest.DONE) {
-
         oBtn.bProgVisible = false;
-
-
         if (doc.status === 200) {
-
           idTrSynModel.xml = doc.responseText
           idTrTextModel.xml = doc.responseText
           idTrMeanModel.xml = doc.responseText
@@ -42,8 +38,6 @@ Item {
           function(tx) {
             tx.executeSql('INSERT INTO Glosa'+dbnumber+' VALUES(?, ?, ?, ?)', [nC,  question, answer, 0 ]);
           })
-
-
 
     glosModel.append({"number": nC, "question": question , "answer": answer, "state1":0})
 
@@ -332,7 +326,6 @@ Item {
 
                 idTrSynModel.query = "/DicResult/def/tr["  +(index + 1) + "]/syn"
                 idTrMeanModel.query = "/DicResult/def/tr["  +(index + 1) + "]/mean"
-
               }
             }
           }
@@ -346,16 +339,12 @@ Item {
         delegate: TextList {
           id:idSynText
           text:syn
-          MouseArea
+          onClick:
           {
-            anchors.fill: parent
-            onClicked:
-            {
-              if (nLastSearch != 1)
-                idTextInput2.text = idSynText.text;
-              else
-                idTextInput.text = idSynText.text;
-            }
+            if (nLastSearch != 1)
+              idTextInput2.text = idSynText.text;
+            else
+              idTextInput.text = idSynText.text;
           }
         }
       }
@@ -365,8 +354,17 @@ Item {
         width:n3BtnWidth
         height : parent.height
         delegate: TextList {
-          id:idSMeanText
+
+          id:idMeanText
           text:mean
+          onClick:
+          {
+            console.log("idTrMeanModel")
+            if (nLastSearch != 1)
+              idTextInput.text = idMeanText.text;
+            else
+              idTextInput2.text = idMeanText.text;
+          }
         }
       }
     }
@@ -431,54 +429,14 @@ Item {
           id:idRmBtn
           height:idAnswer.height
           width:idAnswer.height
-          //    y:-5
-          source: "qrc:qml/pages/rm.png"
+          source: "image://theme/icon-s-edit"
           onClicked:
           {
-            db.transaction(
-                  function(tx) {
-                    tx.executeSql('DELETE FROM Glosa'+nDbNumber+' WHERE number = ?',[number]);
-                  }
-                  )
-            glosModel.remove(index)
-
-            var nC = glosModelWorking.count;
-            for ( var i = 0; i < nC;++i) {
-              if (glosModelWorking.get(i).number === number)
-              {
-                glosModelWorking.remove(i);
-                break;
-              }
-            }
-            if (glosModel.count > 0)
-            {
-              for (  i = 0; i < 3;++i) {
-                if (idQuizModel.get(i).number === number)
-                {
-                  // The removed word is displayed in the Quiz tab
-                  var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
-
-                  idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question;
-                  idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer;
-                  idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number;
-                  idQuizModel.get(i).visible1 = false
-                  break;
-                }
-              }
-            }
-            else
-            {
-              for (  i = 0; i < 3;++i) {
-                idQuizModel.get(i).allok = false;
-                idQuizModel.get(i).question = "-";
-                idQuizModel.get(i).answer = "-";
-                idQuizModel.get(i).number = "-";
-                idQuizModel.get(i).visible1 = false
-              }
-            }
-            sScoreText = glosModelWorking.count + "/" + glosModel.count
+            idEditDlg.visible = true
+            idTextEdit1.text = question
+            idTextEdit2.text = answer
+            idGlosList.currentIndex = index
           }
-
         }
         ButtonQuizImg
         {
@@ -499,10 +457,10 @@ Item {
 
       }
     }
-
   }
   Row
   {
+    id:idLowerButtonRow
     y: idTab2.height - (Theme.itemSizeExtraSmall*1.6)
     spacing:10
     Button
@@ -512,6 +470,10 @@ Item {
       text : "Reset"
       onClicked:
       {
+        var nC = glosModel.count
+
+        if (nC===0)
+          return
         db.transaction(
               function(tx) {
                 tx.executeSql('UPDATE Glosa'+nDbNumber+' SET state=0');
@@ -521,7 +483,7 @@ Item {
 
 
         glosModelWorking.clear()
-        var nC = glosModel.count
+
 
         sScoreText = nC + "/" + nC
         for ( var i = 0; i < nC;++i) {
@@ -552,6 +514,8 @@ Item {
         bIsReverse =  !bIsReverse
         glosModelWorking.clear()
         var nC = glosModel.count
+        if (nC === 0)
+          return
         for ( var i = 0; i < nC;++i) {
           var nState = glosModel.get(i).state1;
           var squestion = glosModel.get(i).answer
@@ -582,5 +546,134 @@ Item {
     text: "Powered by Yandex.Translate "
   }
 
+  Rectangle
+  {
+    id:idEditDlg
+    radius:7
+    visible : false
+    anchors.bottom: idLowerButtonRow.top
+    anchors.bottomMargin: Theme.itemSizeExtraSmal
+    width:parent.width
+    height:Theme.itemSizeExtraSmall*2.5
+    color :Theme.highlightBackgroundColor
+    Column
+    {
+      x:3
+      y:20
+      spacing : 20
+
+      Row
+      {
+        spacing : 20
+        width:parent.width
+        height: Theme.fontSizeLarge
+        InputTextQuiz
+        {
+          id:idTextEdit1
+          width: parent.width / 2 - 10
+          ButtonQuizImg {
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+            source: "image://theme/icon-s-clear-opaque-cross"
+            onClicked: idTextEdit1.text = ""
+          }
+        }
+        InputTextQuiz
+        {
+          id:idTextEdit2
+          width: parent.width / 2 - 10
+          ButtonQuizImg {
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+            source: "image://theme/icon-s-clear-opaque-cross"
+            onClicked: idTextEdit2.text = ""
+          }
+        }
+      }
+      Row
+      {
+        spacing:10
+        ButtonQuiz {
+          id:idBtnApply
+          width:n3BtnWidth
+          text:  "Update"
+          onClicked: {
+            idEditDlg.visible = false
+            db.transaction(
+                  function(tx) {
+                    var nNr = glosModel.get(idGlosList.currentIndex).number
+                    var nQ =  idTextEdit1.displayText
+                    var nA =  idTextEdit2.displayText
+
+                    tx.executeSql('UPDATE Glosa'+nDbNumber+' SET quizword=?, answer=? WHERE number = ?',[nQ,nA,nNr]);
+                  }
+                  )
+
+            glosModel.get(idGlosList.currentIndex).question = idTextEdit1.displayText
+            glosModel.get(idGlosList.currentIndex).answer = idTextEdit2.displayText
+          }
+        }
+        ButtonQuiz {
+          id:idBtnDelete
+          width:n3BtnWidth
+          text:  "Delete"
+          onClicked: {
+            idEditDlg.visible = false
+            db.transaction(
+                  function(tx) {
+                    var nNr = glosModel.get(idGlosList.currentIndex).number
+                    tx.executeSql('DELETE FROM Glosa'+nDbNumber+' WHERE number = ?',[nNr]);
+                  }
+                  )
+
+            var number = glosModel.get(idGlosList.currentIndex).number
+            glosModel.remove(idGlosList.currentIndex)
+
+            var nC = glosModelWorking.count;
+            for ( var i = 0; i < nC;++i) {
+              if (glosModelWorking.get(i).number === number)
+              {
+                glosModelWorking.remove(i);
+                break;
+              }
+            }
+            if (glosModel.count > 0)
+            {
+              for (  i = 0; i < 3;++i) {
+                if (idQuizModel.get(i).number === number)
+                {
+                  // The removed word is displayed in the Quiz tab
+                  var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
+                  idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question;
+                  idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer;
+                  idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number;
+                  idQuizModel.get(i).visible1 = false
+                }
+              }
+            }
+            else
+            {
+              for (  i = 0; i < 3;++i) {
+                idQuizModel.get(i).allok = false;
+                idQuizModel.get(i).question = "-";
+                idQuizModel.get(i).answer = "-";
+                idQuizModel.get(i).number = "-";
+                idQuizModel.get(i).visible1 = false
+              }
+            }
+            sScoreText = glosModelWorking.count + "/" + glosModel.count
+          }
+        }
+        ButtonQuiz {
+          id:idBtnCancel
+          width:n3BtnWidth
+          text:  "Cancel"
+          onClicked: {
+            idEditDlg.visible = false
+          }
+        }
+      }
+    }
+  }
 }
 

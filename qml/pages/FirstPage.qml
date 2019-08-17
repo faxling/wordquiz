@@ -31,7 +31,7 @@ Page {
   property string sScoreText : "-"
   property int nDbNumber : 0;
   property int nQuizIndex: 1
-  property int n3BtnWidth: idTabMain.width / 3 - 7
+  property int n3BtnWidth: idTabMain.width / 3 - 8
   property int n4BtnWidth: idTabMain.width / 4 - 7
   property int n25BtnWidth: idTabMain.width / 2.4 - 7
   property bool bQSort : true
@@ -136,8 +136,6 @@ Page {
 
   // Used by idQuizList
   ListModel {
-
-
     id: glosModelIndex
   }
 
