@@ -40,7 +40,14 @@ Rectangle {
           anchors.horizontalCenter: parent.horizontalCenter
           text : question
         }
-
+        Text
+        {
+          id:idTextExtra
+          color:Theme.primaryColor
+          font.pixelSize: Theme.fontSizeExtraSmall
+          anchors.horizontalCenter: parent.horizontalCenter
+          text :  extra
+        }
         ButtonQuiz
         {
           id:idBtnAnswer
@@ -159,6 +166,7 @@ Rectangle {
               {
                 idQuizModel.get(i).question =  ""
                 idQuizModel.get(i).answer =  ""
+                idQuizModel.get(i).extra =  ""
                 idQuizModel.get(i).allok = true
               }
             }
@@ -189,6 +197,7 @@ Rectangle {
         idQuizModel.get(nI).question = glosModelWorking.get(nIndexOwNewWord).question
         idQuizModel.get(nI).answer = glosModelWorking.get(nIndexOwNewWord).answer
         idQuizModel.get(nI).number = glosModelWorking.get(nIndexOwNewWord).number
+        idQuizModel.get(nI).extra = glosModelWorking.get(nIndexOwNewWord).extra
         idQuizModel.get(nI).visible1 = false
         idQuizModel.get(nI).allok = false
       }

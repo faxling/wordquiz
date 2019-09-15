@@ -7,6 +7,7 @@ ApplicationWindow
 {
     id: idAppWnd
     property string sAppTitle
+    property int nPageBottomY
     initialPage: Component { FirstPage { } }
     cover:  Component {CoverPage {} }
     allowedOrientations: defaultAllowedOrientations

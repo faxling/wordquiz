@@ -39,9 +39,9 @@ Item {
             tx.executeSql('INSERT INTO Glosa'+dbnumber+' VALUES(?, ?, ?, ?)', [nC,  question, answer, 0 ]);
           })
 
-    glosModel.append({"number": nC, "question": question , "answer": answer, "state1":0})
+    glosModel.append({"number": nC, "question": question , "answer": answer, "extra": "", "state1":0})
 
-    glosModelWorking.append({"number": nC, "question": question , "answer": answer, "state1":0})
+    glosModelWorking.append({"number": nC, "question": question , "answer": answer, "extra": "","state1":0})
     idGlosList.positionViewAtEnd()
     sScoreText = glosModelWorking.count + "/" + glosModel.count
 
@@ -53,6 +53,7 @@ Item {
         idQuizModel.get(i).question = question;
         idQuizModel.get(i).answer = answer;
         idQuizModel.get(i).number = nC;
+        idQuizModel.get(i).extra = "";
         idQuizModel.get(i).visible1 = false
       }
 
@@ -136,7 +137,6 @@ Item {
           idTextInput2.text = idTextTrans.text
         else
           idTextInput.text = idTextTrans.text
-
       }
     }
 
@@ -359,7 +359,6 @@ Item {
           text:mean
           onClick:
           {
-            console.log("idTrMeanModel")
             if (nLastSearch != 1)
               idTextInput.text = idMeanText.text;
             else
@@ -370,6 +369,7 @@ Item {
     }
 
     Row {
+      id:idTableHeaderRow
       spacing: 5
       TextList {
         id:idHeader1Text
@@ -420,6 +420,7 @@ Item {
           width: n25BtnWidth
           id:idAnswer
           text: answer
+          font.bold: extra.length > 0
           color: state1 === 0 ? Theme.primaryColor : "green"
           onPressAndHold: idTextInput2.text = answer
         }
@@ -435,6 +436,7 @@ Item {
             idEditDlg.visible = true
             idTextEdit1.text = question
             idTextEdit2.text = answer
+            idTextEdit3.text = extra
             idGlosList.currentIndex = index
           }
         }
@@ -498,6 +500,7 @@ Item {
         idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question
         idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer
         idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number
+        idQuizModel.get(i).extra = glosModelWorking.get(nIndexOwNewWord).extra
         idQuizModel.get(i).visible1 = false
         idQuizModel.get(i).allok = false
 
@@ -516,13 +519,24 @@ Item {
         var nC = glosModel.count
         if (nC === 0)
           return
+
         for ( var i = 0; i < nC;++i) {
           var nState = glosModel.get(i).state1;
-          var squestion = glosModel.get(i).answer
-          var sanswer = glosModel.get(i).question
+          if (bIsReverse)
+          {
+            var squestion = glosModel.get(i).answer
+            var sanswer = glosModel.get(i).question
+          }
+          else
+          {
+            squestion = glosModel.get(i).question
+            sanswer = glosModel.get(i).answer
+          }
+
+          var sextra = glosModel.get(i).extra
           var nnC  = glosModel.get(i).number
           if (nState === 0 )
-            glosModelWorking.append({"number": nnC, "question": squestion , "answer": sanswer})
+            glosModelWorking.append({"number": nnC, "question": squestion , "answer": sanswer,"extra":sextra})
         }
 
         var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
@@ -532,6 +546,7 @@ Item {
         idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question
         idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer
         idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number
+        idQuizModel.get(i).extra = glosModelWorking.get(nIndexOwNewWord).extra
         idQuizModel.get(i).visible1 = false
         idQuizModel.get(i).allok = false
 
@@ -539,28 +554,46 @@ Item {
     }
   }
 
-  Text {
-    font.pixelSize: Theme.fontSizeTiny
-    color:Theme.primaryColor
-    y: idTab2.height - Theme.itemSizeExtraSmall / 2
-    text: "Powered by Yandex.Translate "
-  }
-
   Rectangle
   {
     id:idEditDlg
     radius:7
     visible : false
-    anchors.bottom: idLowerButtonRow.top
-    anchors.bottomMargin: Theme.itemSizeExtraSmal
+    y:50
     width:parent.width
-    height:Theme.itemSizeExtraSmall*2.5
-    color :Theme.highlightBackgroundColor
+    height:Theme.itemSizeExtraSmall*4
+    color :Theme.overlayBackgroundColor
     Column
     {
       x:3
-      y:20
+      anchors.verticalCenter: parent.verticalCenter
       spacing : 20
+      Row
+      {
+        spacing : 20
+        width:parent.width
+        height: Theme.fontSizeLarge
+
+        Label
+        {
+          id:idAddInfo
+          text: "Additional Info"
+        }
+
+
+        InputTextQuiz
+        {
+          id:idTextEdit3
+          width: parent.width - idAddInfo.width - 20
+          ButtonQuizImg {
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+            source: "image://theme/icon-s-clear-opaque-cross"
+            onClicked: parent.text = ""
+          }
+        }
+      }
+
 
       Row
       {
@@ -575,7 +608,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             source: "image://theme/icon-s-clear-opaque-cross"
-            onClicked: idTextEdit1.text = ""
+            onClicked: parent.text = ""
           }
         }
         InputTextQuiz
@@ -602,15 +635,31 @@ Item {
             db.transaction(
                   function(tx) {
                     var nNr = glosModel.get(idGlosList.currentIndex).number
-                    var nQ =  idTextEdit1.displayText
-                    var nA =  idTextEdit2.displayText
+                    var sQ =  idTextEdit1.displayText
+                    var sA =  idTextEdit2.displayText
 
-                    tx.executeSql('UPDATE Glosa'+nDbNumber+' SET quizword=?, answer=? WHERE number = ?',[nQ,nA,nNr]);
+                    if (idTextEdit3.displayText.length > 0)
+                    {
+                      sA = sA + "###" + idTextEdit3.displayText
+                    }
+
+                    tx.executeSql('UPDATE Glosa'+nDbNumber+' SET quizword=?, answer=? WHERE number = ?',[sQ,sA,nNr]);
+
+                    // Assign The updated values
+                    for ( var i = 0; i < 3;++i) {
+                      if (idQuizModel.get(i).number === nNr)
+                      {
+                        idQuizModel.get(i).question = sQ;
+                        idQuizModel.get(i).answer = sA;
+                        idQuizModel.get(i).extra = idTextEdit3.displayText;
+                      }
+                    }
                   }
                   )
 
             glosModel.get(idGlosList.currentIndex).question = idTextEdit1.displayText
             glosModel.get(idGlosList.currentIndex).answer = idTextEdit2.displayText
+            glosModel.get(idGlosList.currentIndex).extra = idTextEdit3.displayText
           }
         }
         ButtonQuiz {
@@ -647,6 +696,7 @@ Item {
                   idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question;
                   idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer;
                   idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number;
+                  idQuizModel.get(i).extra = glosModelWorking.get(nIndexOwNewWord).extra;
                   idQuizModel.get(i).visible1 = false
                 }
               }
@@ -658,6 +708,7 @@ Item {
                 idQuizModel.get(i).question = "-";
                 idQuizModel.get(i).answer = "-";
                 idQuizModel.get(i).number = "-";
+                idQuizModel.get(i).extra = "-";
                 idQuizModel.get(i).visible1 = false
               }
             }

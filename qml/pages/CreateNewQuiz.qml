@@ -272,7 +272,18 @@ Item
                 var rs = tx.executeSql("SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + sQSort);
 
                 for(var i = 0; i < rs.rows.length; i++) {
-                  glosModel.append({"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": rs.rows.item(i).answer, "state1" : rs.rows.item(i).state })
+
+                  var sA;
+                  var sE = "";
+
+                  var ocA = rs.rows.item(i).answer.split("###")
+                  sA = ocA[0]
+                  if (ocA.length > 1)
+                    sE = ocA[1]
+
+                  glosModel.append({"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": sA, "extra": sE, "state1" : rs.rows.item(i).state })
+
+
                 }
 
                 loadQuiz();

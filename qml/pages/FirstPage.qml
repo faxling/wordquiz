@@ -65,6 +65,7 @@ Page {
         idQuizModel.get(i).question = "-";
         idQuizModel.get(i).answer = "-";
         idQuizModel.get(i).number = "-";
+        idQuizModel.get(i).extra = "-";
         idQuizModel.get(i).visible1 = false
       }
       return;
@@ -97,6 +98,7 @@ Page {
       idQuizModel.get(nQuizIndex).question = glosModelWorking.get(nIndexOwNewWord).question;
       idQuizModel.get(nQuizIndex).answer = glosModelWorking.get(nIndexOwNewWord).answer;
       idQuizModel.get(nQuizIndex).number = glosModelWorking.get(nIndexOwNewWord).number;
+      idQuizModel.get(nQuizIndex).extra = glosModelWorking.get(nIndexOwNewWord).extra;
       idQuizModel.get(nQuizIndex).visible1 = false
     }
 
@@ -117,7 +119,16 @@ Page {
               var rs = tx.executeSql("SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + sQSort);
 
               for(var i = 0; i < rs.rows.length; i++) {
-                glosModel.append({"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": rs.rows.item(i).answer, "state1" : rs.rows.item(i).state })
+
+                var sA;
+                var sE = "";
+                var ocA = rs.rows.item(i).answer.split("###")
+                sA = ocA[0]
+                if (ocA.length > 1)
+                  sE = ocA[1]
+
+                glosModel.append({"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": sA, "extra": sE,  "state1" : rs.rows.item(i).state })
+
               }
             }
             )
@@ -147,6 +158,7 @@ Page {
     ListElement {
       question: "-"
       answer:"-"
+      extra:""
       number:0
       visible1:false
       allok:false
@@ -154,6 +166,7 @@ Page {
     ListElement {
       question: "-"
       answer:"-"
+      extra:""
       number:1
       visible1:false
       allok:false
@@ -161,6 +174,7 @@ Page {
     ListElement {
       question: "-"
       answer:"-"
+      extra:""
       number:2
       visible1:false
       allok:false
@@ -267,6 +281,14 @@ Page {
       height: idTabMain.height - idTabRow.height - idTitle.height - 20
       id:idTab2
       visible:false
+
+      Text {
+
+        font.pixelSize: Theme.fontSizeTiny
+        color:Theme.primaryColor
+        y:  Screen.height - parent.y - 85
+        text: "Powered by Yandex.Translate "
+      }
     }
     TakeQuiz
     {
