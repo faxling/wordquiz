@@ -1,9 +1,8 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-Rectangle {
+Item {
   id:idRectTakeQuiz
-  color:"transparent"
 
   // May be the filler is calculated (PathLen - NoElem*sizeElem) /  (NoElem )
   Component
@@ -129,8 +128,6 @@ Rectangle {
         return;
       }
 
-
-
       var bDir = 0
 
       if (nLastIndex == 0 && nI === 1)
@@ -201,7 +198,6 @@ Rectangle {
         idQuizModel.get(nI).visible1 = false
         idQuizModel.get(nI).allok = false
       }
-
     }
 
 
@@ -213,8 +209,6 @@ Rectangle {
       PathLine  { relativeX:  idView.width*3 + 300; relativeY: 0}
     }
   }
-
-
 
 }
 

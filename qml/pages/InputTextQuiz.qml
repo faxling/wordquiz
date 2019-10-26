@@ -22,4 +22,11 @@ Rectangle
     anchors.fill: parent
     id:idTextInput
   }
+
+  ButtonQuizImg {
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    source: "image://theme/icon-s-clear-opaque-cross"
+    onClicked: parent.text = ""
+  }
 }

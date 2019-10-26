@@ -14,9 +14,7 @@ Item {
     idErrorText.visible = false;
 
     doc.onreadystatechange = function() {
-
       if (doc.readyState === XMLHttpRequest.DONE) {
-        oBtn.bProgVisible = false;
         if (doc.status === 200) {
           idTrSynModel.xml = doc.responseText
           idTrTextModel.xml = doc.responseText
@@ -110,12 +108,14 @@ Item {
     // From the translation API
     XmlListModel {
       id: idTranslateModel
+      property var oBtn
       query: "/Translation"
       XmlRole { name: "trans"; query: "text/string()" }
       onStatusChanged:
       {
         if (status === XmlListModel.Ready)
         {
+          oBtn.bProgVisible = false;
           if (idTranslateModel.count <= 0)
           {
             idTextTrans.text = "-"
@@ -150,23 +150,11 @@ Item {
       {
         id:idTextInput
         width: parent.width / 2 - 10
-        ButtonQuizImg {
-          anchors.verticalCenter: parent.verticalCenter
-          anchors.right: parent.right
-          source: "image://theme/icon-s-clear-opaque-cross"
-          onClicked: idTextInput.text = ""
-        }
       }
       InputTextQuiz
       {
         id:idTextInput2
         width: parent.width / 2 - 10
-        ButtonQuizImg {
-          anchors.verticalCenter: parent.verticalCenter
-          anchors.right: parent.right
-          source: "image://theme/icon-s-clear-opaque-cross"
-          onClicked: idTextInput2.text = ""
-        }
       }
     }
 
@@ -201,7 +189,9 @@ Item {
           }
 
           bProgVisible = true
-          downloadDictOnWord(sReqDictUrl , oInText,idBtn1 )
+          if (bHasDictTo)
+            downloadDictOnWord(sReqDictUrl , oInText,idBtn1 )
+          idTranslateModel.oBtn = idBtn1
           idTranslateModel.source = sReqUrl + oInText
         }
       }
@@ -219,7 +209,9 @@ Item {
             return
           }
           bProgVisible = true
-          downloadDictOnWord(sReqDictUrlRev , oInText,idBtn2)
+          if (bHasDictFrom)
+            downloadDictOnWord(sReqDictUrlRev , oInText,idBtn2)
+          idTranslateModel.oBtn = idBtn2
           idTranslateModel.source = sReqUrlRev + oInText
         }
       }
@@ -237,7 +229,9 @@ Item {
           }
 
           bProgVisible = true
-          downloadDictOnWord(sReqDictUrlEn , oInText,idBtn3)
+          if (bHasDictTo)
+            downloadDictOnWord(sReqDictUrlEn , oInText,idBtn3)
+          idTranslateModel.oBtn = idBtn3
           idTranslateModel.source = sReqUrlEn + oInText
         }
       }
@@ -396,7 +390,8 @@ Item {
     }
     SilicaListView {
       id:idGlosList
-      height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6 - idTextInput.height - idHeader1Text.height - Theme.itemSizeExtraSmall
+      height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6
+              - idTextInput.height - idHeader1Text.height - Theme.itemSizeExtraSmall
       clip:true
       width:parent.width
 
@@ -410,7 +405,7 @@ Item {
 
         TextList {
           id: idQuestionText
-          width: n25BtnWidth
+          width: n3BtnWidth
           text:  question
           color: state1 === 0 ? Theme.primaryColor : "green"
           onPressAndHold: idTextInput.text = question
@@ -456,7 +451,6 @@ Item {
           source:"qrc:qml/pages/horn.png"
           onClicked: MyDownloader.playWord(answer,sToLang)
         }
-
       }
     }
   }
@@ -554,10 +548,9 @@ Item {
     }
   }
 
-  Rectangle
+  RectRounded
   {
     id:idEditDlg
-    radius:7
     visible : false
     y:50
     width:parent.width
@@ -580,17 +573,10 @@ Item {
           text: "Additional Info"
         }
 
-
         InputTextQuiz
         {
           id:idTextEdit3
           width: parent.width - idAddInfo.width - 20
-          ButtonQuizImg {
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-            source: "image://theme/icon-s-clear-opaque-cross"
-            onClicked: parent.text = ""
-          }
         }
       }
 
@@ -604,23 +590,11 @@ Item {
         {
           id:idTextEdit1
           width: parent.width / 2 - 10
-          ButtonQuizImg {
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-            source: "image://theme/icon-s-clear-opaque-cross"
-            onClicked: parent.text = ""
-          }
         }
         InputTextQuiz
         {
           id:idTextEdit2
           width: parent.width / 2 - 10
-          ButtonQuizImg {
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-            source: "image://theme/icon-s-clear-opaque-cross"
-            onClicked: idTextEdit2.text = ""
-          }
         }
       }
       Row
@@ -650,7 +624,7 @@ Item {
                       if (idQuizModel.get(i).number === nNr)
                       {
                         idQuizModel.get(i).question = sQ;
-                        idQuizModel.get(i).answer = sA;
+                        idQuizModel.get(i).answer = idTextEdit2.displayText;
                         idQuizModel.get(i).extra = idTextEdit3.displayText;
                       }
                     }

@@ -5,6 +5,8 @@ import QtQuick.LocalStorage 2.0 as Sql
 
 Page {
   id: idWindow
+
+
   property string sReqDictUrlBase : "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang="
   property string sReqDictUrl : "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang=sv-ru&text="
   property string sReqDictUrlRev : "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang=ru-sv&text="
@@ -23,9 +25,10 @@ Page {
   property string sToLang
   property string sFromLang
   property bool bIsReverse
-  property bool bHasSpeech : sToLang ==="ru" || sToLang ==="en"
-  property bool bHasSpeechFrom : sFromLang ==="ru" || sFromLang ==="en"
-
+  property bool bHasSpeech : sToLang !== "hu"
+  property bool bHasSpeechFrom : sFromLang !=="hu"
+  property bool bHasDictTo : sToLang ==="ru" || sToLang ==="en"
+  property bool bHasDictFrom : sFromLang ==="ru" || sFromLang ==="en"
   property string sLangLangEn
   property string sQuizName : "-"
   property string sScoreText : "-"
@@ -34,6 +37,7 @@ Page {
   property int n3BtnWidth: idTabMain.width / 3 - 8
   property int n4BtnWidth: idTabMain.width / 4 - 7
   property int n25BtnWidth: idTabMain.width / 2.4 - 7
+  property int n2BtnWidth: idTabMain.width / 2
   property bool bQSort : true
   property string sQSort : bQSort ? "UPPER(quizword)" : "UPPER(answer)"
 
@@ -106,7 +110,7 @@ Page {
 
   ListModel {
     id: glosModel
-
+    objectName:"glosModel"
 
 
     function sortModel()
@@ -210,12 +214,38 @@ Page {
               nGlosaDbLastIndex = rs.rows.item(0).dbindex
             }
 
+            tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbDesc( dbnumber INT , desc1 TEXT)');
             tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbIndex( dbnumber INT , quizname TEXT, state1 TEXT, langpair TEXT )');
+            rs = tx.executeSql('SELECT * FROM GlosaDbDesc');
+            var oc = [];
+
+            for(var i = 0; i < rs.rows.length; i++) {
+              var oDescription = {dbnumber:rs.rows.item(i).dbnumber, desc1:rs.rows.item(i).desc1}
+              oc.push(oDescription)
+            }
 
             rs = tx.executeSql('SELECT * FROM GlosaDbIndex');
 
-            for(var i = 0; i < rs.rows.length; i++) {
-              glosModelIndex.append({"dbnumber": rs.rows.item(i).dbnumber, "quizname": rs.rows.item(i).quizname , "state1": rs.rows.item(i).state1, "langpair" : rs.rows.item(i).langpair })
+            Array.prototype.indexOfObject = function arrayObjectIndexOf(property, value) {
+              for (var i = 0, len = this.length; i < len; i++) {
+                if (this[i][property] === value) return i;
+              }
+              return -1;
+            }
+
+            var nRowLen = rs.rows.length
+
+
+            for(i = 0; i < nRowLen; i++) {
+              var nDbnumber = rs.rows.item(i).dbnumber
+              var nN = oc.indexOfObject("dbnumber",nDbnumber)
+              var sDesc = "-"
+              if (nN >= 0)
+              {
+                sDesc = oc[nN].desc1
+              }
+
+              glosModelIndex.append({"dbnumber": nDbnumber, "quizname": rs.rows.item(i).quizname , "state1": rs.rows.item(i).state1, "langpair" : rs.rows.item(i).langpair,"desc1" : sDesc  })
             }
 
             idTab1.nQuizListCurrentIndex = nGlosaDbLastIndex;
