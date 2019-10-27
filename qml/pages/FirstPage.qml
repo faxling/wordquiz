@@ -316,7 +316,7 @@ Page {
 
         font.pixelSize: Theme.fontSizeTiny
         color:Theme.primaryColor
-        y:  Screen.height - parent.y - 85
+        y:  Screen.height - parent.y - 89
         text: "Powered by Yandex.Translate "
       }
     }

@@ -16,43 +16,48 @@ static const QString GLOS_SERVER1("http://192.168.2.1");
 Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject *pParent ) :  QObject(pParent)
 {
   QObject::connect(&m_oQuizExpNetMgr, &QNetworkAccessManager::finished,this, &Speechdownloader::quizExported);
-  QObject::connect(&m_oWordNetMgr, &QNetworkAccessManager::finished,this, &Speechdownloader::wordDownloaded);
   QObject::connect(&m_oQuizNetMgr, &QNetworkAccessManager::finished,this, &Speechdownloader::quizDownloaded);
   QObject::connect(&m_oListQuizNetMgr, &QNetworkAccessManager::finished, this, &Speechdownloader::listDownloaded);
   QObject::connect(&m_oDeleteQuizNetMgr, &QNetworkAccessManager::finished,this, &Speechdownloader::quizDeleted);
   m_sStoragePath = sStoragePath;
 }
 
-
-
-QString Speechdownloader::AudioPath(const QString& s)
+class WordDownloadRecv : public QObject
 {
-  return (m_sStoragePath ^ s) + ".wav";
-}
-
-void Speechdownloader::wordDownloaded(QNetworkReply* pReply)
-{
-  m_oDownloadedData = pReply->readAll();
-
-  if (m_oDownloadedData.size() < 10000)
-    return;
-
-  QString sFileName = AudioPath(m_sWord);
-
-  QFile oWav(sFileName);
-  oWav.open(QIODevice::WriteOnly);
-  oWav.write(m_oDownloadedData);
-
-  oWav.close();
-
-  emit downloadedSignal();
-
-
-  if (m_bPlayAfterDownload == true)
+public:
+  WordDownloadRecv(const QString& sWordPath, bool bPlayAfterDownload)
   {
-    QSound::play(sFileName);
+    m_sWordPath = sWordPath;
+    m_bPlayAfterDownload = bPlayAfterDownload;
   }
+  void wordDownloaded(QNetworkReply* pReply)
+  {
+    QByteArray oDownloadedData = pReply->readAll();
+
+    if (oDownloadedData.size() < 1000)
+      return;
+    QFile oWav(m_sWordPath);
+    oWav.open(QIODevice::ReadWrite);
+    oWav.write(oDownloadedData);
+    oWav.close();
+
+    if (m_bPlayAfterDownload == true)
+    {
+      QSound::play(m_sWordPath);
+    }
+    delete this;
+  }
+  QString m_sWordPath;
+  bool m_bPlayAfterDownload;
+};
+
+QString Speechdownloader::AudioPath(const QString& s, const QString& sLang)
+{
+  if (sLang.isEmpty())
+    return (m_sStoragePath ^ s ) + ".wav";
+  return (m_sStoragePath ^ s ) + "_" + sLang + ".wav";
 }
+
 
 void Speechdownloader::quizDeleted(QNetworkReply* pReply)
 {
@@ -74,10 +79,6 @@ void Speechdownloader::quizExported(QNetworkReply* pReply)
     emit exportedSignal(0);
 
 }
-
-
-
-
 
 
 void Speechdownloader::listDownloaded(QNetworkReply* pReply)
@@ -126,7 +127,7 @@ QString sVoicetechEs(QStringLiteral("http://api.voicerss.org/?key=0f8ca674a19145
 
 void Speechdownloader::playWord(QString sWord,QString sLang)
 {
-  QString sFileName = (m_sStoragePath ^ sWord) + ".wav";
+  QString sFileName = AudioPath(sWord,sLang);
   QFileInfo oWavFile(sFileName);
   if (oWavFile.size() > 10000)
   {
@@ -139,10 +140,20 @@ void Speechdownloader::playWord(QString sWord,QString sLang)
   }
 }
 
+
+void Speechdownloader::deleteWord(QString sWord, QString sLang)
+{
+
+  if (QFile::exists(AudioPath(sWord, sLang)))
+    QFile::remove(AudioPath(sWord, sLang));
+
+}
+
 void Speechdownloader::downloadWord(QString sWord, QString sLang)
 {
-  m_sWord = sWord;
   static QMap<QString, QString> ocUrlMap{ { "ru", sVoicetechRu }, { "en", sVoicetechEn }, { "sv", sVoicetechSe }, { "fr", sVoicetechFr }, { "pl", sVoicetechPl }, { "de", sVoicetechDe },{"it",sVoicetechIt}, { "es", sVoicetechEs } };
+  QObject::connect(&m_oWordNetMgr, &QNetworkAccessManager::finished, new WordDownloadRecv(AudioPath(sWord,sLang),m_bPlayAfterDownload), &WordDownloadRecv::wordDownloaded);
+  m_bPlayAfterDownload = false;
   QNetworkRequest request(ocUrlMap[sLang] + sWord);
   m_oWordNetMgr.get(request);
 }
@@ -173,7 +184,6 @@ void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
   ss >> nC;
   QString sLang;
   ss >> sLang;
-
   for (int i = 0; i < nC; i++)
   {
     for (int j = 0; j <= 2; ++j)
@@ -191,7 +201,7 @@ void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
     ss >> s;
     QByteArray oc;
     ss >> oc;
-    QFile oWav(AudioPath(s));
+    QFile oWav(AudioPath(s,""));
     oWav.open(QIODevice::ReadWrite);
     oWav.write(oc);
     oWav.close();
@@ -228,6 +238,7 @@ void Speechdownloader::exportCurrentQuiz(QVariant p, QString sName, QString sLan
   QByteArray ocArray;
   QDataStream  ss(&ocArray, QIODevice::WriteOnly);
   QStringList ocAudio;
+  QStringList ocLang = sLang.split("-");
   int nC = pp->rowCount();
   ss << nC;
   ss << sLang;
@@ -235,23 +246,23 @@ void Speechdownloader::exportCurrentQuiz(QVariant p, QString sName, QString sLan
   {
     for (int j = 0; j <= 3; ++j)
     {
-      if (j == 2 || j == 2) // SKIP  state1 and number
+      if (j == 2) // SKIP  state1 and number
         continue;
       ss << pp->data(pp->index(i), j);
     }
-    QString sFileName = pp->data(pp->index(i), 0).toString();
-    if (QFile::exists(AudioPath(sFileName)))
-      ocAudio.append(sFileName);
-    sFileName = pp->data(pp->index(i), 2).toString();
-    if (QFile::exists(AudioPath(sFileName)))
-      ocAudio.append(sFileName);
+    QString sWord = pp->data(pp->index(i), 0).toString();
+    if (QFile::exists(AudioPath(sWord, ocLang[0])))
+      ocAudio.append(sWord + "_" + ocLang[0]);
+    sWord = pp->data(pp->index(i), 2).toString();
+    if (QFile::exists(AudioPath(sWord, ocLang[1])))
+      ocAudio.append(sWord  + "_" + ocLang[1]);
 
   }
 
   ss << ocAudio.size();
   for (auto& oI : ocAudio)
   {
-    QFile oF(AudioPath(oI));
+    QFile oF(AudioPath(oI,""));
     ss << oI;
     oF.open(QIODevice::ReadOnly);
     ss << oF.readAll();

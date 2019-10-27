@@ -13,7 +13,7 @@ class Speechdownloader : public QObject
   Q_OBJECT
 public:
   explicit Speechdownloader(const QString& sStoragePath, QObject *pParent);
-
+  Q_INVOKABLE void deleteWord(QString sWord, QString sLang);
   Q_INVOKABLE void downloadWord(QString sWord, QString sLang);
   Q_INVOKABLE void playWord(QString sWord, QString sLang);
   Q_INVOKABLE void exportCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
@@ -29,7 +29,6 @@ signals:
   void deletedSignal(int nResponce);
 
 private:
-  void wordDownloaded(QNetworkReply* pReply);
   void quizDownloaded(QNetworkReply* pReply);
   void listDownloaded(QNetworkReply* pReply);
   void quizExported(QNetworkReply* pReply);
@@ -37,8 +36,7 @@ private:
 
 private:
   QVector<int> m_ocIndexMap;
-  QString AudioPath(const QString&s);
-  QString m_sWord;
+  QString AudioPath(const QString&s , const QString& sLang);
   QString m_sStoragePath;
   QNetworkAccessManager m_oQuizExpNetMgr;
   QNetworkAccessManager m_oWordNetMgr;

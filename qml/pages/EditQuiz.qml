@@ -650,7 +650,12 @@ Item {
                   )
 
             var number = glosModel.get(idGlosList.currentIndex).number
+            var sQuestion = glosModel.get(idGlosList.currentIndex).question
+            var sAnswer = glosModel.get(idGlosList.currentIndex).answer
+
             glosModel.remove(idGlosList.currentIndex)
+            MyDownloader.deleteWord(sAnswer,sToLang)
+            MyDownloader.deleteWord(sAnswer,sFromLang)
 
             var nC = glosModelWorking.count;
             for ( var i = 0; i < nC;++i) {

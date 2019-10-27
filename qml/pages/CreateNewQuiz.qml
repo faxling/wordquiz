@@ -64,10 +64,20 @@ Item
     anchors.bottomMargin: 50
     anchors.fill: parent
 
-    TextList
+    Row
     {
-      id:idTextSelected
-      onClick: idTextInputQuizName.text = idTextSelected.text
+      TextList
+      {
+        id:idTextSelected
+        width:idTopColumn.width/2
+        onClick: idTextInputQuizName.text = idTextSelected.text
+      }
+
+      TextList
+      {
+        id:idDescTextOnPage
+        text:"---"
+      }
     }
 
     InputTextQuiz
@@ -348,7 +358,8 @@ Item
         sLangLang = glosModelIndex.get(nTheIndex).langpair;
         nDbNumber  = glosModelIndex.get(nTheIndex).dbnumber;
         sScoreText = glosModelIndex.get(nTheIndex).state1;
-        idQuizNameInput.text = sQuizName
+        idDescTextOnPage.text = glosModelIndex.get(nTheIndex).desc1
+
         var res = sLangLang.split("-");
         sLangLangRev = res[1] + "-" + res[0];
         sToLang = res[1]
@@ -574,6 +585,8 @@ Item
             text:qname
             onClick:
             {
+              idImportMsg.text = ""
+              idDescText.text = desc1
               idImport.sSelectedQ = qname;
               idServerListView.currentIndex = index
             }
