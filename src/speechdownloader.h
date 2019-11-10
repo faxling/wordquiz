@@ -20,6 +20,10 @@ public:
   Q_INVOKABLE void importQuiz(QString sName);
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, QString sId);
+  Q_INVOKABLE void toClipBoard(QString s);
+  Q_INVOKABLE void downLoadAllSpeech(QVariant p,QString sLang);
+  Q_INVOKABLE void initUrls(QVariant p);
+
 
 signals:
   void quizDownloadedSignal(int nQCount, QVariantList oDD, QString sLang);
@@ -33,9 +37,9 @@ private:
   void listDownloaded(QNetworkReply* pReply);
   void quizExported(QNetworkReply* pReply);
   void quizDeleted(QNetworkReply* pReply);
-
-private:
-  QVector<int> m_ocIndexMap;
+  void wordDownloaded(QNetworkReply* pReply);
+  private:
+    QVector<int> m_ocIndexMap;
   QString AudioPath(const QString&s , const QString& sLang);
   QString m_sStoragePath;
   QNetworkAccessManager m_oQuizExpNetMgr;

@@ -5,14 +5,14 @@ import QtQuick.LocalStorage 2.0 as Sql
 
 Page {
   id: idWindow
+// init in initUrls
+  property string sReqDictUrlBase
+  property string sReqDictUrl
+  property string sReqDictUrlRev
+  property string sReqDictUrlEn
+  property string sReqUrlBase
 
 
-  property string sReqDictUrlBase : "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang="
-  property string sReqDictUrl : "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang=sv-ru&text="
-  property string sReqDictUrlRev : "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang=ru-sv&text="
-  property string sReqDictUrlEn : "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang=en-ru&text="
-
-  property string sReqUrlBase: "https://translate.yandex.net/api/v1.5/tr/translate?key=trnsl.1.1.20190526T164138Z.e99d5807bb2acb8d.d11f94738ea722cfaddf111d2e8f756cb3b71f4f&lang="
   property string sReqUrl
   property string sReqUrlRev
   property string sReqUrlEn
@@ -194,6 +194,9 @@ Page {
       return db;
 
     console.log("init Word Quiz")
+
+      MyDownloader.initUrls(idWindow);
+
     db = Sql.LocalStorage.openDatabaseSync("GlosDB", "1.0", "Glos Databas!", 1000000);
 
     Sql.LocalStorage.openDatabaseSync()

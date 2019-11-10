@@ -127,19 +127,38 @@ Item {
       }
     }
 
-    TextList
+    Item
     {
-      id:idTextTrans
-      text :"-"
-      onClick:
+      height:idTextInput.height
+      width:parent.width
+      TextList
       {
-        if (nLastSearch != 1)
-          idTextInput2.text = idTextTrans.text
-        else
-          idTextInput.text = idTextTrans.text
+        id:idTextTrans
+        text :"-"
+        onClick:
+        {
+          if (nLastSearch != 1)
+            idTextInput2.text = idTextTrans.text
+          else
+            idTextInput.text = idTextTrans.text
+        }
+      }
+      ButtonQuizImg
+      {
+        anchors.bottom: parent.bottom
+        x:idTextInput.width - width
+        source: "image://theme/icon-s-clipboard"
+        onClicked:MyDownloader.toClipBoard(idTextInput.text)
+      }
+
+      ButtonQuizImg
+      {
+        x :idTextInput2.x + idTextInput.width - width
+        anchors.bottom: parent.bottom
+        source: "image://theme/icon-s-clipboard"
+        onClicked:MyDownloader.toClipBoard(idTextInput2.text)
       }
     }
-
 
     Row
     {
@@ -504,6 +523,7 @@ Item {
 
     Button
     {
+      id:idReverseBtn
 
       text : "Reverse"
       onClicked:
@@ -601,7 +621,7 @@ Item {
       {
         spacing:10
         ButtonQuiz {
-          id:idBtnApply
+          id:idBtnUpdate
           width:n3BtnWidth
           text:  "Update"
           onClicked: {
@@ -624,16 +644,29 @@ Item {
                       if (idQuizModel.get(i).number === nNr)
                       {
                         idQuizModel.get(i).question = sQ;
-                        idQuizModel.get(i).answer = idTextEdit2.displayText;
-                        idQuizModel.get(i).extra = idTextEdit3.displayText;
+                        idQuizModel.get(i).answer = idTextEdit2.displayText.trim();
+                        idQuizModel.get(i).extra = idTextEdit3.displayText.trim();
                       }
                     }
                   }
                   )
+            var nC = glosModelWorking.count;
+            var nNumber = glosModel.get(idGlosList.currentIndex).number
+            for ( var i = 0; i < nC;++i) {
+              if (glosModelWorking.get(i).number === nNumber)
+              {
+                glosModelWorking.get(i).question = idTextEdit1.displayText.trim()
+                glosModelWorking.get(i).answer = idTextEdit2.displayText.trim()
+                glosModelWorking.get(i).extra = idTextEdit3.displayText.trim()
+                break;
+              }
+            }
+            MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).answer,sToLang)
+            MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).question,sFromLang)
+            glosModel.get(idGlosList.currentIndex).question = idTextEdit1.displayText.trim()
+            glosModel.get(idGlosList.currentIndex).answer = idTextEdit2.displayText.trim()
+            glosModel.get(idGlosList.currentIndex).extra = idTextEdit3.displayText.trim()
 
-            glosModel.get(idGlosList.currentIndex).question = idTextEdit1.displayText
-            glosModel.get(idGlosList.currentIndex).answer = idTextEdit2.displayText
-            glosModel.get(idGlosList.currentIndex).extra = idTextEdit3.displayText
           }
         }
         ButtonQuiz {

@@ -111,7 +111,7 @@ Item
                   }
                   tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',[nNr, idTextInputQuizName.displayText,"0/0",sLangLangSelected  ]);
 
-                  glosModelIndex.append({"dbnumber": nNr, "quizname": idTextInputQuizName.displayText , "state1": "0/0", "langpair" : sLangLangSelected });
+                  glosModelIndex.append({"dbnumber": nNr, "quizname": idTextInputQuizName.displayText.trim() , "state1": "0/0", "langpair" : sLangLangSelected });
 
                   idQuizList.positionViewAtEnd();
                   idQuizList.currentIndex = glosModelIndex.count -1;
@@ -377,7 +377,7 @@ Item
                 // tx.executeSql('DROP TABLE Glosa');
 
                 glosModel.clear();
-                tx.executeSql('CREATE TABLE IF NOT EXISTS Glosa' + nDbNumber + '( number INT , quizword TEXT, answer TEXT, state INT)');
+                tx.executeSql('CREATE TABLE IF NOT EXISTS Glosa' + nDbNumber + ' ( number INT , quizword TEXT, answer TEXT, state INT)');
 
                 var rs = tx.executeSql("SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + sQSort);
 
@@ -652,7 +652,7 @@ Item
         if (idPwdTextInput.text.length > 0)
         {
           idPwdDialog.visible = false;
-          MyDownloader.deleteQuiz(idImport.sSelectedQ, idPwdTextInput.displayText,idServerListView.currentIndex)
+          MyDownloader.deleteQuiz(idImport.sSelectedQ, idPwdTextInput.displayText.trim(),idServerListView.currentIndex)
           idPwdTextInput.text = ""
         }
         else
@@ -729,11 +729,11 @@ Item
           width:n3BtnWidth
           text:  "Rename"
           onClicked: {
-            glosModelIndex.setProperty(idQuizList.currentIndex,"quizname", idQuizNameInput.displayText)
+            glosModelIndex.setProperty(idQuizList.currentIndex,"quizname", idQuizNameInput.displayText.trim())
             db.transaction(
                   function(tx) {
                     var nId = glosModelIndex.get(idQuizList.currentIndex).dbnumber;
-                    tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',[idQuizNameInput.displayText, nId]);
+                    tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',[idQuizNameInput.displayText.trim(), nId]);
                     idTextSelected.text = idQuizNameInput.displayText
                     sQuizName = idTextSelected.text
                   }

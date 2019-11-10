@@ -9,12 +9,16 @@
 #include <QJsonArray>
 #include <QJsonValue>
 #include <QAbstractListModel>
+#include <QGuiApplication>
+#include <QClipboard>
+#include <QUrlQuery>
 
 static const QString GLOS_SERVER2("http://212.112.183.157");
 static const QString GLOS_SERVER1("http://192.168.2.1");
 
 Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject *pParent ) :  QObject(pParent)
 {
+  QObject::connect(&m_oWordNetMgr, &QNetworkAccessManager::finished,this, &Speechdownloader::wordDownloaded);
   QObject::connect(&m_oQuizExpNetMgr, &QNetworkAccessManager::finished,this, &Speechdownloader::quizExported);
   QObject::connect(&m_oQuizNetMgr, &QNetworkAccessManager::finished,this, &Speechdownloader::quizDownloaded);
   QObject::connect(&m_oListQuizNetMgr, &QNetworkAccessManager::finished, this, &Speechdownloader::listDownloaded);
@@ -22,34 +26,69 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject *pParent
   m_sStoragePath = sStoragePath;
 }
 
-class WordDownloadRecv : public QObject
+static const QString sReqDictUrlBase= "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang=";
+static const QString sReqDictUrl = "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang=sv-ru&text=";
+static const QString sReqDictUrlRev =  "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang=ru-sv&text=";
+static const QString sReqDictUrlEn =  "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang=en-ru&text=";
+static const QString sReqUrlBase =  "https://translate.yandex.net/api/v1.5/tr/translate?key=trnsl.1.1.20190526T164138Z.e99d5807bb2acb8d.d11f94738ea722cfaddf111d2e8f756cb3b71f4f&lang=";
+
+
+void Speechdownloader::initUrls(QVariant p)
 {
-public:
-  WordDownloadRecv(const QString& sWordPath, bool bPlayAfterDownload)
-  {
-    m_sWordPath = sWordPath;
-    m_bPlayAfterDownload = bPlayAfterDownload;
-  }
-  void wordDownloaded(QNetworkReply* pReply)
-  {
-    QByteArray oDownloadedData = pReply->readAll();
 
-    if (oDownloadedData.size() < 1000)
-      return;
-    QFile oWav(m_sWordPath);
-    oWav.open(QIODevice::ReadWrite);
-    oWav.write(oDownloadedData);
-    oWav.close();
+  QObject* pp = qvariant_cast<QObject*>(p);
+  pp->setProperty("sReqDictUrlBase",sReqDictUrlBase);
+  pp->setProperty("sReqDictUrl",sReqDictUrl);
+  pp->setProperty("sReqDictUrlRev",sReqDictUrlRev);
+  pp->setProperty("sReqDictUrlEn",sReqDictUrlEn);
+  pp->setProperty("sReqUrlBase",sReqUrlBase);
 
-    if (m_bPlayAfterDownload == true)
-    {
-      QSound::play(m_sWordPath);
-    }
-    delete this;
+}
+
+
+
+void Speechdownloader::wordDownloaded(QNetworkReply* pReply)
+{
+  m_oDownloadedData = pReply->readAll();
+
+  if (m_oDownloadedData.size() < 10000)
+    return;
+
+  QUrlQuery uQ(pReply->url());
+
+  QString sWord,sLang;
+  QStringList ocLang;
+  if (uQ.hasQueryItem("src") == true)
+  {
+    sWord = uQ.queryItemValue("src");
+    ocLang = uQ.queryItemValue("hl").split("-");
   }
-  QString m_sWordPath;
-  bool m_bPlayAfterDownload;
-};
+  else
+  {
+    sWord = uQ.queryItemValue("text");
+    ocLang = uQ.queryItemValue("lang").split("_");
+  }
+
+  sLang = ocLang.first();
+
+  QString sFileName = AudioPath(sWord,sLang);
+
+  QFile oWav(sFileName);
+  oWav.open(QIODevice::WriteOnly);
+  oWav.write(m_oDownloadedData);
+
+  oWav.close();
+
+  emit downloadedSignal();
+
+
+  qDebug() << sWord;
+  if (uQ.hasQueryItem("PlayAfterDownload") == true)
+  {
+    QSound::play(sFileName);
+  }
+
+}
 
 QString Speechdownloader::AudioPath(const QString& s, const QString& sLang)
 {
@@ -152,9 +191,12 @@ void Speechdownloader::deleteWord(QString sWord, QString sLang)
 void Speechdownloader::downloadWord(QString sWord, QString sLang)
 {
   static QMap<QString, QString> ocUrlMap{ { "ru", sVoicetechRu }, { "en", sVoicetechEn }, { "sv", sVoicetechSe }, { "fr", sVoicetechFr }, { "pl", sVoicetechPl }, { "de", sVoicetechDe },{"it",sVoicetechIt}, { "es", sVoicetechEs } };
-  QObject::connect(&m_oWordNetMgr, &QNetworkAccessManager::finished, new WordDownloadRecv(AudioPath(sWord,sLang),m_bPlayAfterDownload), &WordDownloadRecv::wordDownloaded);
+
+  QString sUrl = ocUrlMap[sLang] + sWord;
+  if (m_bPlayAfterDownload==true)
+    sUrl += "&PlayAfterDownload=1";
   m_bPlayAfterDownload = false;
-  QNetworkRequest request(ocUrlMap[sLang] + sWord);
+  QNetworkRequest request(sUrl);
   m_oWordNetMgr.get(request);
 }
 
@@ -165,11 +207,7 @@ void  Speechdownloader::listQuiz()
   m_oListQuizNetMgr.get(request);
 }
 
-/*
-answer
-extra
-question
-*/
+
 void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
 {
   m_oDownloadedData = pReply->readAll();
@@ -222,6 +260,28 @@ void Speechdownloader::importQuiz(QString sName)
   QString sUrl = GLOS_SERVER2 ^ ("quizload.php?qname="  + sName + ".txt");
   QNetworkRequest request(sUrl);
   m_oQuizNetMgr.get(request);
+
+
+}
+
+void Speechdownloader::toClipBoard(QString s)
+{
+  QGuiApplication::clipboard()->setText(s);
+}
+
+
+void Speechdownloader::downLoadAllSpeech(QVariant p, QString sLang)
+{
+  QAbstractListModel* pp = qvariant_cast<QAbstractListModel*>(p);
+  QStringList ocLang = sLang.split("-");
+  int nC = pp->rowCount();
+  for (int i = 0; i < nC; i++)
+  {
+    QString sAnswer = pp->data(pp->index(i), 0).toString();
+    QString sQuestion = pp->data(pp->index(i), 3).toString();
+    downloadWord(sQuestion, ocLang[0]);
+    downloadWord(sAnswer, ocLang[1]);
+  }
 }
 
 
@@ -253,7 +313,7 @@ void Speechdownloader::exportCurrentQuiz(QVariant p, QString sName, QString sLan
     QString sWord = pp->data(pp->index(i), 0).toString();
     if (QFile::exists(AudioPath(sWord, ocLang[0])))
       ocAudio.append(sWord + "_" + ocLang[0]);
-    sWord = pp->data(pp->index(i), 2).toString();
+    sWord = pp->data(pp->index(i), 3).toString();
     if (QFile::exists(AudioPath(sWord, ocLang[1])))
       ocAudio.append(sWord  + "_" + ocLang[1]);
 
