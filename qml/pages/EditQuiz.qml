@@ -413,7 +413,10 @@ Item {
               - idTextInput.height - idHeader1Text.height - Theme.itemSizeExtraSmall
       clip:true
       width:parent.width
-
+      highlight: Rectangle {
+        opacity:0.5
+        color: "#009bff"
+      }
       spacing: 3
       VerticalScrollDecorator { flickable: idGlosList }
       //   header:idHeaderGlos
@@ -437,6 +440,7 @@ Item {
           font.bold: extra.length > 0
           color: state1 === 0 ? Theme.primaryColor : "green"
           onPressAndHold: idTextInput2.text = answer
+          onClick: idGlosList.currentIndex = index
         }
 
         ButtonQuizImg
@@ -495,10 +499,7 @@ Item {
               }
               )
 
-
-
         glosModelWorking.clear()
-
 
         sScoreText = nC + "/" + nC
         for ( var i = 0; i < nC;++i) {
@@ -572,19 +573,21 @@ Item {
   {
     id:idEditDlg
     visible : false
-    y:50
+    y:60
     width:parent.width
     height:Theme.itemSizeExtraSmall*4
     color :Theme.overlayBackgroundColor
+
+    onCloseClicked: idEditDlg.visible = false
     Column
     {
-      x:3
+      x:10
       anchors.verticalCenter: parent.verticalCenter
       spacing : 20
       Row
       {
         spacing : 20
-        width:parent.width
+        width:idEditDlg.width - 20
         height: Theme.fontSizeLarge
 
         Label
@@ -725,14 +728,6 @@ Item {
               }
             }
             sScoreText = glosModelWorking.count + "/" + glosModel.count
-          }
-        }
-        ButtonQuiz {
-          id:idBtnCancel
-          width:n3BtnWidth
-          text:  "Cancel"
-          onClicked: {
-            idEditDlg.visible = false
           }
         }
       }

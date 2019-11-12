@@ -402,6 +402,7 @@ Item
               )
 
         idTextSelected.text = sQuizName
+        idQuizNameInput.text = sQuizName
 
       }
 
@@ -442,7 +443,6 @@ Item
           {
             idEditQuizEntryDlg.visible = true
             idQuizList.currentIndex = index
-
           }
         }
       }
@@ -454,11 +454,16 @@ Item
     y:20
     visible: false
     width:parent.width
-    height:parent.width / 1.7
+    height:parent.width / 1.5
+
+    onCloseClicked: {
+      idExport.visible = false
+    }
 
     TextList {
-      x:20
       id:idExportTitle
+      anchors.top :idExport.bottomClose
+      x:20
       text:"Add a description off the quiz '" +sQuizName + "'"
     }
 
@@ -501,7 +506,7 @@ Item
       text: "Export"
       anchors.bottom: parent.bottom
       anchors.bottomMargin: 20
-      anchors.right: idCancelExport.left
+      anchors.right: parent.right
       anchors.rightMargin: 20
       onClicked:
       {
@@ -510,20 +515,6 @@ Item
       }
     }
 
-    ButtonQuiz
-    {
-      id:idCancelExport
-      width: n3BtnWidth
-      text: "Cancel"
-      anchors.bottom: parent.bottom
-      anchors.right: parent.right
-      anchors.bottomMargin: 20
-      anchors.rightMargin: 20
-      onClicked:
-      {
-        idExport.visible = false
-      }
-    }
   }
 
 
@@ -532,7 +523,12 @@ Item
     y:20
     visible: false;
     width:parent.width
-    height:parent.width / 1.7
+    height:parent.width
+    onCloseClicked:  {
+      idPwdDialog.visible = false;
+      idDeleteQuiz.bProgVisible = false
+      idImport.visible = false
+    }
 
     TextList {
       id:idImportMsg
@@ -544,30 +540,30 @@ Item
 
     TextList {
       id: idImportTitle
+      anchors.top :idImport.bottomClose
       text:"Available Quiz"
     }
-
+    TextList {
+      anchors.right: idImport.right
+      anchors.top :idImport.bottomClose
+      anchors.rightMargin:20
+      text:"Questions"
+    }
     Text
     {
       id:idDescText
       color:Theme.highlightColor
-      font.pixelSize: Theme.fontSizeSmall
-      anchors.top :idImportTitle.bottom
+      anchors.top :idImport.top
+      anchors.topMargin:20
       x:20
       text:"---"
     }
 
-    TextList {
-      anchors.right: parent.right
-      anchors.rightMargin:30
-      text:"Questions"
-    }
     property string sSelectedQ : ""
     ListViewHi
     {
       id:idServerListView
-      anchors.top :idDescText.bottom
-      anchors.bottom:idDeleteQuiz.top
+      anchors.top :idImportTitle.bottom
       width:idImport.width
       height:parent.height
       clip:true
@@ -611,26 +607,30 @@ Item
     RectRounded
     {
       id:idPwdDialog
+      border.width: 2
+      border.color: Theme.primaryColor
+      showClose: false
       visible:false
       height:70
       anchors.bottom: idDeleteQuiz.top
-      anchors.bottomMargin: 20
+      anchors.bottomMargin: 60
       width:idServerListView.width
       Row
       {
         x:20
         anchors.verticalCenter:parent.verticalCenter
         spacing:20
-        Text
+        TextList
         {
+          id:idPwdLabelText
+          font.pixelSize: Theme.fontSizeExtraSmall
           anchors.verticalCenter:parent.verticalCenter
-          color: "white"
           text: "Password to remove '" + idImport.sSelectedQ +"'"
         }
 
         InputTextQuiz
         {
-          width:parent.width / 2
+          width:idServerListView.width - idPwdLabelText.width - 60
           id:idPwdTextInput
         }
       }
@@ -657,7 +657,6 @@ Item
         }
         else
           idPwdDialog.visible = true
-
       }
     }
 
@@ -668,7 +667,7 @@ Item
       width:n4BtnWidth
       anchors.bottom: parent.bottom
       anchors.bottomMargin: 20
-      anchors.right: idCancelLoad.left
+      anchors.right: parent.right
       anchors.rightMargin: 20
       onClicked:
       {
@@ -677,24 +676,8 @@ Item
         MyDownloader.importQuiz(idImport.sSelectedQ)
       }
     }
-
-    ButtonQuiz
-    {
-      id:idCancelLoad
-      text: "Cancel"
-      width:n4BtnWidth
-      anchors.bottom: parent.bottom
-      anchors.right: parent.right
-      anchors.bottomMargin: 20
-      anchors.rightMargin: 20
-      onClicked:
-      {
-        idPwdDialog.visible = false;
-        idDeleteQuiz.bProgVisible = false
-        idImport.visible = false
-      }
-    }
   }
+
   RectRounded
   {
     id:idEditQuizEntryDlg
@@ -704,7 +687,7 @@ Item
     height:Theme.itemSizeExtraSmall*4
     Column
     {
-      x:5
+      x:10
       width:parent.width
       anchors.verticalCenter: parent.verticalCenter
       spacing : 20
@@ -717,7 +700,7 @@ Item
       InputTextQuiz
       {
         id:idQuizNameInput
-        width: parent.width  - 10
+        width: parent.width  - 20
       }
 
       Row
@@ -767,16 +750,15 @@ Item
           }
           );
         }
-        ButtonQuiz {
-          id:idBtnCancel
-          width:n3BtnWidth
-          text:  "Cancel"
-          onClicked: {
-            idEditQuizEntryDlg.visible = false
-          }
-        }
+
       } // Row
+
     } // Col
+
+    onCloseClicked:  {
+      idEditQuizEntryDlg.visible = false
+    }
+
   } // Rectangle
 } // Item
 
