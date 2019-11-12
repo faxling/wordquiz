@@ -197,6 +197,16 @@ Item {
         idQuizModel.get(nI).extra = glosModelWorking.get(nIndexOwNewWord).extra
         idQuizModel.get(nI).visible1 = false
         idQuizModel.get(nI).allok = false
+
+        var nCurrentGlosNumber = idQuizModel.get(nI).number
+        nC = glosModel.count
+        for (  i = 0; i < nC;++i) {
+          if (glosModel.get(i).number === nCurrentGlosNumber)
+          {
+            glosListView.currentIndex = i
+            break;
+          }
+        }
       }
     }
 

@@ -5,7 +5,7 @@ import QtQuick.LocalStorage 2.0 as Sql
 
 Page {
   id: idWindow
-// init in initUrls
+  // init in initUrls
   property string sReqDictUrlBase
   property string sReqDictUrl
   property string sReqDictUrlRev
@@ -40,6 +40,7 @@ Page {
   property int n2BtnWidth: idTabMain.width / 2
   property bool bQSort : true
   property string sQSort : bQSort ? "UPPER(quizword)" : "UPPER(answer)"
+  property alias glosListView :idTab2.glosListView
 
   onSScoreTextChanged:
   {
@@ -195,7 +196,7 @@ Page {
 
     console.log("init Word Quiz")
 
-      MyDownloader.initUrls(idWindow);
+    MyDownloader.initUrls(idWindow);
 
     db = Sql.LocalStorage.openDatabaseSync("GlosDB", "1.0", "Glos Databas!", 1000000);
 
@@ -303,31 +304,31 @@ Page {
 
     CreateNewQuiz
     {
+      id:idTab1
       width:parent.width
       height: idTabMain.height - idTabRow.height - idTitle.height - 20
       visible:false
-      id:idTab1
+
     }
     EditQuiz
     {
+      id:idTab2
       width:parent.width
       height: idTabMain.height - idTabRow.height - idTitle.height - 20
-      id:idTab2
       visible:false
 
       Text {
-
         font.pixelSize: Theme.fontSizeTiny
         color:Theme.primaryColor
-        y:  Screen.height - parent.y - 89
+        y:  Screen.height - parent.y - 95
         text: "Powered by Yandex.Translate "
       }
     }
     TakeQuiz
     {
+      id:idTab3
       width:parent.width
       height: idTabMain.height - idTabRow.height - idTitle.height - 20
-      id:idTab3
       visible:false
     }
 

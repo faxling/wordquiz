@@ -215,9 +215,8 @@ Item
     {
       id:idQuizList
       width:parent.width
-      height:Theme.itemSizeMedium * 5
+      height:Theme.itemSizeMedium * 4
       model:glosModelIndex
-      clip:true
       spacing:5
       function loadFromServerList(nCount, oDD) {
         idImport.visible = true
@@ -503,7 +502,7 @@ Item
     {
       id:idExportBtn
       width: n3BtnWidth
-      text: "Export"
+      text: "Upload"
       anchors.bottom: parent.bottom
       anchors.bottomMargin: 20
       anchors.right: parent.right
@@ -663,7 +662,7 @@ Item
     ButtonQuiz
     {
       id:idLoadQuiz
-      text: "Load"
+      text: "Download"
       width:n4BtnWidth
       anchors.bottom: parent.bottom
       anchors.bottomMargin: 20

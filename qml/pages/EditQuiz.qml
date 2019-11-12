@@ -4,7 +4,10 @@ import QtQuick.XmlListModel 2.0
 import Sailfish.Silica 1.0
 
 Item {
+
   id:idEditQuiz
+  property alias glosListView : idGlosList
+
 
   function downloadDictOnWord(sUrl, sWord, oBtn)
   {
@@ -407,20 +410,14 @@ Item {
         }
       }
     }
-    SilicaListView {
+    ListViewHi {
       id:idGlosList
       height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6
               - idTextInput.height - idHeader1Text.height - Theme.itemSizeExtraSmall
-      clip:true
+
       width:parent.width
-      highlight: Rectangle {
-        opacity:0.5
-        color: "#009bff"
-      }
       spacing: 3
-      VerticalScrollDecorator { flickable: idGlosList }
-      //   header:idHeaderGlos
-      //   headerPositioning :ListView.OverlayHeader
+
       model: glosModel
       delegate: Row {
         spacing:5
@@ -573,21 +570,21 @@ Item {
   {
     id:idEditDlg
     visible : false
-    y:60
     width:parent.width
     height:Theme.itemSizeExtraSmall*4
     color :Theme.overlayBackgroundColor
-
     onCloseClicked: idEditDlg.visible = false
+
     Column
     {
-      x:10
-      anchors.verticalCenter: parent.verticalCenter
+      x:20
+      anchors.top: idEditDlg.bottomClose
+      anchors.topMargin : 10
       spacing : 20
       Row
       {
         spacing : 20
-        width:idEditDlg.width - 20
+        width:idEditDlg.width - 40
         height: Theme.fontSizeLarge
 
         Label
