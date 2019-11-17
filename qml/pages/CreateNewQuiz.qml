@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-
+import QtQuick.LocalStorage 2.0 as Sql
+import "../QuizFunctions.js" as QuizLib
 
 Item
 {
@@ -99,26 +100,7 @@ Item
 
         onClicked:
         {
-
-          db.transaction(
-                function(tx) {
-
-                  var rs = tx.executeSql('SELECT MAX(dbnumber) as newnr FROM GlosaDbIndex');
-                  var nNr = 1
-                  if (rs.rows.length > 0)
-                  {
-                    nNr = rs.rows.item(0).newnr + 1
-                  }
-                  tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',[nNr, idTextInputQuizName.displayText,"0/0",sLangLangSelected  ]);
-
-                  glosModelIndex.append({"dbnumber": nNr, "quizname": idTextInputQuizName.displayText.trim() , "state1": "0/0", "langpair" : sLangLangSelected });
-
-                  idQuizList.positionViewAtEnd();
-                  idQuizList.currentIndex = glosModelIndex.count -1;
-
-                }
-                )
-
+          QuizLib.newQuiz()
         }
       }
 
@@ -218,191 +200,18 @@ Item
       height:Theme.itemSizeMedium * 4
       model:glosModelIndex
       spacing:5
-      function loadFromServerList(nCount, oDD) {
-        idImport.visible = true
-        idServerQModel.clear()
-
-        if (nCount===0)
-        {
-          idDescText.text = ""
-          idImport.sSelectedQ = "";
-          return;
-        }
-
-        idDescText.text = oDD[1];
-        idImport.sSelectedQ = oDD[0];
-
-        for(var i = 0; i < nCount; i+=4) {
-          idServerQModel.append({"qname":oDD[i], "desc1":oDD[i+1],  "code":oDD[i+2],  "state1":oDD[i+3]});
-        }
-        idDownloadBtn.bProgVisible = false
-      }
-      function quizDeleted(nResponce)
-      {
-        idDeleteQuiz.bProgVisible = false
-        idDescText.text = ""
-
-        if (nResponce>=0)
-        {
-          idServerQModel.remove(nResponce);
-          if (nResponce>0)
-          {
-            idServerListView.currentIndex = nResponce - 1
-            idDescText.text = idServerQModel.get(nResponce - 1).desc1;
-            idImport.sSelectedQ = idServerQModel.get(nResponce - 1).qname;
-            idImportMsg.text = ""
-          }
-        }
-        else
-          idImportMsg.text = "Not deleted"
-      }
-      function quizExported(nResponce)
-      {
-        idExportBtn.bProgVisible = false
-        if (nResponce === 0)
-        {
-          idExportError.text = "Network error";
-          idExportError.visible = true;
-        }
-        else
-        {
-          if (nResponce === 206)
-          {
-            idExportError.text = "Quiz with name '"+sQuizName+"' Exists"
-            idExportError.visible = true;
-          }
-          else if (nResponce === 200)
-          {
-            idExport.visible = false;
-          }
-          else
-          {
-            idExportError.text = nResponce
-            idExportError.visible = true;
-          }
-
-        }
-      }
-      function loadFromList(nCount, oDD, sLangLoaded) {
-        if (nCount < 0)
-        {
-          idLoadQuiz.bProgVisible = false
-          idImportMsg.text = "error importing"
-
-          return
-        }
-
-
-        db.transaction(
-              function(tx) {
-                console.log("Load: " + nCount)
-                var rs = tx.executeSql('SELECT MAX(dbnumber) as newnr FROM GlosaDbIndex');
-                var nNr = 1
-                if (rs.rows.length > 0)
-                {
-                  nNr = rs.rows.item(0).newnr + 1
-                }
-
-                nDbNumber = nNr;
-
-                tx.executeSql('CREATE TABLE IF NOT EXISTS Glosa' + nNr + '( number INT , quizword TEXT, answer TEXT, state INT)');
-
-                var sState1 = nCount/3 + "/" +nCount/3
-                tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)', [nDbNumber,idDescText.text]);
-                tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',[nDbNumber, idTextInputQuizName.text,sState1,sLangLoaded  ]);
-
-                glosModelIndex.append({"dbnumber": nNr, "quizname": idTextInputQuizName.text , "state1": sState1 , "langpair" : sLangLoaded,"desc1":idDescText.text })
-                // answer, question , state
-
-                for(var i = 0; i < nCount; i+=3) {
-                  var sAnswString =oDD[i]+"###"+oDD[i+1]
-                  tx.executeSql('INSERT INTO Glosa' +nNr+' VALUES(?, ?, ?, ?)', [i/2,  oDD[i+2], sAnswString, 0 ]);
-                }
-                idLoadQuiz.bProgVisible = false
-                idImport.visible = false
-              }
-              );
-
-      }
 
       Component.onCompleted: {
-        MyDownloader.exportedSignal.connect(quizExported)
-        MyDownloader.quizDownloadedSignal.connect(loadFromList)
-        MyDownloader.quizListDownloadedSignal.connect(loadFromServerList)
-        MyDownloader.deletedSignal.connect(quizDeleted)
+        MyDownloader.exportedSignal.connect(QuizLib.quizExported)
+        MyDownloader.quizDownloadedSignal.connect(QuizLib.loadFromList)
+        MyDownloader.quizListDownloadedSignal.connect(QuizLib.loadFromServerList)
+        MyDownloader.deletedSignal.connect(QuizLib.quizDeleted)
       }
 
       onCurrentIndexChanged:
       {
-
-        var nTheIndex = currentIndex;
-        if (nTheIndex<0)
-          return;
-
-        if (nTheIndex >= glosModelIndex.count)
-          return;
-
-
-        getDb().transaction(
-
-              function(tx) {
-                tx.executeSql('UPDATE GlosaDbLastIndex SET dbindex=?',[nTheIndex]);
-              }
-              )
-
-        if (glosModelIndex.count === 0)
-          return;
-
-        sQuizName = glosModelIndex.get(nTheIndex).quizname;
-        sLangLang = glosModelIndex.get(nTheIndex).langpair;
-        nDbNumber  = glosModelIndex.get(nTheIndex).dbnumber;
-        sScoreText = glosModelIndex.get(nTheIndex).state1;
-        idDescTextOnPage.text = glosModelIndex.get(nTheIndex).desc1
-
-        var res = sLangLang.split("-");
-        sLangLangRev = res[1] + "-" + res[0];
-        sToLang = res[1]
-        sFromLang = res[0]
-        sLangLangEn = "en"+ "-" + res[1];
-        sReqDictUrl = sReqDictUrlBase +  sLangLang + "&text=";
-        sReqDictUrlRev = sReqDictUrlBase + sLangLangRev + "&text=";
-        sReqDictUrlEn= sReqDictUrlBase + sLangLangEn + "&text=";
-
-        sReqUrl = sReqUrlBase +  sLangLang + "&text=";
-        sReqUrlRev = sReqUrlBase +  sLangLangRev + "&text=";
-        sReqUrlEn = sReqUrlBase +  sLangLangEn + "&text=";
-        db.transaction(
-              function(tx) {
-                // tx.executeSql('DROP TABLE Glosa');
-
-                glosModel.clear();
-                tx.executeSql('CREATE TABLE IF NOT EXISTS Glosa' + nDbNumber + ' ( number INT , quizword TEXT, answer TEXT, state INT)');
-
-                var rs = tx.executeSql("SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + sQSort);
-
-                for(var i = 0; i < rs.rows.length; i++) {
-
-                  var sA;
-                  var sE = "";
-
-                  var ocA = rs.rows.item(i).answer.split("###")
-                  sA = ocA[0]
-                  if (ocA.length > 1)
-                    sE = ocA[1]
-
-                  glosModel.append({"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": sA, "extra": sE, "state1" : rs.rows.item(i).state })
-
-
-                }
-
-                loadQuiz();
-
-              }
-              )
-
-        idTextSelected.text = sQuizName
+        QuizLib.loadFromQuizList()
         idQuizNameInput.text = sQuizName
-
       }
 
       delegate:
@@ -510,7 +319,7 @@ Item
       onClicked:
       {
         bProgVisible = true
-        MyDownloader.exportCurrentQuiz( glosModel, sQuizName,sLangLang, idTextInputQuizPwd.text, idTextInputQuizDesc.text )
+        MyDownloader.exportCurrentQuiz( glosModel, sQuizName,sLangLang, idTextInputQuizPwd.displayText, idTextInputQuizDesc.displayText )
       }
     }
 
@@ -522,11 +331,12 @@ Item
     y:20
     visible: false;
     width:parent.width
-    height:parent.width
+    height:parent.width / 1.5
     onCloseClicked:  {
       idPwdDialog.visible = false;
       idDeleteQuiz.bProgVisible = false
       idImport.visible = false
+      idPwdTextInput.text = ""
     }
 
     TextList {
@@ -564,8 +374,7 @@ Item
       id:idServerListView
       anchors.top :idImportTitle.bottom
       width:idImport.width
-      height:parent.height
-      clip:true
+      height:parent.height - idDeleteQuiz.height *3
       model: idServerQModel
       delegate: Item {
         property int nW : idServerListView.width / 6
@@ -648,10 +457,11 @@ Item
       {
         bProgVisible = true
         idTextInputQuizName.text = idImport.sSelectedQ
+        idPwdTextInput.text = idPwdTextInput.displayText
         if (idPwdTextInput.text.length > 0)
         {
           idPwdDialog.visible = false;
-          MyDownloader.deleteQuiz(idImport.sSelectedQ, idPwdTextInput.displayText.trim(),idServerListView.currentIndex)
+          MyDownloader.deleteQuiz(idImport.sSelectedQ, idPwdTextInput.displayText,idServerListView.currentIndex)
           idPwdTextInput.text = ""
         }
         else

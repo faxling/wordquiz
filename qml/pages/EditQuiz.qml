@@ -2,66 +2,13 @@ import QtQuick 2.3
 import QtQuick.Window 2.2
 import QtQuick.XmlListModel 2.0
 import Sailfish.Silica 1.0
+import QtQuick.LocalStorage 2.0 as Sql
+import "../QuizFunctions.js" as QuizLib
 
 Item {
 
   id:idEditQuiz
   property alias glosListView : idGlosList
-
-
-  function downloadDictOnWord(sUrl, sWord, oBtn)
-  {
-    var doc = new XMLHttpRequest();
-    doc.open("GET",sUrl+ sWord);
-
-    idErrorText.visible = false;
-
-    doc.onreadystatechange = function() {
-      if (doc.readyState === XMLHttpRequest.DONE) {
-        if (doc.status === 200) {
-          idTrSynModel.xml = doc.responseText
-          idTrTextModel.xml = doc.responseText
-          idTrMeanModel.xml = doc.responseText
-        }
-        else
-        {
-          idErrorText.text = "error from dictionary server"
-          idErrorText.visible = true;
-        }
-      }
-    }
-    doc.send()
-  }
-
-  function insertGlosa(dbnumber, nC, question, answer)
-  {
-    db.transaction(
-          function(tx) {
-            tx.executeSql('INSERT INTO Glosa'+dbnumber+' VALUES(?, ?, ?, ?)', [nC,  question, answer, 0 ]);
-          })
-
-    glosModel.append({"number": nC, "question": question , "answer": answer, "extra": "", "state1":0})
-
-    glosModelWorking.append({"number": nC, "question": question , "answer": answer, "extra": "","state1":0})
-    idGlosList.positionViewAtEnd()
-    sScoreText = glosModelWorking.count + "/" + glosModel.count
-
-
-    if (glosModel.count === 1)
-    {
-      for (var  i = 0; i < 3;++i) {
-        idQuizModel.get(i).allok = false;
-        idQuizModel.get(i).question = question;
-        idQuizModel.get(i).answer = answer;
-        idQuizModel.get(i).number = nC;
-        idQuizModel.get(i).extra = "";
-        idQuizModel.get(i).visible1 = false
-      }
-
-      return;
-    }
-  }
-
 
   property int nLastSearch : 0
 
@@ -212,7 +159,7 @@ Item {
 
           bProgVisible = true
           if (bHasDictTo)
-            downloadDictOnWord(sReqDictUrl , oInText,idBtn1 )
+            QuizLib.downloadDictOnWord(sReqDictUrl , oInText,idBtn1 )
           idTranslateModel.oBtn = idBtn1
           idTranslateModel.source = sReqUrl + oInText
         }
@@ -232,7 +179,7 @@ Item {
           }
           bProgVisible = true
           if (bHasDictFrom)
-            downloadDictOnWord(sReqDictUrlRev , oInText,idBtn2)
+            QuizLib.downloadDictOnWord(sReqDictUrlRev , oInText,idBtn2)
           idTranslateModel.oBtn = idBtn2
           idTranslateModel.source = sReqUrlRev + oInText
         }
@@ -252,7 +199,7 @@ Item {
 
           bProgVisible = true
           if (bHasDictTo)
-            downloadDictOnWord(sReqDictUrlEn , oInText,idBtn3)
+            QuizLib.downloadDictOnWord(sReqDictUrlEn , oInText,idBtn3)
           idTranslateModel.oBtn = idBtn3
           idTranslateModel.source = sReqUrlEn + oInText
         }
@@ -288,7 +235,7 @@ Item {
           if (bHasSpeechFrom)
             MyDownloader.downloadWord(sNewWordFrom,sFromLang)
 
-          insertGlosa(nDbNumber,nC, sNewWordFrom, sNewWordTo)
+          QuizLib.insertGlosa(nDbNumber,nC, sNewWordFrom, sNewWordTo)
 
         }
       }
@@ -437,7 +384,6 @@ Item {
           font.bold: extra.length > 0
           color: state1 === 0 ? Theme.primaryColor : "green"
           onPressAndHold: idTextInput2.text = answer
-          onClick: idGlosList.currentIndex = index
         }
 
         ButtonQuizImg

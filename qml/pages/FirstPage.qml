@@ -1,7 +1,9 @@
+
+
 import QtQuick 2.2
 import Sailfish.Silica 1.0
-
 import QtQuick.LocalStorage 2.0 as Sql
+import "../QuizFunctions.js" as QuizLib
 
 Page {
   id: idWindow
@@ -40,7 +42,8 @@ Page {
   property int n2BtnWidth: idTabMain.width / 2
   property bool bQSort : true
   property string sQSort : bQSort ? "UPPER(quizword)" : "UPPER(answer)"
-  property alias glosListView :idTab2.glosListView
+  property variant glosListView
+  property int nGlosaDbLastIndex;
 
   onSScoreTextChanged:
   {
@@ -188,76 +191,7 @@ Page {
 
 
   objectName: "idFirstPage"
-  function getDb()
-  {
 
-    if (db !== undefined)
-      return db;
-
-    console.log("init Word Quiz")
-
-    MyDownloader.initUrls(idWindow);
-
-    db = Sql.LocalStorage.openDatabaseSync("GlosDB", "1.0", "Glos Databas!", 1000000);
-
-    Sql.LocalStorage.openDatabaseSync()
-
-    db.transaction(
-          function(tx) {
-
-            // tx.executeSql('DROP TABLE GlosaDbIndex');
-            var nGlosaDbLastIndex;
-            tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbLastIndex( dbindex INT )');
-            var rs = tx.executeSql('SELECT * FROM GlosaDbLastIndex')
-            if (rs.rows.length===0)
-            {
-              tx.executeSql('INSERT INTO GlosaDbLastIndex VALUES(0)')
-            }
-            else
-            {
-              nGlosaDbLastIndex = rs.rows.item(0).dbindex
-            }
-
-            tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbDesc( dbnumber INT , desc1 TEXT)');
-            tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbIndex( dbnumber INT , quizname TEXT, state1 TEXT, langpair TEXT )');
-            rs = tx.executeSql('SELECT * FROM GlosaDbDesc');
-            var oc = [];
-
-            for(var i = 0; i < rs.rows.length; i++) {
-              var oDescription = {dbnumber:rs.rows.item(i).dbnumber, desc1:rs.rows.item(i).desc1}
-              oc.push(oDescription)
-            }
-
-            rs = tx.executeSql('SELECT * FROM GlosaDbIndex');
-
-            Array.prototype.indexOfObject = function arrayObjectIndexOf(property, value) {
-              for (var i = 0, len = this.length; i < len; i++) {
-                if (this[i][property] === value) return i;
-              }
-              return -1;
-            }
-
-            var nRowLen = rs.rows.length
-
-
-            for(i = 0; i < nRowLen; i++) {
-              var nDbnumber = rs.rows.item(i).dbnumber
-              var nN = oc.indexOfObject("dbnumber",nDbnumber)
-              var sDesc = "-"
-              if (nN >= 0)
-              {
-                sDesc = oc[nN].desc1
-              }
-
-              glosModelIndex.append({"dbnumber": nDbnumber, "quizname": rs.rows.item(i).quizname , "state1": rs.rows.item(i).state1, "langpair" : rs.rows.item(i).langpair,"desc1" : sDesc  })
-            }
-
-            idTab1.nQuizListCurrentIndex = nGlosaDbLastIndex;
-
-          }
-          )
-    return db;
-  }
 
   Column  {
     id:idTabMain
@@ -282,7 +216,7 @@ Page {
       {
         id:idTab1Btn
         width: n3BtnWidth
-        text:"File"
+        text:"Home"
         onClicked: idWindow.state = "idTab1"
       }
 
@@ -291,6 +225,7 @@ Page {
         id:idTab2Btn
         width: n3BtnWidth
         text:"Edit"
+
         onClicked:  idWindow.state =  "idTab2"
       }
       Button
@@ -305,6 +240,10 @@ Page {
     CreateNewQuiz
     {
       id:idTab1
+      Component.onCompleted:
+      {
+        idTab1.nQuizListCurrentIndex = idWindow.nGlosaDbLastIndex
+      }
       width:parent.width
       height: idTabMain.height - idTabRow.height - idTitle.height - 20
       visible:false
@@ -316,7 +255,10 @@ Page {
       width:parent.width
       height: idTabMain.height - idTabRow.height - idTitle.height - 20
       visible:false
-
+      Component.onCompleted:
+      {
+        idWindow.glosListView = idTab2.glosListView
+      }
       Text {
         font.pixelSize: Theme.fontSizeTiny
         color:Theme.primaryColor
@@ -342,9 +284,11 @@ Page {
     source: "qrc:qml/pages/harbour-wordquiz.png"
   }
   */
+
   Component.onCompleted: {
-    getDb();
+    QuizLib.getAndInitDb();
   }
+
   states: [
     State {
       name: "idTab1"

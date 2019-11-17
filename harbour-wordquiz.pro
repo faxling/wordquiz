@@ -35,6 +35,7 @@ DISTFILES += qml/harbour-wordquiz.qml \
     qml/pages/RectRounded.qml \
     qml/pages/TakeQuiz.qml \
     qml/pages/TextList.qml \
+    qml/QuizFunctions.js \
     harbour-wordquiz.desktop \
     rpm/harbour-wordquiz.changes.in \
     rpm/harbour-wordquiz.changes.run.in \

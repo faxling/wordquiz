@@ -13,7 +13,19 @@
 #include <QClipboard>
 #include <QUrlQuery>
 
-static const QString GLOS_SERVER2("http://212.112.183.157");
+/// Faxling     Raggo100 trnsl.1.1.20190526T164138Z.e99d5807bb2acb8d.d11f94738ea722cfaddf111d2e8f756cb3b71f4f
+
+// https://cloud.yandex.com/docs/speechkit/tts/request
+// https://translate.yandex.net/api/v1.5/tr/translate?key=trnsl.1.1.20190526T164138Z.e99d5807bb2acb8d.d11f94738ea722cfaddf111d2e8f756cb3b71f4f&text=groda&lang=sv-ru
+// dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739
+
+// speaker=<jane|oksana|alyss|omazh|zahar|ermil>
+//http://tts.voicetech.yandex.net/generate?lang=ru_RU&format=wav&speaker=ermil&text=да&key=6372dda5-9674-4413-85ff-e9d0eb2f99a7
+
+//https://dictionary.yandex.net/api/v1/dicservice/getLangs?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739
+
+
+static const QString GLOS_SERVER2("http://212.112.183.157/glosquiz");
 static const QString GLOS_SERVER1("http://192.168.2.1");
 
 Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject *pParent ) :  QObject(pParent)
@@ -40,6 +52,7 @@ void Speechdownloader::initUrls(QVariant p)
   pp->setProperty("sReqDictUrlBase",sReqDictUrlBase);
   pp->setProperty("sReqDictUrl",sReqDictUrl);
   pp->setProperty("sReqDictUrlRev",sReqDictUrlRev);
+
   pp->setProperty("sReqDictUrlEn",sReqDictUrlEn);
   pp->setProperty("sReqUrlBase",sReqUrlBase);
 
@@ -159,6 +172,7 @@ QString sVoicetechEn(QStringLiteral("http://tts.voicetech.yandex.net/generate?la
 
 QString sVoicetechFr(QStringLiteral("http://api.voicerss.org/?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&r=2&hl=fr-fr&src="));
 QString sVoicetechSe(QStringLiteral("http://api.voicerss.org/?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=sv-se&src="));
+QString sVoicetechNo(QStringLiteral("http://api.voicerss.org/?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=nb-no&src="));
 QString sVoicetechIt(QStringLiteral("http://api.voicerss.org/?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=it-it&src="));
 QString sVoicetechDe(QStringLiteral("http://api.voicerss.org/?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=de-de&src="));
 QString sVoicetechPl(QStringLiteral("http://api.voicerss.org/?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=pl-pl&src="));
@@ -190,7 +204,7 @@ void Speechdownloader::deleteWord(QString sWord, QString sLang)
 
 void Speechdownloader::downloadWord(QString sWord, QString sLang)
 {
-  static QMap<QString, QString> ocUrlMap{ { "ru", sVoicetechRu }, { "en", sVoicetechEn }, { "sv", sVoicetechSe }, { "fr", sVoicetechFr }, { "pl", sVoicetechPl }, { "de", sVoicetechDe },{"it",sVoicetechIt}, { "es", sVoicetechEs } };
+  static QMap<QString, QString> ocUrlMap{ { "no", sVoicetechNo },{ "ru", sVoicetechRu }, { "en", sVoicetechEn }, { "sv", sVoicetechSe }, { "fr", sVoicetechFr }, { "pl", sVoicetechPl }, { "de", sVoicetechDe },{"it",sVoicetechIt}, { "es", sVoicetechEs } };
 
   QString sUrl = ocUrlMap[sLang] + sWord;
   if (m_bPlayAfterDownload==true)
@@ -311,12 +325,11 @@ void Speechdownloader::exportCurrentQuiz(QVariant p, QString sName, QString sLan
       ss << pp->data(pp->index(i), j);
     }
     QString sWord = pp->data(pp->index(i), 0).toString();
-    if (QFile::exists(AudioPath(sWord, ocLang[0])))
-      ocAudio.append(sWord + "_" + ocLang[0]);
-    sWord = pp->data(pp->index(i), 3).toString();
     if (QFile::exists(AudioPath(sWord, ocLang[1])))
-      ocAudio.append(sWord  + "_" + ocLang[1]);
-
+      ocAudio.append(sWord + "_" + ocLang[1]);
+    sWord = pp->data(pp->index(i), 3).toString();
+    if (QFile::exists(AudioPath(sWord, ocLang[0])))
+      ocAudio.append(sWord  + "_" + ocLang[0]);
   }
 
   ss << ocAudio.size();

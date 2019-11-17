@@ -27,6 +27,10 @@ Rectangle
     anchors.verticalCenter: parent.verticalCenter
     anchors.right: parent.right
     source: "image://theme/icon-s-clear-opaque-cross"
-    onClicked: parent.text = ""
+    onClicked:
+    {
+      parent.text = parent.displayText
+      parent.text = ""
+    }
   }
 }
