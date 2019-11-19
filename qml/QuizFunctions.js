@@ -25,75 +25,75 @@ function downloadDictOnWord(sUrl, sWord)
 
 
 function getAndInitDb()
- {
+{
 
-   if (idWindow.db !== undefined)
-     return idWindow.db;
+  if (idWindow.db !== undefined)
+    return idWindow.db;
 
-   console.log("init Word Quiz")
+  console.log("init Word Quiz")
 
-   MyDownloader.initUrls(idWindow);
+  MyDownloader.initUrls(idWindow);
 
-   db = Sql.LocalStorage.openDatabaseSync("GlosDB", "1.0", "Glos Databas!", 1000000);
+  db = Sql.LocalStorage.openDatabaseSync("GlosDB", "1.0", "Glos Databas!", 1000000);
 
-   Sql.LocalStorage.openDatabaseSync()
+  Sql.LocalStorage.openDatabaseSync()
 
-   db.transaction(
-         function(tx) {
+  db.transaction(
+        function(tx) {
 
-           // tx.executeSql('DROP TABLE GlosaDbIndex');
-           var nGlosaDbLastIndex;
-           tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbLastIndex( dbindex INT )');
-           var rs = tx.executeSql('SELECT * FROM GlosaDbLastIndex')
-           if (rs.rows.length===0)
-           {
-             tx.executeSql('INSERT INTO GlosaDbLastIndex VALUES(0)')
-           }
-           else
-           {
-             nGlosaDbLastIndex = rs.rows.item(0).dbindex
-           }
+          // tx.executeSql('DROP TABLE GlosaDbIndex');
+          var nGlosaDbLastIndex;
+          tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbLastIndex( dbindex INT )');
+          var rs = tx.executeSql('SELECT * FROM GlosaDbLastIndex')
+          if (rs.rows.length===0)
+          {
+            tx.executeSql('INSERT INTO GlosaDbLastIndex VALUES(0)')
+          }
+          else
+          {
+            nGlosaDbLastIndex = rs.rows.item(0).dbindex
+          }
 
-           tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbDesc( dbnumber INT , desc1 TEXT)');
-           tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbIndex( dbnumber INT , quizname TEXT, state1 TEXT, langpair TEXT )');
-           rs = tx.executeSql('SELECT * FROM GlosaDbDesc');
-           var oc = [];
+          tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbDesc( dbnumber INT , desc1 TEXT)');
+          tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbIndex( dbnumber INT , quizname TEXT, state1 TEXT, langpair TEXT )');
+          rs = tx.executeSql('SELECT * FROM GlosaDbDesc');
+          var oc = [];
 
-           for(var i = 0; i < rs.rows.length; i++) {
-             var oDescription = {dbnumber:rs.rows.item(i).dbnumber, desc1:rs.rows.item(i).desc1}
-             oc.push(oDescription)
-           }
+          for(var i = 0; i < rs.rows.length; i++) {
+            var oDescription = {dbnumber:rs.rows.item(i).dbnumber, desc1:rs.rows.item(i).desc1}
+            oc.push(oDescription)
+          }
 
-           rs = tx.executeSql('SELECT * FROM GlosaDbIndex');
+          rs = tx.executeSql('SELECT * FROM GlosaDbIndex');
 
-           Array.prototype.indexOfObject = function arrayObjectIndexOf(property, value) {
-             for (var i = 0, len = this.length; i < len; i++) {
-               if (this[i][property] === value) return i;
-             }
-             return -1;
-           }
+          Array.prototype.indexOfObject = function arrayObjectIndexOf(property, value) {
+            for (var i = 0, len = this.length; i < len; i++) {
+              if (this[i][property] === value) return i;
+            }
+            return -1;
+          }
 
-           var nRowLen = rs.rows.length
+          var nRowLen = rs.rows.length
 
 
-           for(i = 0; i < nRowLen; i++) {
-             var nDbnumber = rs.rows.item(i).dbnumber
-             var nN = oc.indexOfObject("dbnumber",nDbnumber)
-             var sDesc = "-"
-             if (nN >= 0)
-             {
-               sDesc = oc[nN].desc1
-             }
+          for(i = 0; i < nRowLen; i++) {
+            var nDbnumber = rs.rows.item(i).dbnumber
+            var nN = oc.indexOfObject("dbnumber",nDbnumber)
+            var sDesc = "-"
+            if (nN >= 0)
+            {
+              sDesc = oc[nN].desc1
+            }
 
-             glosModelIndex.append({"dbnumber": nDbnumber, "quizname": rs.rows.item(i).quizname , "state1": rs.rows.item(i).state1, "langpair" : rs.rows.item(i).langpair,"desc1" : sDesc  })
-           }
+            glosModelIndex.append({"dbnumber": nDbnumber, "quizname": rs.rows.item(i).quizname , "state1": rs.rows.item(i).state1, "langpair" : rs.rows.item(i).langpair,"desc1" : sDesc  })
+          }
 
-           idWindow.nGlosaDbLastIndex = nGlosaDbLastIndex;
+          idWindow.nGlosaDbLastIndex = nGlosaDbLastIndex;
 
-         }
-         )
-   return db;
- }
+        }
+        )
+  return db;
+}
 
 
 /*
@@ -114,9 +114,9 @@ function insertGlosa(dbnumber, nC, question, answer)
   glosModel.append({"number": nC, "question": question , "answer": answer, "extra": "", "state1":0})
 
   glosModelWorking.append({"number": nC, "question": question , "answer": answer, "extra": "","state1":0})
-  idItemEdit.glosListView.positionViewAtEnd()
+  idTab2.glosListView.positionViewAtEnd()
+  idTab2.glosListView.currentIndex = glosModel.count -1
   sScoreText = glosModelWorking.count + "/" + glosModel.count
-
 
   if (glosModel.count === 1)
   {
@@ -128,13 +128,14 @@ function insertGlosa(dbnumber, nC, question, answer)
       idQuizModel.get(i).extra = "";
       idQuizModel.get(i).visible1 = false
     }
-
-    return;
   }
 }
 
 function loadFromQuizList (){
-  getAndInitDb().transaction(
+
+  db = getAndInitDb();
+
+  db.transaction(
         function(tx) {
           tx.executeSql('UPDATE GlosaDbLastIndex SET dbindex=?',[idQuizList.currentIndex]);
         }
@@ -142,6 +143,9 @@ function loadFromQuizList (){
 
   if (glosModelIndex.count === 0)
     return;
+
+
+
   sQuizName = glosModelIndex.get(idQuizList.currentIndex).quizname;
   sLangLang = glosModelIndex.get(idQuizList.currentIndex).langpair;
   nDbNumber  = glosModelIndex.get(idQuizList.currentIndex).dbnumber;

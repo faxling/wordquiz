@@ -240,14 +240,9 @@ Page {
     CreateNewQuiz
     {
       id:idTab1
-      Component.onCompleted:
-      {
-        idTab1.nQuizListCurrentIndex = idWindow.nGlosaDbLastIndex
-      }
       width:parent.width
       height: idTabMain.height - idTabRow.height - idTitle.height - 20
       visible:false
-
     }
     EditQuiz
     {
@@ -272,6 +267,11 @@ Page {
       width:parent.width
       height: idTabMain.height - idTabRow.height - idTitle.height - 20
       visible:false
+      Component.onCompleted:
+      {
+        QuizLib.getAndInitDb();
+        idTab1.nQuizListCurrentIndex = idWindow.nGlosaDbLastIndex
+      }
     }
 
   }
@@ -285,9 +285,6 @@ Page {
   }
   */
 
-  Component.onCompleted: {
-    QuizLib.getAndInitDb();
-  }
 
   states: [
     State {

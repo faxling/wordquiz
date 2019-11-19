@@ -89,11 +89,9 @@ void Speechdownloader::wordDownloaded(QNetworkReply* pReply)
   QFile oWav(sFileName);
   oWav.open(QIODevice::WriteOnly);
   oWav.write(m_oDownloadedData);
-
   oWav.close();
 
   emit downloadedSignal();
-
 
   qDebug() << sWord;
   if (uQ.hasQueryItem("PlayAfterDownload") == true)
