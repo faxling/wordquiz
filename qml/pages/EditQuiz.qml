@@ -522,6 +522,11 @@ Item {
     height:Theme.itemSizeExtraSmall*4
     color :Theme.overlayBackgroundColor
     onCloseClicked: idEditDlg.visible = false
+    onVisibleChanged:
+    {
+      if (!visible)
+        idGlosList.positionViewAtIndex(idGlosList.currentIndex, ListView.Center)
+    }
 
     Column
     {
@@ -574,43 +579,48 @@ Item {
           text:  "Update"
           onClicked: {
             idEditDlg.visible = false
+            var nNumber = glosModel.get(idGlosList.currentIndex).number
+            var sQ =  idTextEdit1.displayText.trim()
+            var sA =  idTextEdit2.displayText.trim()
+            var sA_Org =  sA
+
+            var sE =  idTextEdit3.displayText.trim()
             db.transaction(
                   function(tx) {
-                    var nNr = glosModel.get(idGlosList.currentIndex).number
-                    var sQ =  idTextEdit1.displayText
-                    var sA =  idTextEdit2.displayText
-
                     if (idTextEdit3.displayText.length > 0)
                     {
                       sA = sA + "###" + idTextEdit3.displayText
                     }
 
-                    tx.executeSql('UPDATE Glosa'+nDbNumber+' SET quizword=?, answer=? WHERE number = ?',[sQ,sA,nNr]);
+                    tx.executeSql('UPDATE Glosa'+nDbNumber+' SET quizword=?, answer=? WHERE number = ?',[sQ,sA,nNumber]);
 
                     // Assign The updated values
                     for ( var i = 0; i < 3;++i) {
-                      if (idQuizModel.get(i).number === nNr)
+                      if (idQuizModel.get(i).number === nNumber)
                       {
                         idQuizModel.get(i).question = sQ;
-                        idQuizModel.get(i).answer = idTextEdit2.displayText.trim();
-                        idQuizModel.get(i).extra = idTextEdit3.displayText.trim();
+                        idQuizModel.get(i).answer = sA_Org;
+                        idQuizModel.get(i).extra = sE;
                       }
                     }
                   }
                   )
-            var nNumber = glosModel.get(idGlosList.currentIndex).number
 
-            var i = findNumberInModel(glosModelWorking, nNumber)
 
-            glosModelWorking.get(i).question = idTextEdit1.displayText.trim()
-            glosModelWorking.get(i).answer = idTextEdit2.displayText.trim()
-            glosModelWorking.get(i).extra = idTextEdit3.displayText.trim()
+            var i = QuizLib.findNumberInModel(glosModelWorking, nNumber)
+
+            if (i >= 0)
+            {
+              glosModelWorking.get(i).question = sQ
+              glosModelWorking.get(i).answer = sA_Org
+              glosModelWorking.get(i).extra = sE
+            }
 
             MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).answer,sToLang)
             MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).question,sFromLang)
-            glosModel.get(idGlosList.currentIndex).question = idTextEdit1.displayText.trim()
-            glosModel.get(idGlosList.currentIndex).answer = idTextEdit2.displayText.trim()
-            glosModel.get(idGlosList.currentIndex).extra = idTextEdit3.displayText.trim()
+            glosModel.get(idGlosList.currentIndex).question = sQ
+            glosModel.get(idGlosList.currentIndex).answer = sA_Org
+            glosModel.get(idGlosList.currentIndex).extra =  sE
 
           }
         }
@@ -620,14 +630,13 @@ Item {
           text:  "Delete"
           onClicked: {
             idEditDlg.visible = false
+            var nNumber = glosModel.get(idGlosList.currentIndex).number
             db.transaction(
                   function(tx) {
-                    var nNr = glosModel.get(idGlosList.currentIndex).number
-                    tx.executeSql('DELETE FROM Glosa'+nDbNumber+' WHERE number = ?',[nNr]);
+                    tx.executeSql('DELETE FROM Glosa'+nDbNumber+' WHERE number = ?',[nNumber]);
                   }
                   )
 
-            var number = glosModel.get(idGlosList.currentIndex).number
             var sQuestion = glosModel.get(idGlosList.currentIndex).question
             var sAnswer = glosModel.get(idGlosList.currentIndex).answer
 
@@ -637,7 +646,7 @@ Item {
 
             var nC = glosModelWorking.count;
             for ( var i = 0; i < nC;++i) {
-              if (glosModelWorking.get(i).number === number)
+              if (glosModelWorking.get(i).number === nNumber)
               {
                 glosModelWorking.remove(i);
                 break;
@@ -646,7 +655,7 @@ Item {
             if (glosModel.count > 0)
             {
               for (  i = 0; i < 3;++i) {
-                if (idQuizModel.get(i).number === number)
+                if (idQuizModel.get(i).number === nNumber)
                 {
                   // The removed word is displayed in the Quiz tab
                   var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);

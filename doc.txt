@@ -19,5 +19,8 @@ The created quiz and the downloaded voice files are stored in the Sql LocalStora
 
 
 
+
+
+
 Make Your own language rehearsal quiz. Take the quiz and swipe right if you known the word or swipe left if you don't 
 Look up words or sentence in online dictionary or enter manually.

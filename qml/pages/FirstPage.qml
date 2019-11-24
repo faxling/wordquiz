@@ -45,6 +45,7 @@ Page {
   property variant glosListView
   property variant quizListView
   property int nGlosaDbLastIndex:  -1
+
   onSScoreTextChanged:
   {
     db.transaction(
@@ -57,7 +58,6 @@ Page {
           }
           )
   }
-
 
 
   ListModel {
@@ -144,82 +144,93 @@ Page {
   {
     QuizLib.getAndInitDb();
   }
-  Column  {
-    id:idTabMain
-    anchors.fill : parent
-    anchors.leftMargin : 50
-    anchors.rightMargin : 50
-    anchors.topMargin : 50
-    spacing :10
 
-    Label {
-      anchors.horizontalCenter: parent.horizontalCenter
-      id: idTitle
-      text: sQuizName + " " + sFromLang + (bIsReverse ? "<-" : "->") +  sToLang + " " + sScoreText
-      onTextChanged: sAppTitle = sQuizName
+  SilicaListView {
+    anchors.fill: parent
+
+
+    PushUpMenu {
+      MenuItem {
+        text: "Help"
+        onClicked: Qt.openUrlExternally("http://212.112.183.157/glosquiz/man.html");
+      }
     }
-
-    Row {
-      id:idTabRow
-      width:parent.width
+    Column  {
+      id:idTabMain
+      anchors.fill : parent
+      anchors.leftMargin : 50
+      anchors.rightMargin : 50
+      anchors.topMargin : 50
       spacing :10
-      Button
+
+      Label {
+        anchors.horizontalCenter: parent.horizontalCenter
+        id: idTitle
+        text: sQuizName + " " + sFromLang + (bIsReverse ? "<-" : "->") +  sToLang + " " + sScoreText
+        onTextChanged: sAppTitle = sQuizName
+      }
+
+      Row {
+        id:idTabRow
+        width:parent.width
+        spacing :10
+        Button
+        {
+          id:idTab1Btn
+          width: n3BtnWidth
+          text:"Home"
+          onClicked: idWindow.state = "idTab1"
+        }
+
+        Button
+        {
+          id:idTab2Btn
+          width: n3BtnWidth
+          text:"Edit"
+
+          onClicked:  idWindow.state =  "idTab2"
+        }
+        Button
+        {
+          id:idTab3Btn
+          width: n3BtnWidth
+          text:"Quiz"
+          onClicked:  idWindow.state ="idTab3"
+        }
+      }
+
+      CreateNewQuiz
       {
-        id:idTab1Btn
-        width: n3BtnWidth
-        text:"Home"
-        onClicked: idWindow.state = "idTab1"
+        id:idTab1
+        width:parent.width
+        height: idTabMain.height - idTabRow.height - idTitle.height - 20
+        visible:false
       }
-
-      Button
+      EditQuiz
       {
-        id:idTab2Btn
-        width: n3BtnWidth
-        text:"Edit"
+        id:idTab2
+        width:parent.width
+        height: idTabMain.height - idTabRow.height - idTitle.height - 20
+        visible:false
 
-        onClicked:  idWindow.state =  "idTab2"
+        Text {
+          font.pixelSize: Theme.fontSizeTiny
+          color:Theme.primaryColor
+          y:  Screen.height - parent.y - 95
+          text: "Powered by Yandex.Translate "
+        }
       }
-      Button
+      TakeQuiz
       {
-        id:idTab3Btn
-        width: n3BtnWidth
-        text:"Quiz"
-        onClicked:  idWindow.state ="idTab3"
+        id:idTab3
+        width:parent.width
+        height: idTabMain.height - idTabRow.height - idTitle.height - 20
+        visible:false
+
       }
-    }
-
-    CreateNewQuiz
-    {
-      id:idTab1
-      width:parent.width
-      height: idTabMain.height - idTabRow.height - idTitle.height - 20
-      visible:false
-    }
-    EditQuiz
-    {
-      id:idTab2
-      width:parent.width
-      height: idTabMain.height - idTabRow.height - idTitle.height - 20
-      visible:false
-
-      Text {
-        font.pixelSize: Theme.fontSizeTiny
-        color:Theme.primaryColor
-        y:  Screen.height - parent.y - 95
-        text: "Powered by Yandex.Translate "
-      }
-    }
-    TakeQuiz
-    {
-      id:idTab3
-      width:parent.width
-      height: idTabMain.height - idTabRow.height - idTitle.height - 20
-      visible:false
 
     }
-
   }
-
   /*
   Image
   {
