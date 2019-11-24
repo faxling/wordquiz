@@ -1,3 +1,33 @@
+function findDbNumberInModel(oListModelVar, nNumber)
+{
+
+  var nC = oListModelVar.count;
+
+  for ( var i = 0; i < nC;++i) {
+    if (oListModelVar.get(i).dbnumber === nNumber)
+    {
+      return i;
+    }
+  }
+
+  return -1
+}
+
+function findNumberInModel(oListModelVar, nNumber)
+{
+
+  var nC = oListModelVar.count;
+  for ( var i = 0; i < nC;++i) {
+    if (oListModelVar.get(i).number === nNumber)
+    {
+      return i;
+    }
+  }
+
+  return -1
+}
+
+
 function downloadDictOnWord(sUrl, sWord)
 {
   var doc = new XMLHttpRequest();
@@ -42,7 +72,7 @@ function getAndInitDb()
         function(tx) {
 
           // tx.executeSql('DROP TABLE GlosaDbIndex');
-          var nGlosaDbLastIndex;
+          var nGlosaDbLastIndex = 0;
           tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbLastIndex( dbindex INT )');
           var rs = tx.executeSql('SELECT * FROM GlosaDbLastIndex')
           if (rs.rows.length===0)
@@ -75,7 +105,6 @@ function getAndInitDb()
 
           var nRowLen = rs.rows.length
 
-
           for(i = 0; i < nRowLen; i++) {
             var nDbnumber = rs.rows.item(i).dbnumber
             var nN = oc.indexOfObject("dbnumber",nDbnumber)
@@ -88,7 +117,8 @@ function getAndInitDb()
             glosModelIndex.append({"dbnumber": nDbnumber, "quizname": rs.rows.item(i).quizname , "state1": rs.rows.item(i).state1, "langpair" : rs.rows.item(i).langpair,"desc1" : sDesc  })
           }
 
-          idWindow.nGlosaDbLastIndex = nGlosaDbLastIndex;
+          idWindow.quizListView.currentIndex = nGlosaDbLastIndex;
+
 
         }
         )
@@ -114,8 +144,8 @@ function insertGlosa(dbnumber, nC, question, answer)
   glosModel.append({"number": nC, "question": question , "answer": answer, "extra": "", "state1":0})
 
   glosModelWorking.append({"number": nC, "question": question , "answer": answer, "extra": "","state1":0})
-  idTab2.glosListView.positionViewAtEnd()
-  idTab2.glosListView.currentIndex = glosModel.count -1
+  idWindow.glosListView.positionViewAtEnd()
+  idWindow.glosListView.currentIndex = glosModel.count -1
   sScoreText = glosModelWorking.count + "/" + glosModel.count
 
   if (glosModel.count === 1)
@@ -129,6 +159,66 @@ function insertGlosa(dbnumber, nC, question, answer)
       idQuizModel.get(i).visible1 = false
     }
   }
+}
+
+function assignQuizModel(nIndexOwNewWord)
+{
+  for (var i = 0; i < 3;++i) {
+    idQuizModel.get(i).allok = false;
+  }
+
+  var sNumberNewWord = glosModelWorking.get(nIndexOwNewWord).number
+  idQuizModel.get(nQuizIndex).question = glosModelWorking.get(nIndexOwNewWord).question;
+  idQuizModel.get(nQuizIndex).answer = glosModelWorking.get(nIndexOwNewWord).answer;
+  idQuizModel.get(nQuizIndex).number = sNumberNewWord;
+  idQuizModel.get(nQuizIndex).extra = glosModelWorking.get(nIndexOwNewWord).extra;
+  idQuizModel.get(nQuizIndex).visible1 = false
+
+  idWindow.glosListView.currentIndex = findNumberInModel(glosModel,sNumberNewWord)
+}
+
+
+function loadQuiz()
+{
+  glosModelWorking.clear();
+  if (glosModel.count < 1)
+  {
+    for (var  i = 0; i < 3;++i) {
+      idQuizModel.get(i).allok = false;
+      idQuizModel.get(i).question = "-";
+      idQuizModel.get(i).answer = "-";
+      idQuizModel.get(i).number = "-";
+      idQuizModel.get(i).extra = "-";
+      idQuizModel.get(i).visible1 = false
+    }
+    return;
+  }
+
+  var nC = glosModel.count
+
+  bIsReverse = false
+
+  for (  i = 0; i < nC;++i) {
+    if (glosModel.get(i).state1 === 0)
+      glosModelWorking.append(glosModel.get(i))
+  }
+
+  var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
+
+  // sScoreText =  glosModelWorking.count + "/" + nC
+
+  if (glosModelWorking.count === 0)
+  {
+    for (  i = 0; i < 3;++i) {
+      idQuizModel.get(i).allok = true;
+    }
+  }
+  else
+  {
+    console.log("loadQuiz assignQuizModel")
+    assignQuizModel(nIndexOwNewWord)
+  }
+
 }
 
 function loadFromQuizList (){
@@ -164,6 +254,8 @@ function loadFromQuizList (){
   sReqDictUrlEn= sReqDictUrlBase + sLangLangEn + "&text=";
 
   sReqUrl = sReqUrlBase +  sLangLang + "&text=";
+  sReqUrlRev = sReqUrlBase +  sLangLangRev + "&text=";
+  sReqUrlEn = sReqUrlBase +  sLangLangEn + "&text=";
 
   idWindow.db.transaction(
         function(tx) {
@@ -190,6 +282,8 @@ function loadFromQuizList (){
 
         }
         )
+
+
   idTextSelected.text = sQuizName
 
 }

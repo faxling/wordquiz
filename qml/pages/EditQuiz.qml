@@ -8,7 +8,6 @@ import "../QuizFunctions.js" as QuizLib
 Item {
 
   id:idEditQuiz
-  property alias glosListView : idGlosList
 
   property int nLastSearch : 0
 
@@ -596,17 +595,14 @@ Item {
                     }
                   }
                   )
-            var nC = glosModelWorking.count;
             var nNumber = glosModel.get(idGlosList.currentIndex).number
-            for ( var i = 0; i < nC;++i) {
-              if (glosModelWorking.get(i).number === nNumber)
-              {
-                glosModelWorking.get(i).question = idTextEdit1.displayText.trim()
-                glosModelWorking.get(i).answer = idTextEdit2.displayText.trim()
-                glosModelWorking.get(i).extra = idTextEdit3.displayText.trim()
-                break;
-              }
-            }
+
+            var i = findNumberInModel(glosModelWorking, nNumber)
+
+            glosModelWorking.get(i).question = idTextEdit1.displayText.trim()
+            glosModelWorking.get(i).answer = idTextEdit2.displayText.trim()
+            glosModelWorking.get(i).extra = idTextEdit3.displayText.trim()
+
             MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).answer,sToLang)
             MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).question,sFromLang)
             glosModel.get(idGlosList.currentIndex).question = idTextEdit1.displayText.trim()

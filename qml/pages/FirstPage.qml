@@ -43,7 +43,7 @@ Page {
   property bool bQSort : true
   property string sQSort : bQSort ? "UPPER(quizword)" : "UPPER(answer)"
   property variant glosListView
-  property int nGlosaDbLastIndex;
+  property variant quizListView
 
   onSScoreTextChanged:
   {
@@ -51,66 +51,14 @@ Page {
           function(tx) {
             tx.executeSql('UPDATE GlosaDbIndex SET state1=? WHERE dbnumber=?',[sScoreText, nDbNumber]);
 
-            var nC = glosModelIndex.count
-            for ( var i = 0; i < nC;++i) {
-              if (glosModelIndex.get(i).dbnumber === nDbNumber)
-              {
-                glosModelIndex.setProperty(i,"state1", sScoreText)
-                break;
-              }
-            }
+            var i = QuizLib.findDbNumberInModel(glosModelIndex, nDbNumber)
+            glosModelIndex.setProperty(i,"state1", sScoreText)
+
           }
           )
   }
 
-  function loadQuiz()
-  {
-    glosModelWorking.clear();
-    if (glosModel.count < 1)
-    {
-      for (var  i = 0; i < 3;++i) {
-        idQuizModel.get(i).allok = false;
-        idQuizModel.get(i).question = "-";
-        idQuizModel.get(i).answer = "-";
-        idQuizModel.get(i).number = "-";
-        idQuizModel.get(i).extra = "-";
-        idQuizModel.get(i).visible1 = false
-      }
-      return;
-    }
 
-    var nC = glosModel.count
-
-    bIsReverse = false
-
-    for (  i = 0; i < nC;++i) {
-      if (glosModel.get(i).state1 === 0)
-        glosModelWorking.append(glosModel.get(i))
-    }
-
-    var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
-
-    // sScoreText =  glosModelWorking.count + "/" + nC
-
-    if (glosModelWorking.count === 0)
-    {
-      for (  i = 0; i < 3;++i) {
-        idQuizModel.get(i).allok = true;
-      }
-    }
-    else
-    {
-      for (  i = 0; i < 3;++i) {
-        idQuizModel.get(i).allok = false;
-      }
-      idQuizModel.get(nQuizIndex).question = glosModelWorking.get(nIndexOwNewWord).question;
-      idQuizModel.get(nQuizIndex).answer = glosModelWorking.get(nIndexOwNewWord).answer;
-      idQuizModel.get(nQuizIndex).number = glosModelWorking.get(nIndexOwNewWord).number;
-      idQuizModel.get(nQuizIndex).extra = glosModelWorking.get(nIndexOwNewWord).extra;
-      idQuizModel.get(nQuizIndex).visible1 = false
-    }
-
-  }
 
   ListModel {
     id: glosModel
@@ -192,7 +140,10 @@ Page {
 
   objectName: "idFirstPage"
 
-
+  Component.onCompleted:
+  {
+    QuizLib.getAndInitDb();
+  }
   Column  {
     id:idTabMain
     anchors.fill : parent
@@ -267,11 +218,7 @@ Page {
       width:parent.width
       height: idTabMain.height - idTabRow.height - idTitle.height - 20
       visible:false
-      Component.onCompleted:
-      {
-        QuizLib.getAndInitDb();
-        idTab1.nQuizListCurrentIndex = idWindow.nGlosaDbLastIndex
-      }
+
     }
 
   }

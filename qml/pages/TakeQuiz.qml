@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../QuizFunctions.js" as QuizLib
 
 Item {
   id:idRectTakeQuiz
@@ -191,22 +192,7 @@ Item {
       if (glosModelWorking.count>0)
       {
         var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
-        idQuizModel.get(nI).question = glosModelWorking.get(nIndexOwNewWord).question
-        idQuizModel.get(nI).answer = glosModelWorking.get(nIndexOwNewWord).answer
-        idQuizModel.get(nI).number = glosModelWorking.get(nIndexOwNewWord).number
-        idQuizModel.get(nI).extra = glosModelWorking.get(nIndexOwNewWord).extra
-        idQuizModel.get(nI).visible1 = false
-        idQuizModel.get(nI).allok = false
-
-        var nCurrentGlosNumber = idQuizModel.get(nI).number
-        nC = glosModel.count
-        for (  i = 0; i < nC;++i) {
-          if (glosModel.get(i).number === nCurrentGlosNumber)
-          {
-            glosListView.currentIndex = i
-            break;
-          }
-        }
+        QuizLib.assignQuizModel(nIndexOwNewWord)
       }
     }
 
