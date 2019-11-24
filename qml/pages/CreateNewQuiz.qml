@@ -211,8 +211,15 @@ Item
 
       onCurrentIndexChanged:
       {
-        QuizLib.loadFromQuizList()
-        idQuizNameInput.text = sQuizName
+        if (nGlosaDbLastIndex >= 0)
+        {
+          QuizLib.loadFromQuizList()
+          idQuizNameInput.text = sQuizName
+        }
+        else
+        {
+          nGlosaDbLastIndex = 0
+        }
       }
 
       delegate:

@@ -363,7 +363,10 @@ Item {
 
       width:parent.width
       spacing: 3
-
+      Component.onCompleted:
+      {
+        idWindow.glosListView = idGlosList
+      }
       model: glosModel
       delegate: Row {
         spacing:5

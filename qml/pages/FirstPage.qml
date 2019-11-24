@@ -44,7 +44,7 @@ Page {
   property string sQSort : bQSort ? "UPPER(quizword)" : "UPPER(answer)"
   property variant glosListView
   property variant quizListView
-
+  property int nGlosaDbLastIndex:  -1
   onSScoreTextChanged:
   {
     db.transaction(
@@ -201,10 +201,7 @@ Page {
       width:parent.width
       height: idTabMain.height - idTabRow.height - idTitle.height - 20
       visible:false
-      Component.onCompleted:
-      {
-        idWindow.glosListView = idTab2.glosListView
-      }
+
       Text {
         font.pixelSize: Theme.fontSizeTiny
         color:Theme.primaryColor
