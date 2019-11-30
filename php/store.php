@@ -1,9 +1,6 @@
 <?php
 
-$servername = "localhost";
-$username = "root";
-$password = "admin";
-
+include 'dbconn.php';
 // Create connection
 $conn = new mysqli($servername, $username, $password, "glosquiz");
 

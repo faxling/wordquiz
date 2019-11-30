@@ -230,35 +230,39 @@ Item
         TextList
         {
           id:idCol1
-          width: Theme.itemSizeMedium*2.5
+          width: n4BtnWidth*2
           text:quizname
           onClick: idQuizList.currentIndex = index
         }
         TextList
         {
           id:idCol2
-          width: Theme.itemSizeMedium
+          width: n4BtnWidth
           text:langpair
           onClick: idQuizList.currentIndex = index
         }
-        TextList
+        Item
         {
-          id:idCol3
-          width: Theme.itemSizeMedium
-          text:state1
-          onClick: idQuizList.currentIndex = index
-        }
-
-        ButtonQuizImg
-        {
-          id:idEdtBtn
+          width: n4BtnWidth
           height:idCol1.height
-          width:idCol1.height
-          source: "image://theme/icon-s-edit"
-          onClicked:
+          TextList
           {
-            idEditQuizEntryDlg.visible = true
-            idQuizList.currentIndex = index
+            id:idCol3
+            text:state1
+            onClick: idQuizList.currentIndex = index
+          }
+
+          ButtonQuizImg
+          {
+            id:idEdtBtn
+            anchors.right: parent.right
+            height:idCol1.height
+            source: "image://theme/icon-s-edit"
+            onClicked:
+            {
+              idEditQuizEntryDlg.visible = true
+              idQuizList.currentIndex = index
+            }
           }
         }
       }

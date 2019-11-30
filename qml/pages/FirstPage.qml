@@ -148,13 +148,6 @@ Page {
   SilicaListView {
     anchors.fill: parent
 
-
-    PushUpMenu {
-      MenuItem {
-        text: "Help"
-        onClicked: Qt.openUrlExternally("http://212.112.183.157/glosquiz/man.html");
-      }
-    }
     Column  {
       id:idTabMain
       anchors.fill : parent
@@ -163,11 +156,27 @@ Page {
       anchors.topMargin : 50
       spacing :10
 
-      Label {
-        anchors.horizontalCenter: parent.horizontalCenter
-        id: idTitle
-        text: sQuizName + " " + sFromLang + (bIsReverse ? "<-" : "->") +  sToLang + " " + sScoreText
-        onTextChanged: sAppTitle = sQuizName
+      Item
+      {
+        width:parent.width
+        height: idTitle.height
+        Label {
+          id: idTitle
+          anchors.horizontalCenter: parent.horizontalCenter
+          text: sQuizName + " " + sFromLang + (bIsReverse ? "<-" : "->") +  sToLang + " " + sScoreText
+          onTextChanged: sAppTitle = sQuizName
+        }
+
+        ButtonQuizImg
+        {
+          id: idBtnHelp
+          anchors.right: parent.right
+          anchors.topMargin : -40
+          anchors.rightMargin : -40
+          anchors.top : parent.top
+          source:"image://theme/icon-m-question"
+          onClicked: Qt.openUrlExternally("https://faxling.github.io/WordQuizWin/index.html");
+        }
       }
 
       Row {
@@ -187,7 +196,6 @@ Page {
           id:idTab2Btn
           width: n3BtnWidth
           text:"Edit"
-
           onClicked:  idWindow.state =  "idTab2"
         }
         Button

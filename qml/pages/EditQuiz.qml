@@ -96,16 +96,24 @@ Item {
       {
         anchors.bottom: parent.bottom
         x:idTextInput.width - width
-        source: "image://theme/icon-s-clipboard"
-        onClicked:MyDownloader.toClipBoard(idTextInput.text)
+        source: "image://theme/icon-s-clipboard?" + (focus ? Theme.highlightColor : Theme.primaryColor)
+        onClicked:
+        {
+          focus = true
+          MyDownloader.toClipBoard(idTextInput.text)
+        }
       }
 
       ButtonQuizImg
       {
         x :idTextInput2.x + idTextInput.width - width
         anchors.bottom: parent.bottom
-        source: "image://theme/icon-s-clipboard"
-        onClicked:MyDownloader.toClipBoard(idTextInput2.text)
+        source: "image://theme/icon-s-clipboard?" + (focus ? Theme.highlightColor : Theme.primaryColor)
+        onClicked:{
+          focus = true
+          MyDownloader.toClipBoard(idTextInput2.text)
+        }
+
       }
     }
 
@@ -454,14 +462,7 @@ Item {
 
         var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
 
-        i =  nQuizIndex
-
-        idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question
-        idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer
-        idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number
-        idQuizModel.get(i).extra = glosModelWorking.get(nIndexOwNewWord).extra
-        idQuizModel.get(i).visible1 = false
-        idQuizModel.get(i).allok = false
+        QuizLib.assignQuizModel(nIndexOwNewWord)
 
       }
 
@@ -500,16 +501,7 @@ Item {
         }
 
         var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
-
-        i =  nQuizIndex
-
-        idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question
-        idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer
-        idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number
-        idQuizModel.get(i).extra = glosModelWorking.get(nIndexOwNewWord).extra
-        idQuizModel.get(i).visible1 = false
-        idQuizModel.get(i).allok = false
-
+        QuizLib.assignQuizModel(nIndexOwNewWord)
       }
     }
   }
