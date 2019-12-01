@@ -23,6 +23,43 @@ function findNumberInModel(oListModelVar, nNumber) {
   return -1
 }
 
+function getTextFromInput(oTextInput)
+{
+  var oInText  = oTextInput.displayText.trim()
+  if (oInText.length < 1 )
+  {
+    idErrorText.visible = true
+    idErrorText.text = "No input to lookup in dictionary"
+    return "";
+  }
+  return oInText;
+}
+
+function updateDesc1(sDesc)
+{
+
+  var nDbId = glosModelIndex.get(idQuizList.currentIndex).dbnumber;
+
+  glosModelIndex.get(idQuizList.currentIndex).desc1 = sDesc
+  idDescTextOnPage.text = sDesc
+
+
+  db.transaction(
+        function (tx) {
+          var rs = tx.executeSql("SELECT dbnumber FROM GlosaDbDesc WHERE dbnumber=?",[nDbId]);
+          if (rs.rows.length > 0)
+          {
+            tx.executeSql("UPDATE GlosaDbDesc SET desc1=? WHERE dbnumber=?",[sDesc, nDbId]);
+          }
+          else
+          {
+            tx.executeSql("INSERT INTO GlosaDbDesc (desc1 , dbnumber) VALUES(?,?)",[sDesc, nDbId]);
+          }
+
+        }
+        )
+}
+
 
 function downloadDictOnWord(sUrl, sWord) {
   var doc = new XMLHttpRequest();
@@ -221,8 +258,7 @@ function loadFromQuizList() {
   nDbNumber = glosModelIndex.get(idQuizList.currentIndex).dbnumber;
   sScoreText = glosModelIndex.get(idQuizList.currentIndex).state1;
   idDescTextOnPage.text = glosModelIndex.get(idQuizList.currentIndex).desc1;
-
-
+  idTextInputQuizDesc.text = idDescTextOnPage.text;
 
   var res = sLangLang.split("-");
   sLangLangRev = res[1] + "-" + res[0];
@@ -292,8 +328,10 @@ function newQuiz() {
 
 
 function loadFromServerList(nCount, oDD) {
+  var nLastIndex = idServerListView.currentIndex
   idServerQModel.clear()
   idDownloadBtn.bProgVisible = false
+
   idImport.visible = true
   if (nCount === 0) {
     idDescText.text = ""
@@ -307,8 +345,10 @@ function loadFromServerList(nCount, oDD) {
   for (var i = 0; i < nCount; i += 4) {
     idServerQModel.append({ "qname": oDD[i], "desc1": oDD[i + 1], "code": oDD[i + 2], "state1": oDD[i + 3] });
   }
-
+  idServerListView.currentIndex = nLastIndex
 }
+
+
 function quizDeleted(nResponce) {
   idDeleteQuiz.bProgVisible = false
   idDescText.text = ""
@@ -329,6 +369,8 @@ function quizDeleted(nResponce) {
 
 function quizExported(nResponce) {
   idExportBtn.bProgVisible = false
+  idUpdateBtn.bProgVisible = false
+
   if (nResponce === 0) {
     idExportError.text = "Network error";
     idExportError.visible = true;
@@ -338,6 +380,10 @@ function quizExported(nResponce) {
       idExportError.text = "Quiz with name '" + sQuizName + "' Exists"
       idExportError.visible = true;
     }
+    else if (nResponce === 207) {
+      idExportError.text = "Can not update '" + sQuizName + "'"
+      idExportError.visible = true;
+    }
     else if (nResponce === 200) {
       idExport.visible = false;
     }
@@ -345,7 +391,6 @@ function quizExported(nResponce) {
       idExportError.text = nResponce
       idExportError.visible = true;
     }
-
   }
 }
 
@@ -390,7 +435,254 @@ function loadFromList(nCount, oDD, sLangLoaded) {
           }
           idLoadQuiz.bProgVisible = false
           idImport.visible = false
+          idQuizList.currentIndex = glosModelIndex.count -1
+
         }
         );
 
+}
+
+
+function reverseQuiz()
+{
+  bIsReverse =  !bIsReverse
+  glosModelWorking.clear()
+  var nC = glosModel.count
+  if (nC === 0)
+    return
+
+  for ( var i = 0; i < nC;++i) {
+    var nState = glosModel.get(i).state1;
+    if (bIsReverse)
+    {
+      var squestion = glosModel.get(i).answer
+      var sanswer = glosModel.get(i).question
+    }
+    else
+    {
+      squestion = glosModel.get(i).question
+      sanswer = glosModel.get(i).answer
+    }
+
+    var sextra = glosModel.get(i).extra
+    var nnC  = glosModel.get(i).number
+    if (nState === 0 )
+      glosModelWorking.append({"number": nnC, "question": squestion , "answer": sanswer,"extra":sextra})
+  }
+
+  var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
+  assignQuizModel(nIndexOwNewWord)
+}
+
+
+function resetQuiz()
+{
+  var nC = glosModel.count
+
+  if (nC===0)
+    return
+  db.transaction(
+        function(tx) {
+          tx.executeSql('UPDATE Glosa'+nDbNumber+' SET state=0');
+        }
+        )
+
+  glosModelWorking.clear()
+
+  sScoreText = nC + "/" + nC
+  for ( var i = 0; i < nC;++i) {
+    glosModel.get(i).state1=0;
+    glosModelWorking.append(glosModel.get(i))
+  }
+
+  var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
+
+  assignQuizModel(nIndexOwNewWord)
+}
+
+
+
+
+function updateQuiz()
+{
+  idEditDlg.visible = false
+  var nNumber = glosModel.get(idGlosList.currentIndex).number
+  var sQ =  idTextEdit1.displayText.trim()
+  var sA =  idTextEdit2.displayText.trim()
+  var sA_Org =  sA
+
+  var sE =  idTextEdit3.displayText.trim()
+  db.transaction(
+        function(tx) {
+          if (idTextEdit3.displayText.length > 0)
+          {
+            sA = sA + "###" + idTextEdit3.displayText
+          }
+
+          tx.executeSql('UPDATE Glosa'+nDbNumber+' SET quizword=?, answer=? WHERE number = ?',[sQ,sA,nNumber]);
+
+          // Assign The updated values
+          for ( var i = 0; i < 3;++i) {
+            if (idQuizModel.get(i).number === nNumber)
+            {
+              idQuizModel.get(i).question = sQ;
+              idQuizModel.get(i).answer = sA_Org;
+              idQuizModel.get(i).extra = sE;
+            }
+          }
+        }
+        )
+
+
+  var i = findNumberInModel(glosModelWorking, nNumber)
+
+  if (i >= 0)
+  {
+    glosModelWorking.get(i).question = sQ
+    glosModelWorking.get(i).answer = sA_Org
+    glosModelWorking.get(i).extra = sE
+  }
+
+  MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).answer,sToLang)
+  MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).question,sFromLang)
+  glosModel.get(idGlosList.currentIndex).question = sQ
+  glosModel.get(idGlosList.currentIndex).answer = sA_Org
+  glosModel.get(idGlosList.currentIndex).extra =  sE
+}
+
+function deleteWordInQuiz()
+{
+  idEditDlg.visible = false
+  var nNumber = glosModel.get(idGlosList.currentIndex).number
+  db.transaction(
+        function(tx) {
+          tx.executeSql('DELETE FROM Glosa'+nDbNumber+' WHERE number = ?',[nNumber]);
+        }
+        )
+
+  var sQuestion = glosModel.get(idGlosList.currentIndex).question
+  var sAnswer = glosModel.get(idGlosList.currentIndex).answer
+
+  glosModel.remove(idGlosList.currentIndex)
+  MyDownloader.deleteWord(sAnswer,sToLang)
+  MyDownloader.deleteWord(sAnswer,sFromLang)
+
+  var nC = glosModelWorking.count;
+  for ( var i = 0; i < nC;++i) {
+    if (glosModelWorking.get(i).number === nNumber)
+    {
+      glosModelWorking.remove(i);
+      break;
+    }
+  }
+  if (glosModel.count > 0)
+  {
+    for (  i = 0; i < 3;++i) {
+      if (idQuizModel.get(i).number === nNumber)
+      {
+        // The removed word is displayed in the Quiz tab
+        var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
+        idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question;
+        idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer;
+        idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number;
+        idQuizModel.get(i).extra = glosModelWorking.get(nIndexOwNewWord).extra;
+        idQuizModel.get(i).visible1 = false
+      }
+    }
+  }
+  else
+  {
+    for (  i = 0; i < 3;++i) {
+      idQuizModel.get(i).allok = false;
+      idQuizModel.get(i).question = "-";
+      idQuizModel.get(i).answer = "-";
+      idQuizModel.get(i).number = "-";
+      idQuizModel.get(i).extra = "-";
+      idQuizModel.get(i).visible1 = false
+    }
+  }
+  sScoreText = glosModelWorking.count + "/" + glosModel.count
+}
+
+function calcAndAssigNextQuizWord(currentIndex)
+{
+  var nI = (currentIndex+1) % 3
+  var nLastIndex = idView.nLastIndex
+  nQuizIndex = nI
+
+  if (glosModelWorking.count === 0 )
+  {
+    for (var j = 0; j < 3 ;++j)
+    {
+      idQuizModel.get(j).allok = true
+    }
+
+    return;
+  }
+
+  var bDir = 0
+
+  if (nLastIndex == 0 && nI === 1)
+    bDir = 1
+  if (nLastIndex == 0 && nI === 2)
+    bDir = -1
+  if (nLastIndex == 1 && nI === 0)
+    bDir = -1
+  if (nLastIndex == 1 && nI === 2)
+    bDir = 1
+  if (nLastIndex == 2 && nI === 0)
+    bDir = 1
+  if (nLastIndex == 2 && nI === 1)
+    bDir = -1
+
+
+  var nLastNumber = idQuizModel.get(nLastIndex).number
+
+  idView.nLastIndex = nI
+
+
+  if (bDir ===-1)
+  {
+    var nC = glosModelWorking.count
+    for ( var i = 0; i < nC;++i) {
+      if (glosModelWorking.get(i).number === nLastNumber)
+      {
+        glosModelWorking.remove(i);
+
+        if (glosModelWorking.count ===0 )
+        {
+          for ( i = 0; i < 3 ;++i)
+          {
+            idQuizModel.get(i).question =  ""
+            idQuizModel.get(i).answer =  ""
+            idQuizModel.get(i).extra =  ""
+            idQuizModel.get(i).allok = true
+          }
+        }
+
+        sScoreText  = glosModelWorking.count + "/" + glosModel.count
+        nC = glosModel.count
+        for (  i = 0; i < nC;++i) {
+          if (glosModel.get(i).number === nLastNumber)
+          {
+            glosModel.get(i).state1 = 1;
+
+            db.transaction(
+                  function(tx) {
+                    tx.executeSql("UPDATE Glosa"+nDbNumber+" SET state=1 WHERE number=?", nLastNumber);
+                  })
+
+            break;
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  if (glosModelWorking.count>0)
+  {
+    var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
+    QuizLib.assignQuizModel(nIndexOwNewWord)
+  }
 }

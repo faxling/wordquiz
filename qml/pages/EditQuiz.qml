@@ -139,17 +139,7 @@ Item {
       id:idBtnRow
       spacing:10
       height: idBtn1.height
-      function getTextFromInput(oTextInput)
-      {
-        var oInText  = oTextInput.displayText.trim()
-        if (oInText.length < 1 )
-        {
-          idErrorText.visible = true
-          idErrorText.text = "No input to lookup in dictionary"
-          return "";
-        }
-        return oInText;
-      }
+
 
       ButtonQuiz {
         id:idBtn1
@@ -158,7 +148,7 @@ Item {
         onClicked: {
           nLastSearch = 0
 
-          var oInText  = idBtnRow.getTextFromInput(idTextInput)
+          var oInText  = QuizLib.getTextFromInput(idTextInput)
           if (oInText.length < 1 )
           {
             return
@@ -166,7 +156,7 @@ Item {
 
           bProgVisible = true
           if (bHasDictTo)
-            QuizLib.downloadDictOnWord(sReqDictUrl , oInText,idBtn1 )
+            QuizLib.downloadDictOnWord(sReqDictUrl , oInText )
           idTranslateModel.oBtn = idBtn1
           idTranslateModel.source = sReqUrl + oInText
         }
@@ -179,14 +169,14 @@ Item {
         text:  sLangLangRev
         onClicked: {
           nLastSearch = 1
-          var oInText  = idBtnRow.getTextFromInput(idTextInput2)
+          var oInText  = QuizLib.getTextFromInput(idTextInput2)
           if (oInText.length < 1 )
           {
             return
           }
           bProgVisible = true
           if (bHasDictFrom)
-            QuizLib.downloadDictOnWord(sReqDictUrlRev , oInText,idBtn2)
+            QuizLib.downloadDictOnWord(sReqDictUrlRev , oInText)
           idTranslateModel.oBtn = idBtn2
           idTranslateModel.source = sReqUrlRev + oInText
         }
@@ -198,7 +188,7 @@ Item {
         text:  sLangLangEn
         onClicked: {
           nLastSearch = 2
-          var oInText  = idBtnRow.getTextFromInput(idTextInput)
+          var oInText  = QuizLib.getTextFromInput(idTextInput)
           if (oInText.length < 1 )
           {
             return
@@ -206,9 +196,10 @@ Item {
 
           bProgVisible = true
           if (bHasDictTo)
-            QuizLib.downloadDictOnWord(sReqDictUrlEn , oInText,idBtn3)
+            QuizLib.downloadDictOnWord(sReqDictUrlEn , oInText)
           idTranslateModel.oBtn = idBtn3
           idTranslateModel.source = sReqUrlEn + oInText
+
         }
       }
 
@@ -220,8 +211,8 @@ Item {
           // Find a new Id
           var nC = 0;
 
-          var sNewWordFrom = idTextInput.displayText.trim()
-          var sNewWordTo = idTextInput2.displayText.trim()
+          var sNewWordFrom = QuizLib.getTextFromInput(idTextInput)
+          var sNewWordTo = QuizLib.getTextFromInput(idTextInput2)
 
           for(var i = 0; i < glosModel.count; i++) {
             if (glosModel.get(i).question === sNewWordFrom && glosModel.get(i).answer === sNewWordTo)
@@ -442,28 +433,7 @@ Item {
       text : "Reset"
       onClicked:
       {
-        var nC = glosModel.count
-
-        if (nC===0)
-          return
-        db.transaction(
-              function(tx) {
-                tx.executeSql('UPDATE Glosa'+nDbNumber+' SET state=0');
-              }
-              )
-
-        glosModelWorking.clear()
-
-        sScoreText = nC + "/" + nC
-        for ( var i = 0; i < nC;++i) {
-          glosModel.get(i).state1=0;
-          glosModelWorking.append(glosModel.get(i))
-        }
-
-        var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
-
-        QuizLib.assignQuizModel(nIndexOwNewWord)
-
+        QuizLib.resetQuiz()
       }
 
     }
@@ -471,37 +441,10 @@ Item {
     Button
     {
       id:idReverseBtn
-
       text : "Reverse"
       onClicked:
       {
-        bIsReverse =  !bIsReverse
-        glosModelWorking.clear()
-        var nC = glosModel.count
-        if (nC === 0)
-          return
-
-        for ( var i = 0; i < nC;++i) {
-          var nState = glosModel.get(i).state1;
-          if (bIsReverse)
-          {
-            var squestion = glosModel.get(i).answer
-            var sanswer = glosModel.get(i).question
-          }
-          else
-          {
-            squestion = glosModel.get(i).question
-            sanswer = glosModel.get(i).answer
-          }
-
-          var sextra = glosModel.get(i).extra
-          var nnC  = glosModel.get(i).number
-          if (nState === 0 )
-            glosModelWorking.append({"number": nnC, "question": squestion , "answer": sanswer,"extra":sextra})
-        }
-
-        var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
-        QuizLib.assignQuizModel(nIndexOwNewWord)
+        QuizLib.reverseQuiz()
       }
     }
   }
@@ -569,112 +512,25 @@ Item {
           id:idBtnUpdate
           width:n3BtnWidth
           text:  "Update"
+
           onClicked: {
-            idEditDlg.visible = false
-            var nNumber = glosModel.get(idGlosList.currentIndex).number
-            var sQ =  idTextEdit1.displayText.trim()
-            var sA =  idTextEdit2.displayText.trim()
-            var sA_Org =  sA
-
-            var sE =  idTextEdit3.displayText.trim()
-            db.transaction(
-                  function(tx) {
-                    if (idTextEdit3.displayText.length > 0)
-                    {
-                      sA = sA + "###" + idTextEdit3.displayText
-                    }
-
-                    tx.executeSql('UPDATE Glosa'+nDbNumber+' SET quizword=?, answer=? WHERE number = ?',[sQ,sA,nNumber]);
-
-                    // Assign The updated values
-                    for ( var i = 0; i < 3;++i) {
-                      if (idQuizModel.get(i).number === nNumber)
-                      {
-                        idQuizModel.get(i).question = sQ;
-                        idQuizModel.get(i).answer = sA_Org;
-                        idQuizModel.get(i).extra = sE;
-                      }
-                    }
-                  }
-                  )
-
-
-            var i = QuizLib.findNumberInModel(glosModelWorking, nNumber)
-
-            if (i >= 0)
-            {
-              glosModelWorking.get(i).question = sQ
-              glosModelWorking.get(i).answer = sA_Org
-              glosModelWorking.get(i).extra = sE
-            }
-
-            MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).answer,sToLang)
-            MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).question,sFromLang)
-            glosModel.get(idGlosList.currentIndex).question = sQ
-            glosModel.get(idGlosList.currentIndex).answer = sA_Org
-            glosModel.get(idGlosList.currentIndex).extra =  sE
-
+            QuizLib.updateQuiz()
           }
+
         }
         ButtonQuiz {
           id:idBtnDelete
           width:n3BtnWidth
           text:  "Delete"
+
           onClicked: {
-            idEditDlg.visible = false
-            var nNumber = glosModel.get(idGlosList.currentIndex).number
-            db.transaction(
-                  function(tx) {
-                    tx.executeSql('DELETE FROM Glosa'+nDbNumber+' WHERE number = ?',[nNumber]);
-                  }
-                  )
-
-            var sQuestion = glosModel.get(idGlosList.currentIndex).question
-            var sAnswer = glosModel.get(idGlosList.currentIndex).answer
-
-            glosModel.remove(idGlosList.currentIndex)
-            MyDownloader.deleteWord(sAnswer,sToLang)
-            MyDownloader.deleteWord(sAnswer,sFromLang)
-
-            var nC = glosModelWorking.count;
-            for ( var i = 0; i < nC;++i) {
-              if (glosModelWorking.get(i).number === nNumber)
-              {
-                glosModelWorking.remove(i);
-                break;
-              }
-            }
-            if (glosModel.count > 0)
-            {
-              for (  i = 0; i < 3;++i) {
-                if (idQuizModel.get(i).number === nNumber)
-                {
-                  // The removed word is displayed in the Quiz tab
-                  var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
-                  idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question;
-                  idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer;
-                  idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number;
-                  idQuizModel.get(i).extra = glosModelWorking.get(nIndexOwNewWord).extra;
-                  idQuizModel.get(i).visible1 = false
-                }
-              }
-            }
-            else
-            {
-              for (  i = 0; i < 3;++i) {
-                idQuizModel.get(i).allok = false;
-                idQuizModel.get(i).question = "-";
-                idQuizModel.get(i).answer = "-";
-                idQuizModel.get(i).number = "-";
-                idQuizModel.get(i).extra = "-";
-                idQuizModel.get(i).visible1 = false
-              }
-            }
-            sScoreText = glosModelWorking.count + "/" + glosModel.count
+            QuizLib.deleteWordInQuiz()
           }
+
         }
       }
     }
   }
+
 }
 

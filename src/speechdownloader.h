@@ -17,6 +17,7 @@ public:
   Q_INVOKABLE void downloadWord(QString sWord, QString sLang);
   Q_INVOKABLE void playWord(QString sWord, QString sLang);
   Q_INVOKABLE void exportCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
+  Q_INVOKABLE void updateCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
   Q_INVOKABLE void importQuiz(QString sName);
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, QString sId);
@@ -38,8 +39,9 @@ private:
   void quizExported(QNetworkReply* pReply);
   void quizDeleted(QNetworkReply* pReply);
   void wordDownloaded(QNetworkReply* pReply);
-  private:
-    QVector<int> m_ocIndexMap;
+private:
+  void currentQuizCmd(QVariant p,QString sName, QString sLang,  QString sPwd,QString sDesc, QString sCmd);
+  QVector<int> m_ocIndexMap;
   QString AudioPath(const QString&s , const QString& sLang);
   QString m_sStoragePath;
   QNetworkAccessManager m_oQuizExpNetMgr;

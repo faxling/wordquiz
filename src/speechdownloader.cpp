@@ -296,7 +296,15 @@ void Speechdownloader::downLoadAllSpeech(QVariant p, QString sLang)
   }
 }
 
+void Speechdownloader::updateCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc)
+{
+   currentQuizCmd(p,sName, sLang,sPwd, sDesc , "updatequiz" );
+}
 
+void Speechdownloader::exportCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc)
+{
+  currentQuizCmd(p,sName, sLang,sPwd, sDesc , "store" );
+}
 // {"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": sA, "extra": sE, "state1" : rs.rows.item(i).state }
 //0 answer
 //1 extra
@@ -304,7 +312,7 @@ void Speechdownloader::downLoadAllSpeech(QVariant p, QString sLang)
 //3 question
 //4 state
 
-void Speechdownloader::exportCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc)
+void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc, QString sCmd)
 {
   QAbstractListModel* pp = qvariant_cast<QAbstractListModel*>(p);
   QByteArray ocArray;
@@ -339,8 +347,8 @@ void Speechdownloader::exportCurrentQuiz(QVariant p, QString sName, QString sLan
     ss << oF.readAll();
     oF.close();
   }
-  QString sFmt = GLOS_SERVER2 ^ "store.php?qname=%ls&slang=%ls&qcount=%d&desc1=%ls&pwd=%ls";
-  QString sUrl = QString::asprintf(sFmt.toLatin1(), sName.utf16(), sLang.utf16(), nC,sDesc.utf16(), sPwd.utf16() );
+  QString sFmt = GLOS_SERVER2 ^ "%ls.php?qname=%ls&slang=%ls&qcount=%d&desc1=%ls&pwd=%ls";
+  QString sUrl = QString::asprintf(sFmt.toLatin1(),sCmd.utf16(), sName.utf16(), sLang.utf16(), nC,sDesc.utf16(), sPwd.utf16() );
   qDebug() << " size " << ocArray.size();
 
   QNetworkRequest request(sUrl);

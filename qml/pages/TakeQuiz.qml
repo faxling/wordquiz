@@ -114,88 +114,8 @@ Item {
     property int nLastIndex : 1
     onCurrentIndexChanged:
     {
-
-      var nI = (currentIndex+1) % 3
-
-      nQuizIndex = nI
-
-      if (glosModelWorking.count === 0 )
-      {
-        for (var j = 0; j < 3 ;++j)
-        {
-          idQuizModel.get(j).allok = true
-        }
-
-        return;
-      }
-
-      var bDir = 0
-
-      if (nLastIndex == 0 && nI === 1)
-        bDir = 1
-      if (nLastIndex == 0 && nI === 2)
-        bDir = -1
-      if (nLastIndex == 1 && nI === 0)
-        bDir = -1
-      if (nLastIndex == 1 && nI === 2)
-        bDir = 1
-      if (nLastIndex == 2 && nI === 0)
-        bDir = 1
-      if (nLastIndex == 2 && nI === 1)
-        bDir = -1
-
-
-      var nLastNumber = idQuizModel.get(nLastIndex).number
-
-      nLastIndex = nI
-
-
-      if (bDir ===-1)
-      {
-        var nC = glosModelWorking.count
-        for ( var i = 0; i < nC;++i) {
-          if (glosModelWorking.get(i).number === nLastNumber)
-          {
-            glosModelWorking.remove(i);
-
-            if (glosModelWorking.count ===0 )
-            {
-              for ( i = 0; i < 3 ;++i)
-              {
-                idQuizModel.get(i).question =  ""
-                idQuizModel.get(i).answer =  ""
-                idQuizModel.get(i).extra =  ""
-                idQuizModel.get(i).allok = true
-              }
-            }
-
-            sScoreText  = glosModelWorking.count + "/" + glosModel.count
-            nC = glosModel.count
-            for (  i = 0; i < nC;++i) {
-              if (glosModel.get(i).number === nLastNumber)
-              {
-                glosModel.get(i).state1 = 1;
-
-                db.transaction(
-                      function(tx) {
-                        tx.executeSql("UPDATE Glosa"+nDbNumber+" SET state=1 WHERE number=?", nLastNumber);
-                      })
-
-                break;
-              }
-            }
-            break;
-          }
-        }
-      }
-
-      if (glosModelWorking.count>0)
-      {
-        var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
-        QuizLib.assignQuizModel(nIndexOwNewWord)
-      }
+      QuizLib.calcAndAssigNextQuizWord(currentIndex)
     }
-
 
     model : idQuizModel
     delegate:idQuestionComponent

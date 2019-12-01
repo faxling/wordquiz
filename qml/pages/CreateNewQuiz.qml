@@ -318,11 +318,27 @@ Item
       color:"red"
       text:"error"
     }
+    ButtonQuiz
+    {
+      id:idUpdateBtn
+      width: n4BtnWidth
+      text: "Update"
+      anchors.bottom: parent.bottom
+      anchors.bottomMargin: 20
+      anchors.right: idExportBtn.left
+      anchors.rightMargin: 20
+      onClicked:
+      {
+        bProgVisible = true
+        QuizLib.updateDesc1(idTextInputQuizDesc.displayText)
+        MyDownloader.updateCurrentQuiz( glosModel, sQuizName,sLangLang, idTextInputQuizPwd.displayText, idTextInputQuizDesc.displayText )
+      }
+    }
 
     ButtonQuiz
     {
       id:idExportBtn
-      width: n3BtnWidth
+      width: n4BtnWidth
       text: "Upload"
       anchors.bottom: parent.bottom
       anchors.bottomMargin: 20
@@ -331,6 +347,7 @@ Item
       onClicked:
       {
         bProgVisible = true
+        QuizLib.updateDesc1(idTextInputQuizDesc.displayText)
         MyDownloader.exportCurrentQuiz( glosModel, sQuizName,sLangLang, idTextInputQuizPwd.displayText, idTextInputQuizDesc.displayText )
       }
     }
@@ -505,12 +522,12 @@ Item
     visible : false
     y:50
     width:parent.width
-    height:Theme.itemSizeExtraSmall*4
+    height:Theme.itemSizeExtraSmall*3.7
     Column
     {
-      x:10
-      width:parent.width
-      anchors.verticalCenter: parent.verticalCenter
+      x:20
+      width:parent.width - 40
+      anchors.top : parent.bottomClose
       spacing : 20
       Label
       {
@@ -521,60 +538,64 @@ Item
       InputTextQuiz
       {
         id:idQuizNameInput
-        width: parent.width  - 20
+        width: parent.width
       }
-
-      Row
-      {
-        id:idQuizUpdateBtnRow
-        spacing:10
-        ButtonQuiz {
-          id:idBtnRename
-          width:n3BtnWidth
-          text:  "Rename"
-          onClicked: {
-            glosModelIndex.setProperty(idQuizList.currentIndex,"quizname", idQuizNameInput.displayText.trim())
-            db.transaction(
-                  function(tx) {
-                    var nId = glosModelIndex.get(idQuizList.currentIndex).dbnumber;
-                    tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',[idQuizNameInput.displayText.trim(), nId]);
-                    idTextSelected.text = idQuizNameInput.displayText
-                    sQuizName = idTextSelected.text
-                  }
-
-                  )
-            idEditQuizEntryDlg.visible = false
-          }
-        }
-        ButtonQuiz {
-          id:idBtnQuizDelete
-          width:n3BtnWidth
-          text:  "Delete"
-          onClicked: Remorse.popupAction(idTopColumn,"Delete Quiz " + idTextSelected.text, function()
-          {
-
-            db.transaction(
-                  function(tx) {
-
-                    tx.executeSql('DELETE FROM GlosaDbIndex WHERE dbnumber = ?',[nDbNumber]);
-                    tx.executeSql('DROP TABLE Glosa'+nDbNumber);
-                    tx.executeSql('DELETE FROM GlosaDbDesc WHERE dbnumber = ?',[nDbNumber]);
-
-                  }
-                  )
-
-            glosModelIndex.remove(idQuizList.currentIndex)
-
-            if(idQuizList.currentIndex > 0)
-              idQuizList.currentIndex = idQuizList.currentIndex -1;
-            idEditQuizEntryDlg.visible = false
-          }
-          );
-        }
-
-      } // Row
-
     } // Col
+
+
+
+    ButtonQuiz {
+      id:idBtnRename
+      width:n4BtnWidth
+      anchors.bottom: parent.bottom
+      anchors.bottomMargin: 20
+      anchors.right: idBtnQuizDelete.left
+      anchors.rightMargin: 20
+      text:  "Rename"
+      onClicked: {
+        glosModelIndex.setProperty(idQuizList.currentIndex,"quizname", idQuizNameInput.displayText.trim())
+        db.transaction(
+              function(tx) {
+                var nId = glosModelIndex.get(idQuizList.currentIndex).dbnumber;
+                tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',[idQuizNameInput.displayText.trim(), nId]);
+                idTextSelected.text = idQuizNameInput.displayText
+                sQuizName = idTextSelected.text
+              }
+
+              )
+        idEditQuizEntryDlg.visible = false
+      }
+    }
+
+    ButtonQuiz {
+      id:idBtnQuizDelete
+      width:n4BtnWidth
+      anchors.bottom: parent.bottom
+      anchors.bottomMargin: 20
+      anchors.right: parent.right
+      anchors.rightMargin: 20
+      text:  "Delete"
+      onClicked: Remorse.popupAction(idTopColumn,"Delete Quiz " + idTextSelected.text, function()
+      {
+
+        db.transaction(
+              function(tx) {
+
+                tx.executeSql('DELETE FROM GlosaDbIndex WHERE dbnumber = ?',[nDbNumber]);
+                tx.executeSql('DROP TABLE Glosa'+nDbNumber);
+                tx.executeSql('DELETE FROM GlosaDbDesc WHERE dbnumber = ?',[nDbNumber]);
+
+              }
+              )
+
+        glosModelIndex.remove(idQuizList.currentIndex)
+
+        if(idQuizList.currentIndex > 0)
+          idQuizList.currentIndex = idQuizList.currentIndex -1;
+        idEditQuizEntryDlg.visible = false
+      }
+      );
+    }
 
     onCloseClicked:  {
       idEditQuizEntryDlg.visible = false
