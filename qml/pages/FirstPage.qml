@@ -45,6 +45,7 @@ Page {
   property variant glosListView
   property variant quizListView
   property int nGlosaDbLastIndex:  -1
+  property string sSearchQuery
 
   onSScoreTextChanged:
   {
@@ -67,28 +68,9 @@ Page {
 
     function sortModel()
     {
-
       db.transaction(
-            function(tx) {
-              glosModel.clear();
-
-              var rs = tx.executeSql("SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + sQSort);
-
-              for(var i = 0; i < rs.rows.length; i++) {
-
-                var sA;
-                var sE = "";
-                var ocA = rs.rows.item(i).answer.split("###")
-                sA = ocA[0]
-                if (ocA.length > 1)
-                  sE = ocA[1]
-
-                glosModel.append({"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": sA, "extra": sE,  "state1" : rs.rows.item(i).state })
-
-              }
-            }
+            function(tx) {QuizLib.loadFromDb(tx)}
             )
-
     }
 
   }
@@ -177,6 +159,17 @@ Page {
           source:"image://theme/icon-m-question"
           onClicked: Qt.openUrlExternally("https://faxling.github.io/WordQuizWin/index.html");
         }
+
+        ButtonQuizImg
+        {
+          id: idBtnSearch
+          anchors.left: parent.left
+          anchors.topMargin : -40
+          anchors.leftMargin : -40
+          anchors.top : parent.top
+          source:"image://theme/icon-m-search"
+          onClicked: Qt.openUrlExternally("https://www.google.com/search?q="+sSearchQuery);
+        }
       }
 
       Row {
@@ -224,7 +217,7 @@ Page {
         Text {
           font.pixelSize: Theme.fontSizeTiny
           color:Theme.primaryColor
-          y:  Screen.height - parent.y - 95
+          y:  Screen.height - parent.y - 98
           text: "Powered by Yandex.Translate "
         }
       }

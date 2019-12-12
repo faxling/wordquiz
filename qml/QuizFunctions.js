@@ -238,6 +238,39 @@ function loadQuiz() {
 
 }
 
+
+function loadFromDb(tx) {
+// To select the right word at quiz load time
+  var nn = idWindow.glosListView.currentIndex
+  var nCurrentNumber = -1
+  if (nn>= 0)
+  {
+    nCurrentNumber = glosModel.get(nn).number
+  }
+  glosModel.clear();
+
+  var rs = tx.executeSql("SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + sQSort);
+
+  for(var i = 0; i < rs.rows.length; i++) {
+
+    var sA;
+    var sE = "";
+    var ocA = rs.rows.item(i).answer.split("###")
+    sA = ocA[0]
+    if (ocA.length > 1)
+      sE = ocA[1]
+
+    glosModel.append({"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": sA, "extra": sE,  "state1" : rs.rows.item(i).state })
+
+  }
+  if (nCurrentNumber > 0)
+  {
+    idWindow.glosListView.currentIndex = findNumberInModel(glosModel, nCurrentNumber)
+  }
+}
+
+
+
 function loadFromQuizList() {
 
   db = getAndInitDb();
@@ -277,28 +310,14 @@ function loadFromQuizList() {
         function (tx) {
           // tx.executeSql('DROP TABLE Glosa');
 
-          glosModel.clear();
           tx.executeSql('CREATE TABLE IF NOT EXISTS Glosa' + nDbNumber + '( number INT , quizword TEXT, answer TEXT, state INT)');
 
-          var rs = tx.executeSql('SELECT * FROM Glosa' + nDbNumber);
-          var nLen = rs.rows.length
-
-          for (var i = 0; i < nLen; i++) {
-            var sA;
-            var sE = "";
-
-            var ocA = rs.rows.item(i).answer.split("###")
-            sA = ocA[0]
-            if (ocA.length > 1)
-              sE = ocA[1]
-
-            glosModel.append({ "number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword, "answer": sA, "extra": sE, "state1": rs.rows.item(i).state })
-          }
+          loadFromDb(tx);
           loadQuiz();
-
         }
-        )
 
+
+        )
 
   idTextSelected.text = sQuizName
 
@@ -343,7 +362,16 @@ function loadFromServerList(nCount, oDD) {
   idImport.sSelectedQ = oDD[0];
 
   for (var i = 0; i < nCount; i += 4) {
-    idServerQModel.append({ "qname": oDD[i], "desc1": oDD[i + 1], "code": oDD[i + 2], "state1": oDD[i + 3] });
+
+    var ocDesc = oDD[i + 1].split("###")
+    var sDate = "-"
+
+    var sDesc1 = ocDesc[0]
+
+    if (ocDesc.length > 1)
+      sDate = ocDesc[1]
+
+    idServerQModel.append({ "qname": oDD[i], "desc1": sDesc1, "code": oDD[i + 2], "state1": oDD[i + 3], "date1":sDate });
   }
   idServerListView.currentIndex = nLastIndex
 }
@@ -622,17 +650,17 @@ function calcAndAssigNextQuizWord(currentIndex)
 
   var bDir = 0
 
-  if (nLastIndex == 0 && nI === 1)
+  if (nLastIndex === 0 && nI === 1)
     bDir = 1
-  if (nLastIndex == 0 && nI === 2)
+  if (nLastIndex === 0 && nI === 2)
     bDir = -1
-  if (nLastIndex == 1 && nI === 0)
+  if (nLastIndex === 1 && nI === 0)
     bDir = -1
-  if (nLastIndex == 1 && nI === 2)
+  if (nLastIndex === 1 && nI === 2)
     bDir = 1
-  if (nLastIndex == 2 && nI === 0)
+  if (nLastIndex === 2 && nI === 0)
     bDir = 1
-  if (nLastIndex == 2 && nI === 1)
+  if (nLastIndex === 2 && nI === 1)
     bDir = -1
 
 

@@ -36,6 +36,8 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject *pParent
   QObject::connect(&m_oListQuizNetMgr, &QNetworkAccessManager::finished, this, &Speechdownloader::listDownloaded);
   QObject::connect(&m_oDeleteQuizNetMgr, &QNetworkAccessManager::finished,this, &Speechdownloader::quizDeleted);
   m_sStoragePath = sStoragePath;
+
+  QSound::play(m_sStoragePath ^ "welcome_en.wav");
 }
 
 static const QString sReqDictUrlBase= "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang=";
@@ -96,6 +98,7 @@ void Speechdownloader::wordDownloaded(QNetworkReply* pReply)
   qDebug() << sWord;
   if (uQ.hasQueryItem("PlayAfterDownload") == true)
   {
+    qDebug() << "play " << sFileName;
     QSound::play(sFileName);
   }
 
@@ -298,7 +301,7 @@ void Speechdownloader::downLoadAllSpeech(QVariant p, QString sLang)
 
 void Speechdownloader::updateCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc)
 {
-   currentQuizCmd(p,sName, sLang,sPwd, sDesc , "updatequiz" );
+  currentQuizCmd(p,sName, sLang,sPwd, sDesc , "updatequiz" );
 }
 
 void Speechdownloader::exportCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc)

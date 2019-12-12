@@ -100,6 +100,7 @@ Item {
         onClicked:
         {
           focus = true
+          sSearchQuery = idTextInput.text
           MyDownloader.toClipBoard(idTextInput.text)
         }
       }
@@ -111,6 +112,7 @@ Item {
         source: "image://theme/icon-s-clipboard?" + (focus ? Theme.highlightColor : Theme.primaryColor)
         onClicked:{
           focus = true
+          sSearchQuery = idTextInput2.text
           MyDownloader.toClipBoard(idTextInput2.text)
         }
 
@@ -465,7 +467,7 @@ Item {
 
     Column
     {
-      x:20
+      x:25
       anchors.top: idEditDlg.bottomClose
       anchors.topMargin : 10
       spacing : 20
@@ -487,8 +489,6 @@ Item {
           width: parent.width - idAddInfo.width - 20
         }
       }
-
-
       Row
       {
         spacing : 20
@@ -505,32 +505,32 @@ Item {
           width: parent.width / 2 - 10
         }
       }
-      Row
-      {
-        spacing:10
-        ButtonQuiz {
-          id:idBtnUpdate
-          width:n3BtnWidth
-          text:  "Update"
+    }
+    ButtonQuiz {
+      id:idBtnUpdate
+      width:n4BtnWidth
+      anchors.bottom: parent.bottom
+      anchors.bottomMargin: 20
+      anchors.right: idBtnDelete.left
+      anchors.rightMargin: 20
+      text:  "Update"
+      onClicked: {
+        QuizLib.updateQuiz()
+      }
+    }
 
-          onClicked: {
-            QuizLib.updateQuiz()
-          }
-
-        }
-        ButtonQuiz {
-          id:idBtnDelete
-          width:n3BtnWidth
-          text:  "Delete"
-
-          onClicked: {
-            QuizLib.deleteWordInQuiz()
-          }
-
-        }
+    ButtonQuiz {
+      id:idBtnDelete
+      width:n4BtnWidth
+      anchors.bottom: parent.bottom
+      anchors.bottomMargin: 20
+      anchors.right: parent.right
+      anchors.rightMargin: 20
+      text:  "Delete"
+      onClicked: {
+        QuizLib.deleteWordInQuiz()
       }
     }
   }
-
 }
 

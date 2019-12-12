@@ -14,6 +14,7 @@ Item
       code:""
       state1:""
       desc1:""
+      date1:""
     }
   }
 
@@ -367,6 +368,24 @@ Item
       idImport.visible = false
       idPwdTextInput.text = ""
     }
+    Text
+    {
+      id:idDescText
+      color:Theme.highlightColor
+      anchors.top :idImport.top
+      anchors.topMargin:20
+      x:20
+      text:"---"
+    }
+    Text
+    {
+      id:idDescDate
+      color:Theme.highlightColor
+      anchors.top :idDescText.bottom
+      anchors.topMargin:5
+      x:20
+      text:"-"
+    }
 
     TextList {
       id:idImportMsg
@@ -378,23 +397,17 @@ Item
 
     TextList {
       id: idImportTitle
+      x:10
+      color: "steelblue"
       anchors.top :idImport.bottomClose
-      text:"Available Quiz"
+      text:"Downloadable Quiz's"
     }
     TextList {
       anchors.right: idImport.right
       anchors.top :idImport.bottomClose
       anchors.rightMargin:20
+      color: "steelblue"
       text:"Questions"
-    }
-    Text
-    {
-      id:idDescText
-      color:Theme.highlightColor
-      anchors.top :idImport.top
-      anchors.topMargin:20
-      x:20
-      text:"---"
     }
 
     property string sSelectedQ : ""
@@ -402,8 +415,9 @@ Item
     {
       id:idServerListView
       anchors.top :idImportTitle.bottom
-      width:idImport.width
-      height:parent.height - idDeleteQuiz.height *3
+      width:idImport.width - 20
+      x:10
+      height:parent.height - idDeleteQuiz.height *3 + 10
       model: idServerQModel
       delegate: Item {
         property int nW : idServerListView.width / 6
@@ -420,6 +434,7 @@ Item
             {
               idImportMsg.text = ""
               idDescText.text = desc1
+              idDescDate.text = date1
               idImport.sSelectedQ = qname;
               idServerListView.currentIndex = index
             }
@@ -484,11 +499,13 @@ Item
       anchors.rightMargin: 20
       onClicked:
       {
-        bProgVisible = true
+
+
         idTextInputQuizName.text = idImport.sSelectedQ
         idPwdTextInput.text = idPwdTextInput.displayText
         if (idPwdTextInput.text.length > 0)
         {
+          bProgVisible = true
           idPwdDialog.visible = false;
           MyDownloader.deleteQuiz(idImport.sSelectedQ, idPwdTextInput.displayText,idServerListView.currentIndex)
           idPwdTextInput.text = ""
@@ -528,7 +545,7 @@ Item
       x:20
       width:parent.width - 40
       anchors.top : parent.bottomClose
-      spacing : 20
+      spacing : 5
       Label
       {
         id:idAddInfo
@@ -541,8 +558,6 @@ Item
         width: parent.width
       }
     } // Col
-
-
 
     ButtonQuiz {
       id:idBtnRename
