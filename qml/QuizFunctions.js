@@ -143,7 +143,13 @@ function getAndInitDb() {
 
             glosModelIndex.append({ "dbnumber": nDbnumber, "quizname": rs.rows.item(i).quizname, "state1": rs.rows.item(i).state1, "langpair": rs.rows.item(i).langpair, "desc1": sDesc })
           }
+
+          var bDoChanged = (idWindow.quizListView.currentIndex === -1 && nGlosaDbLastIndex===0)
           idWindow.quizListView.currentIndex = nGlosaDbLastIndex;
+          if (bDoChanged)
+          {
+            idWindow.quizListView.currentIndexChanged()
+          }
         }
         )
   return db;
@@ -636,6 +642,9 @@ function calcAndAssigNextQuizWord(currentIndex)
 {
   var nI = (currentIndex+1) % 3
   var nLastIndex = idView.nLastIndex
+
+  //nQuizIndex the index of the view with 3 items that swipes left or right
+
   nQuizIndex = nI
 
   if (glosModelWorking.count === 0 )
@@ -644,7 +653,6 @@ function calcAndAssigNextQuizWord(currentIndex)
     {
       idQuizModel.get(j).allok = true
     }
-
     return;
   }
 
@@ -688,6 +696,7 @@ function calcAndAssigNextQuizWord(currentIndex)
           }
         }
 
+
         sScoreText  = glosModelWorking.count + "/" + glosModel.count
         nC = glosModel.count
         for (  i = 0; i < nC;++i) {
@@ -710,7 +719,18 @@ function calcAndAssigNextQuizWord(currentIndex)
 
   if (glosModelWorking.count>0)
   {
-    var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
-    QuizLib.assignQuizModel(nIndexOwNewWord)
+
+    while (glosModelWorking.count > 1)
+    {
+      var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
+      if (glosModelWorking.get(nIndexOwNewWord).number !== nLastNumber)
+        break
+    }
+
+    if (glosModelWorking.count === 1)
+      QuizLib.assignQuizModel(0,nQuizIndex)
+    else
+      QuizLib.assignQuizModel(nIndexOwNewWord,nQuizIndex)
+
   }
 }

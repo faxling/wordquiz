@@ -381,8 +381,8 @@ Item {
         }
 
         TextList {
-          width: n25BtnWidth
           id:idAnswer
+          width: n25BtnWidth
           text: answer
           font.bold: extra.length > 0
           color: state1 === 0 ? Theme.primaryColor : "green"

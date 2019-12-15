@@ -17,6 +17,31 @@ Item {
       width:idView.width
       height:idRectTakeQuiz.height - 200
       color:Theme.darkSecondaryColor
+
+      ButtonQuizImg
+      {
+        id:idInfoBtn
+        anchors.left:  parent.left
+        anchors.leftMargin:  20
+        anchors.top:  parent.top
+        anchors.topMargin:  20
+        source:"image://theme/icon-m-about"
+        visible :extra.length > 0
+        onClicked: idTextExtra.visible = !idTextExtra.visible
+      }
+
+      Text
+      {
+        id:idTextExtra
+        anchors.left: idInfoBtn.right
+        anchors.leftMargin:  20
+        anchors.verticalCenter: idInfoBtn.verticalCenter
+        color:Theme.primaryColor
+        font.pixelSize: Theme.fontSizeExtraSmall
+        visible:false
+        text: extra
+      }
+
       Column
       {
         spacing: 20
@@ -40,14 +65,7 @@ Item {
           anchors.horizontalCenter: parent.horizontalCenter
           text : question
         }
-        Text
-        {
-          id:idTextExtra
-          color:Theme.primaryColor
-          font.pixelSize: Theme.fontSizeExtraSmall
-          anchors.horizontalCenter: parent.horizontalCenter
-          text :  extra
-        }
+
         ButtonQuiz
         {
           id:idBtnAnswer
