@@ -401,6 +401,7 @@ Item {
             idTextEdit1.text = question
             idTextEdit2.text = answer
             idTextEdit3.text = extra
+            idGlosState.checked = state1 !== 0
             idGlosList.currentIndex = index
           }
         }
@@ -506,6 +507,30 @@ Item {
         }
       }
     }
+
+
+    Label
+    {
+      anchors.verticalCenter: idBtnUpdate.verticalCenter
+      anchors.right: idGlosState.left
+      anchors.rightMargin: 20
+      text: "Done:"
+    }
+
+
+    ButtonQuizImg
+    {
+      id:idGlosState
+      property bool checked : false
+      anchors.verticalCenter: idBtnUpdate.verticalCenter
+      anchors.right: idBtnUpdate.left
+      anchors.rightMargin: 20
+      source: checked ? "image://theme/icon-m-like" : "image://theme/icon-m-outline-like"
+      onClicked: {
+        checked = !checked
+      }
+    }
+
     ButtonQuiz {
       id:idBtnUpdate
       width:n4BtnWidth

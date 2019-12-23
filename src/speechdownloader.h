@@ -26,6 +26,7 @@ public:
   Q_INVOKABLE void initUrls(QVariant p);
 
 
+
 signals:
   void quizDownloadedSignal(int nQCount, QVariantList oDD, QString sLang);
   void quizListDownloadedSignal(int nQCount, QStringList oDD);

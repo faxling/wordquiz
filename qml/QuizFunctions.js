@@ -246,7 +246,7 @@ function loadQuiz() {
 
 
 function loadFromDb(tx) {
-// To select the right word at quiz load time
+  // To select the right word at quiz load time
   var nn = idWindow.glosListView.currentIndex
   var nCurrentNumber = -1
   if (nn>= 0)
@@ -546,6 +546,8 @@ function updateQuiz()
   var sA_Org =  sA
 
   var sE =  idTextEdit3.displayText.trim()
+
+  var nState = idGlosState.checked ? 1 :0
   db.transaction(
         function(tx) {
           if (idTextEdit3.displayText.length > 0)
@@ -553,7 +555,7 @@ function updateQuiz()
             sA = sA + "###" + idTextEdit3.displayText
           }
 
-          tx.executeSql('UPDATE Glosa'+nDbNumber+' SET quizword=?, answer=? WHERE number = ?',[sQ,sA,nNumber]);
+          tx.executeSql('UPDATE Glosa'+nDbNumber+' SET quizword=?, answer=?, state=? WHERE number = ?',[sQ,sA,nState,nNumber]);
 
           // Assign The updated values
           for ( var i = 0; i < 3;++i) {
@@ -562,6 +564,7 @@ function updateQuiz()
               idQuizModel.get(i).question = sQ;
               idQuizModel.get(i).answer = sA_Org;
               idQuizModel.get(i).extra = sE;
+              idQuizModel.get(i).state1 = nState
             }
           }
         }
@@ -570,18 +573,36 @@ function updateQuiz()
 
   var i = findNumberInModel(glosModelWorking, nNumber)
 
+
   if (i >= 0)
   {
-    glosModelWorking.get(i).question = sQ
-    glosModelWorking.get(i).answer = sA_Org
-    glosModelWorking.get(i).extra = sE
+    if (nState !== 0)
+    {
+      glosModelWorking.remove(i)
+    }
+    else
+    {
+      glosModelWorking.get(i).question = sQ
+      glosModelWorking.get(i).answer = sA_Org
+      glosModelWorking.get(i).extra = sE
+    }
   }
+  else
+  {
+    if (nState === 0)
+    {
+      glosModelWorking.append({ "number": nNumber, "question": sQ, "answer": sA_Org, "extra": sE, "state1": nState})
+    }
+  }
+
+  sScoreText  = glosModelWorking.count + "/" + glosModel.count
 
   MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).answer,sToLang)
   MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).question,sFromLang)
   glosModel.get(idGlosList.currentIndex).question = sQ
   glosModel.get(idGlosList.currentIndex).answer = sA_Org
   glosModel.get(idGlosList.currentIndex).extra =  sE
+  glosModel.get(idGlosList.currentIndex).state1 = nState
 }
 
 function deleteWordInQuiz()
@@ -679,43 +700,36 @@ function calcAndAssigNextQuizWord(currentIndex)
 
   if (bDir ===-1)
   {
-    var nC = glosModelWorking.count
-    for ( var i = 0; i < nC;++i) {
-      if (glosModelWorking.get(i).number === nLastNumber)
+    var i = findNumberInModel(glosModelWorking, nLastNumber)
+
+    glosModelWorking.remove(i);
+
+    if (glosModelWorking.count ===0 )
+    {
+      for ( i = 0; i < 3 ;++i)
       {
-        glosModelWorking.remove(i);
-
-        if (glosModelWorking.count ===0 )
-        {
-          for ( i = 0; i < 3 ;++i)
-          {
-            idQuizModel.get(i).question =  ""
-            idQuizModel.get(i).answer =  ""
-            idQuizModel.get(i).extra =  ""
-            idQuizModel.get(i).allok = true
-          }
-        }
-
-
-        sScoreText  = glosModelWorking.count + "/" + glosModel.count
-        nC = glosModel.count
-        for (  i = 0; i < nC;++i) {
-          if (glosModel.get(i).number === nLastNumber)
-          {
-            glosModel.get(i).state1 = 1;
-
-            db.transaction(
-                  function(tx) {
-                    tx.executeSql("UPDATE Glosa"+nDbNumber+" SET state=1 WHERE number=?", nLastNumber);
-                  })
-
-            break;
-          }
-        }
-        break;
+        idQuizModel.get(i).question =  ""
+        idQuizModel.get(i).answer =  ""
+        idQuizModel.get(i).extra =  ""
+        idQuizModel.get(i).allok = true
       }
     }
+
+    sScoreText  = glosModelWorking.count + "/" + glosModel.count
+
+    i = findNumberInModel(glosModel, nLastNumber)
+    if (i !== -1)
+    {
+      glosModel.get(i).state1 = 1;
+
+      db.transaction(
+            function(tx) {
+              tx.executeSql("UPDATE Glosa"+nDbNumber+" SET state=1 WHERE number=?", nLastNumber);
+            })
+    }
+
   }
+
 
   if (glosModelWorking.count>0)
   {
@@ -733,4 +747,5 @@ function calcAndAssigNextQuizWord(currentIndex)
       QuizLib.assignQuizModel(nIndexOwNewWord,nQuizIndex)
 
   }
+  idRectTakeQuiz.bExtraInfoVisible = false
 }

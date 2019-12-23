@@ -4,6 +4,7 @@ import "../QuizFunctions.js" as QuizLib
 
 Item {
   id:idRectTakeQuiz
+  property bool bExtraInfoVisible : false
 
   // May be the filler is calculated (PathLen - NoElem*sizeElem) /  (NoElem )
   Component
@@ -27,7 +28,7 @@ Item {
         anchors.topMargin:  20
         source:"image://theme/icon-m-about"
         visible :extra.length > 0
-        onClicked: idTextExtra.visible = !idTextExtra.visible
+        onClicked: bExtraInfoVisible = true
       }
 
       Text
@@ -38,7 +39,7 @@ Item {
         anchors.verticalCenter: idInfoBtn.verticalCenter
         color:Theme.primaryColor
         font.pixelSize: Theme.fontSizeExtraSmall
-        visible:false
+        visible:bExtraInfoVisible
         text: extra
       }
 
