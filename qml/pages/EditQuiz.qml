@@ -10,6 +10,15 @@ Item {
   id:idEditQuiz
 
   property int nLastSearch : 0
+  onVisibleChanged:
+  {
+    if (visible)
+    {
+
+      idGlosList.currentIndex = idWindow.nGlosaTakeQuizIndex
+      idGlosList.positionViewAtIndex(idWindow.nGlosaTakeQuizIndex, ListView.Center)
+    }
+  }
 
   Column
   {
@@ -342,7 +351,7 @@ Item {
         text:  "Question"
         onClick: {
           bQSort = true
-          glosModel.sortModel()
+          QuizLib.sortModel()
         }
       }
 
@@ -353,7 +362,7 @@ Item {
         text: "Answer"
         onClick: {
           bQSort = false
-          glosModel.sortModel()
+          QuizLib.sortModel()
         }
       }
     }
@@ -462,8 +471,7 @@ Item {
     onCloseClicked: idEditDlg.visible = false
     onVisibleChanged:
     {
-      if (!visible)
-        idGlosList.positionViewAtIndex(idGlosList.currentIndex, ListView.Center)
+
     }
 
     Column
@@ -518,14 +526,20 @@ Item {
     }
 
 
-    ButtonQuizImg
+    ButtonQuiz
     {
       id:idGlosState
       property bool checked : false
       anchors.verticalCenter: idBtnUpdate.verticalCenter
       anchors.right: idBtnUpdate.left
       anchors.rightMargin: 20
-      source: checked ? "image://theme/icon-m-like" : "image://theme/icon-m-outline-like"
+      Image {
+        visible: parent.checked
+        anchors.centerIn: parent
+        source: "image://theme/icon-m-accept"
+      }
+      height :  Theme.itemSizeExtraSmall
+      width:  Theme.itemSizeExtraSmall
       onClicked: {
         checked = !checked
       }
@@ -541,6 +555,7 @@ Item {
       text:  "Update"
       onClicked: {
         QuizLib.updateQuiz()
+        idGlosList.positionViewAtIndex(idGlosList.currentIndex, ListView.Center)
       }
     }
 

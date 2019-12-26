@@ -5,6 +5,7 @@ import "../QuizFunctions.js" as QuizLib
 Item {
   id:idRectTakeQuiz
   property bool bExtraInfoVisible : false
+  property bool bAnswerVisible : false
 
   // May be the filler is calculated (PathLen - NoElem*sizeElem) /  (NoElem )
   Component
@@ -74,7 +75,7 @@ Item {
           text:"Show Answer"
           onClicked:
           {
-            idQuizModel.setProperty(index,"visible1",true)
+            bAnswerVisible = true
           }
         }
 
@@ -84,7 +85,7 @@ Item {
           color:Theme.highlightColor
           font.pixelSize: Theme.fontSizeExtraLarge
           font.bold: true
-          visible:visible1
+          visible:bAnswerVisible
           anchors.horizontalCenter: parent.horizontalCenter
           horizontalAlignment: Text.AlignHCenter
           text : answer
@@ -93,7 +94,7 @@ Item {
         ButtonQuizImg
         {
           anchors.horizontalCenter: parent.horizontalCenter
-          visible: (bIsReverse ? bHasSpeechFrom : bHasSpeech) && visible1
+          visible: (bIsReverse ? bHasSpeechFrom : bHasSpeech) && bAnswerVisible
           source:"qrc:qml/pages/hornbig.png"
           onClicked: MyDownloader.playWord(answer,bIsReverse ? sFromLang : sToLang )
         }

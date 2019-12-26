@@ -571,7 +571,7 @@ Item
         glosModelIndex.setProperty(idQuizList.currentIndex,"quizname", idQuizNameInput.displayText.trim())
         db.transaction(
               function(tx) {
-                var nId = glosModelIndex.get(idQuizList.currentIndex).dbnumber;
+                var nId = glosModelIndex.get(idQuizList.currentIndex).number;
                 tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',[idQuizNameInput.displayText.trim(), nId]);
                 idTextSelected.text = idQuizNameInput.displayText
                 sQuizName = idTextSelected.text

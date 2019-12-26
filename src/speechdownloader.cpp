@@ -36,8 +36,9 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject *pParent
   QObject::connect(&m_oListQuizNetMgr, &QNetworkAccessManager::finished, this, &Speechdownloader::listDownloaded);
   QObject::connect(&m_oDeleteQuizNetMgr, &QNetworkAccessManager::finished,this, &Speechdownloader::quizDeleted);
   m_sStoragePath = sStoragePath;
-
   QSound::play(m_sStoragePath ^ "welcome_en.wav");
+  m_pStopWatch = nullptr;
+
 }
 
 static const QString sReqDictUrlBase= "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang=";
@@ -94,11 +95,8 @@ void Speechdownloader::wordDownloaded(QNetworkReply* pReply)
   oWav.close();
 
   emit downloadedSignal();
-
-  qDebug() << sWord;
   if (uQ.hasQueryItem("PlayAfterDownload") == true)
   {
-    qDebug() << "play " << sFileName;
     QSound::play(sFileName);
   }
 
@@ -275,8 +273,6 @@ void Speechdownloader::importQuiz(QString sName)
   QString sUrl = GLOS_SERVER2 ^ ("quizload.php?qname="  + sName + ".txt");
   QNetworkRequest request(sUrl);
   m_oQuizNetMgr.get(request);
-
-
 }
 
 void Speechdownloader::toClipBoard(QString s)
@@ -358,5 +354,43 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
   request.setRawHeader("Content-Type", "application/octet-stream");
   request.setRawHeader("Content-Length", QByteArray::number(ocArray.size()));
   m_oQuizExpNetMgr.post(request, ocArray);
+}
 
+int Speechdownloader::NumberRole(QAbstractListModel* pp)
+{
+  auto oc = pp->roleNames();
+  QByteArray sNumber("number");
+  for (auto oI = oc.begin() ; oI != oc.end(); ++oI )
+  {
+    if (oI.value() == sNumber)
+    {
+      return oI.key();
+    }
+  }
+  return -1;
+}
+
+int Speechdownloader::indexFromGlosNr(QVariant p, int nNr )
+{
+  QAbstractListModel* pp = qvariant_cast<QAbstractListModel*>(p);
+  int nC = pp->rowCount();
+  int nR = NumberRole(pp);
+  for (int i = 0; i < nC; i++)
+  {
+    int nVal = pp->data(pp->index(i),nR).toInt();
+    if ( nVal == nNr )
+      return i;
+  }
+
+  return -1;
+}
+
+void Speechdownloader::startTimer()
+{
+  m_pStopWatch = new StopWatch("timing %1");
+}
+void Speechdownloader::stopTimer()
+{
+  delete m_pStopWatch;
+  m_pStopWatch = nullptr;
 }

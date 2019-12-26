@@ -1,27 +1,10 @@
-function findDbNumberInModel(oListModelVar, nNumber) {
-
-  var nC = oListModelVar.count;
-
-  for (var i = 0; i < nC; ++i) {
-    if (oListModelVar.get(i).dbnumber === nNumber) {
-      return i;
-    }
-  }
-
-  return -1
+function sortModel()
+{
+  db.transaction(
+        function(tx) {QuizLib.loadFromDb(tx)}
+        )
 }
 
-function findNumberInModel(oListModelVar, nNumber) {
-
-  var nC = oListModelVar.count;
-  for (var i = 0; i < nC; ++i) {
-    if (oListModelVar.get(i).number === nNumber) {
-      return i;
-    }
-  }
-
-  return -1
-}
 
 function getTextFromInput(oTextInput)
 {
@@ -38,7 +21,7 @@ function getTextFromInput(oTextInput)
 function updateDesc1(sDesc)
 {
 
-  var nDbId = glosModelIndex.get(idQuizList.currentIndex).dbnumber;
+  var nDbId = glosModelIndex.get(idQuizList.currentIndex).number;
 
   glosModelIndex.get(idQuizList.currentIndex).desc1 = sDesc
   idDescTextOnPage.text = sDesc
@@ -141,7 +124,7 @@ function getAndInitDb() {
               sDesc = oc[nN].desc1
             }
 
-            glosModelIndex.append({ "dbnumber": nDbnumber, "quizname": rs.rows.item(i).quizname, "state1": rs.rows.item(i).state1, "langpair": rs.rows.item(i).langpair, "desc1": sDesc })
+            glosModelIndex.append({ "number": nDbnumber, "quizname": rs.rows.item(i).quizname, "state1": rs.rows.item(i).state1, "langpair": rs.rows.item(i).langpair, "desc1": sDesc })
           }
 
           var bDoChanged = (idWindow.quizListView.currentIndex === -1 && nGlosaDbLastIndex===0)
@@ -172,7 +155,8 @@ function insertGlosa(dbnumber, nC, question, answer) {
 
   glosModel.append({ "number": nC, "question": question, "answer": answer, "extra": "", "state1": 0 })
 
-  glosModelWorking.append({ "number": nC, "question": question, "answer": answer, "extra": "", "state1": 0 })
+  glosModelWorking.append({  "answer": answer, "question": question, "number": nC, "extra": ""})
+
   idWindow.glosListView.positionViewAtEnd()
   idWindow.glosListView.currentIndex = glosModel.count - 1
   sScoreText = glosModelWorking.count + "/" + glosModel.count
@@ -184,24 +168,22 @@ function insertGlosa(dbnumber, nC, question, answer) {
       idQuizModel.get(i).answer = answer;
       idQuizModel.get(i).number = nC;
       idQuizModel.get(i).extra = "";
-      idQuizModel.get(i).visible1 = false
     }
   }
 }
 
-function assignQuizModel(nIndexOwNewWord) {
+function assignQuizModel(nIndexOfNewWord) {
   for (var i = 0; i < 3; ++i) {
     idQuizModel.get(i).allok = false;
   }
 
-  var sNumberNewWord = glosModelWorking.get(nIndexOwNewWord).number
-  idQuizModel.get(nQuizIndex).question = glosModelWorking.get(nIndexOwNewWord).question;
-  idQuizModel.get(nQuizIndex).answer = glosModelWorking.get(nIndexOwNewWord).answer;
+  var sNumberNewWord = glosModelWorking.get(nIndexOfNewWord).number
+  idQuizModel.get(nQuizIndex).question = glosModelWorking.get(nIndexOfNewWord).question;
+  idQuizModel.get(nQuizIndex).answer = glosModelWorking.get(nIndexOfNewWord).answer;
   idQuizModel.get(nQuizIndex).number = sNumberNewWord;
-  idQuizModel.get(nQuizIndex).extra = glosModelWorking.get(nIndexOwNewWord).extra;
-  idQuizModel.get(nQuizIndex).visible1 = false
-
-  idWindow.glosListView.currentIndex = findNumberInModel(glosModel, sNumberNewWord)
+  idQuizModel.get(nQuizIndex).extra = glosModelWorking.get(nIndexOfNewWord).extra;
+  idWindow.nGlosaTakeQuizIndex = MyDownloader.indexFromGlosNr(glosModel, sNumberNewWord)
+  // idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(glosModel, sNumberNewWord)
 }
 
 
@@ -214,7 +196,6 @@ function loadQuiz() {
       idQuizModel.get(i).answer = "-";
       idQuizModel.get(i).number = "-";
       idQuizModel.get(i).extra = "-";
-      idQuizModel.get(i).visible1 = false
     }
     return;
   }
@@ -225,8 +206,13 @@ function loadQuiz() {
 
   for (i = 0; i < nC; ++i) {
     if (glosModel.get(i).state1 === 0)
-      glosModelWorking.append(glosModel.get(i))
+    {
+
+      //glosModelWorking.append(glosModel.get(i))
+      glosModelWorking.append({"answer": glosModel.get(i).answer,"question": glosModel.get(i).question, "number": glosModel.get(i).number,"extra": glosModel.get(i).extra  })
+    }
   }
+
 
   var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
 
@@ -271,7 +257,7 @@ function loadFromDb(tx) {
   }
   if (nCurrentNumber > 0)
   {
-    idWindow.glosListView.currentIndex = findNumberInModel(glosModel, nCurrentNumber)
+    idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(glosModel, nCurrentNumber)
   }
 }
 
@@ -294,7 +280,7 @@ function loadFromQuizList() {
 
   sQuizName = glosModelIndex.get(idQuizList.currentIndex).quizname;
   sLangLang = glosModelIndex.get(idQuizList.currentIndex).langpair;
-  nDbNumber = glosModelIndex.get(idQuizList.currentIndex).dbnumber;
+  nDbNumber = glosModelIndex.get(idQuizList.currentIndex).number;
   sScoreText = glosModelIndex.get(idQuizList.currentIndex).state1;
   idDescTextOnPage.text = glosModelIndex.get(idQuizList.currentIndex).desc1;
   idTextInputQuizDesc.text = idDescTextOnPage.text;
@@ -342,7 +328,7 @@ function newQuiz() {
           }
           tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)', [nNr, idTextInputQuizName.displayText, "0/0", sLangLangSelected]);
           tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)', [nNr, "-"]);
-          glosModelIndex.append({ "dbnumber": nNr, "quizname": idTextInputQuizName.displayText.trim(), "state1": "0/0", "langpair": sLangLangSelected, "desc1": "-" });
+          glosModelIndex.append({ "number": nNr, "quizname": idTextInputQuizName.displayText.trim(), "state1": "0/0", "langpair": sLangLangSelected, "desc1": "-" });
 
           idQuizList.positionViewAtEnd();
           idQuizList.currentIndex = glosModelIndex.count - 1;
@@ -455,7 +441,7 @@ function loadFromList(nCount, oDD, sLangLoaded) {
           tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)', [nDbNumber, idDescText.text]);
           tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)', [nDbNumber, idTextInputQuizName.text, sState1, sLangLoaded]);
 
-          glosModelIndex.append({ "dbnumber": nNr, "quizname": idTextInputQuizName.text, "state1": sState1, "langpair": sLangLoaded, "desc1": idDescText.text })
+          glosModelIndex.append({ "number": nNr, "quizname": idTextInputQuizName.text, "state1": sState1, "langpair": sLangLoaded, "desc1": idDescText.text })
 
           // answer, question , state
           /*
@@ -463,9 +449,11 @@ function loadFromList(nCount, oDD, sLangLoaded) {
               extra
               question
               */
+          var nNumber = 0
           for (var i = 0; i < nCount; i += 3) {
             var sAnswString = oDD[i] + "###" + oDD[i + 1]
-            tx.executeSql('INSERT INTO Glosa' + nNr + ' VALUES(?, ?, ?, ?)', [i / 2, oDD[i + 2], sAnswString, 0]);
+            nNumber = nNumber + 1
+            tx.executeSql('INSERT INTO Glosa' + nNr + ' VALUES(?, ?, ?, ?)', [nNumber, oDD[i + 2], sAnswString, 0]);
           }
           idLoadQuiz.bProgVisible = false
           idImport.visible = false
@@ -501,7 +489,7 @@ function reverseQuiz()
     var sextra = glosModel.get(i).extra
     var nnC  = glosModel.get(i).number
     if (nState === 0 )
-      glosModelWorking.append({"number": nnC, "question": squestion , "answer": sanswer,"extra":sextra})
+      glosModelWorking.append({  "answer": sanswer,"question": squestion , "number": nnC,"extra":sextra})
   }
 
   var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
@@ -526,7 +514,7 @@ function resetQuiz()
   sScoreText = nC + "/" + nC
   for ( var i = 0; i < nC;++i) {
     glosModel.get(i).state1=0;
-    glosModelWorking.append(glosModel.get(i))
+    glosModelWorking.append({"answer": glosModel.get(i).answer,"question": glosModel.get(i).question, "number": glosModel.get(i).number,"extra": glosModel.get(i).extra  })
   }
 
   var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
@@ -571,8 +559,7 @@ function updateQuiz()
         )
 
 
-  var i = findNumberInModel(glosModelWorking, nNumber)
-
+  var i = MyDownloader.indexFromGlosNr(glosModelWorking, nNumber);
 
   if (i >= 0)
   {
@@ -582,8 +569,9 @@ function updateQuiz()
     }
     else
     {
-      glosModelWorking.get(i).question = sQ
       glosModelWorking.get(i).answer = sA_Org
+      glosModelWorking.get(i).question = sQ
+      glosModelWorking.get(i).number = nNumber
       glosModelWorking.get(i).extra = sE
     }
   }
@@ -591,7 +579,7 @@ function updateQuiz()
   {
     if (nState === 0)
     {
-      glosModelWorking.append({ "number": nNumber, "question": sQ, "answer": sA_Org, "extra": sE, "state1": nState})
+      glosModelWorking.append({ "number": nNumber, "question": sQ, "answer": sA_Org, "extra": sE})
     }
   }
 
@@ -641,7 +629,6 @@ function deleteWordInQuiz()
         idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer;
         idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number;
         idQuizModel.get(i).extra = glosModelWorking.get(nIndexOwNewWord).extra;
-        idQuizModel.get(i).visible1 = false
       }
     }
   }
@@ -651,9 +638,8 @@ function deleteWordInQuiz()
       idQuizModel.get(i).allok = false;
       idQuizModel.get(i).question = "-";
       idQuizModel.get(i).answer = "-";
-      idQuizModel.get(i).number = "-";
+      idQuizModel.get(i).number = 0;
       idQuizModel.get(i).extra = "-";
-      idQuizModel.get(i).visible1 = false
     }
   }
   sScoreText = glosModelWorking.count + "/" + glosModel.count
@@ -661,6 +647,7 @@ function deleteWordInQuiz()
 
 function calcAndAssigNextQuizWord(currentIndex)
 {
+
   var nI = (currentIndex+1) % 3
   var nLastIndex = idView.nLastIndex
 
@@ -700,7 +687,7 @@ function calcAndAssigNextQuizWord(currentIndex)
 
   if (bDir ===-1)
   {
-    var i = findNumberInModel(glosModelWorking, nLastNumber)
+    var i = MyDownloader.indexFromGlosNr(glosModelWorking, nLastNumber);
 
     glosModelWorking.remove(i);
 
@@ -717,7 +704,8 @@ function calcAndAssigNextQuizWord(currentIndex)
 
     sScoreText  = glosModelWorking.count + "/" + glosModel.count
 
-    i = findNumberInModel(glosModel, nLastNumber)
+    i =  MyDownloader.indexFromGlosNr(glosModel, nLastNumber);
+
     if (i !== -1)
     {
       glosModel.get(i).state1 = 1;
@@ -726,10 +714,10 @@ function calcAndAssigNextQuizWord(currentIndex)
             function(tx) {
               tx.executeSql("UPDATE Glosa"+nDbNumber+" SET state=1 WHERE number=?", nLastNumber);
             })
+
     }
 
   }
-
 
   if (glosModelWorking.count>0)
   {
@@ -742,10 +730,12 @@ function calcAndAssigNextQuizWord(currentIndex)
     }
 
     if (glosModelWorking.count === 1)
-      QuizLib.assignQuizModel(0,nQuizIndex)
+      assignQuizModel(0,nQuizIndex)
     else
-      QuizLib.assignQuizModel(nIndexOwNewWord,nQuizIndex)
+      assignQuizModel(nIndexOwNewWord,nQuizIndex)
 
   }
+
   idRectTakeQuiz.bExtraInfoVisible = false
+  idRectTakeQuiz.bAnswerVisible = false
 }

@@ -7,7 +7,9 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 #include <QEventLoop>
-
+#include <QMap>
+class QAbstractListModel;
+class StopWatch;
 class Speechdownloader : public QObject
 {
   Q_OBJECT
@@ -24,8 +26,9 @@ public:
   Q_INVOKABLE void toClipBoard(QString s);
   Q_INVOKABLE void downLoadAllSpeech(QVariant p,QString sLang);
   Q_INVOKABLE void initUrls(QVariant p);
-
-
+  Q_INVOKABLE int indexFromGlosNr(QVariant p, int nNr);
+  Q_INVOKABLE void startTimer();
+  Q_INVOKABLE void stopTimer();
 
 signals:
   void quizDownloadedSignal(int nQCount, QVariantList oDD, QString sLang);
@@ -53,6 +56,8 @@ private:
 
   QByteArray m_oDownloadedData;
   bool m_bPlayAfterDownload = false;
+  int NumberRole(QAbstractListModel* pp);
+   StopWatch* m_pStopWatch;
 };
 
 #endif // SPEECHDOWNLOADER_H

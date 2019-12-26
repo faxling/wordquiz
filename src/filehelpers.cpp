@@ -1,6 +1,66 @@
 #include "filehelpers.h"
 
 #include <QRegExp>
+#include <QElapsedTimer>
+#include <QDebug>
+
+StopWatch::StopWatch(const QString& sMsg)
+{
+  m_oTimer = new QElapsedTimer;
+  m_sMsg = sMsg;
+  m_oTimer->start();
+  return;
+}
+
+StopWatch::StopWatch()
+{
+  m_oTimer = new QElapsedTimer;
+  m_oTimer->start();
+  m_bMsgPrinted = true;
+  return;
+}
+
+StopWatch::~StopWatch()
+{
+  // Only print in destructtor if Stop not called
+  if (m_bMsgPrinted == false)
+  {
+    qint64 nanoSec = m_oTimer->nsecsElapsed();
+    double fTime = (nanoSec) / 1000000.0; // milliseconds
+
+    QString sMsg(m_sMsg.arg(fTime));
+    qDebug() << sMsg;
+  }
+  delete m_oTimer;
+}
+
+
+double StopWatch::StopTimeSec()
+{
+  qint64 nanoSec = m_oTimer->nsecsElapsed();
+  return (nanoSec) / 1000000000.0;
+}
+
+void StopWatch::Stop()
+{
+  qint64 nanoSec = m_oTimer->nsecsElapsed();
+  double fTime = (nanoSec) / 1000000.0; // milliseconds
+
+  QString sMsg(m_sMsg.arg(fTime));
+  m_bMsgPrinted = true;
+  qDebug() << sMsg;
+}
+
+
+void StopWatch::Pause()
+{
+  // FIXTIT
+}
+
+void StopWatch::Continue()
+{
+  // FIXTIT
+}
 
 QString operator^(const QString &sIn, const QString &s2In)
 {
