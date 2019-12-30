@@ -36,7 +36,7 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject *pParent
   QObject::connect(&m_oListQuizNetMgr, &QNetworkAccessManager::finished, this, &Speechdownloader::listDownloaded);
   QObject::connect(&m_oDeleteQuizNetMgr, &QNetworkAccessManager::finished,this, &Speechdownloader::quizDeleted);
   m_sStoragePath = sStoragePath;
-  QSound::play(m_sStoragePath ^ "welcome_en.wav");
+  QSound::play("qrc:welcome_en.wav");
   m_pStopWatch = nullptr;
 
 }
@@ -109,6 +109,13 @@ QString Speechdownloader::AudioPath(const QString& s, const QString& sLang)
   return (m_sStoragePath ^ s ) + "_" + sLang + ".wav";
 }
 
+
+QString Speechdownloader::ImgPath(const QString& s, const QString& sLang)
+{
+  if (sLang.isEmpty())
+    return (m_sStoragePath ^ s ) + ".png";
+  return (m_sStoragePath ^ s ) + "_" + sLang + ".png";
+}
 
 void Speechdownloader::quizDeleted(QNetworkReply* pReply)
 {
@@ -258,6 +265,22 @@ void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
     oWav.close();
   }
 
+  if (ss.version() >= 2)
+  {
+    ss >> nC;
+    for (int i = 0; i < nC; i++)
+    {
+      QString s;
+      ss >> s;
+      QByteArray oc;
+      ss >> oc;
+      QFile oImg(ImgPath(s,""));
+      oImg.open(QIODevice::ReadWrite);
+      oImg.write(oc);
+      oImg.close();
+    }
+  }
+
   emit quizDownloadedSignal(oDataDownloaded.size(), oDataDownloaded, sLang);
 }
 
@@ -317,6 +340,7 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
   QByteArray ocArray;
   QDataStream  ss(&ocArray, QIODevice::WriteOnly);
   QStringList ocAudio;
+  QStringList ocImg;
   QStringList ocLang = sLang.split("-");
   int nC = pp->rowCount();
   ss << nC;
@@ -335,6 +359,8 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
     sWord = pp->data(pp->index(i), 3).toString();
     if (QFile::exists(AudioPath(sWord, ocLang[0])))
       ocAudio.append(sWord  + "_" + ocLang[0]);
+    if (QFile::exists(ImgPath(sWord, ocLang[0])))
+      ocImg.append(sWord  + "_" + ocLang[0]);
   }
 
   ss << ocAudio.size();
@@ -346,10 +372,20 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
     ss << oF.readAll();
     oF.close();
   }
+  ss << ocImg.size();
+  for (auto& oI : ocImg)
+  {
+    QFile oF(ImgPath(oI,""));
+    ss << oI;
+    oF.open(QIODevice::ReadOnly);
+    ss << oF.readAll();
+    oF.close();
+  }
+
   QString sFmt = GLOS_SERVER2 ^ "%ls.php?qname=%ls&slang=%ls&qcount=%d&desc1=%ls&pwd=%ls";
   QString sUrl = QString::asprintf(sFmt.toLatin1(),sCmd.utf16(), sName.utf16(), sLang.utf16(), nC,sDesc.utf16(), sPwd.utf16() );
   qDebug() << " size " << ocArray.size();
-
+  ss.setVersion(2);
   QNetworkRequest request(sUrl);
   request.setRawHeader("Content-Type", "application/octet-stream");
   request.setRawHeader("Content-Length", QByteArray::number(ocArray.size()));

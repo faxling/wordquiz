@@ -47,6 +47,7 @@ private:
   void currentQuizCmd(QVariant p,QString sName, QString sLang,  QString sPwd,QString sDesc, QString sCmd);
   QVector<int> m_ocIndexMap;
   QString AudioPath(const QString&s , const QString& sLang);
+  QString ImgPath(const QString&s , const QString& sLang);
   QString m_sStoragePath;
   QNetworkAccessManager m_oQuizExpNetMgr;
   QNetworkAccessManager m_oWordNetMgr;
@@ -57,7 +58,7 @@ private:
   QByteArray m_oDownloadedData;
   bool m_bPlayAfterDownload = false;
   int NumberRole(QAbstractListModel* pp);
-   StopWatch* m_pStopWatch;
+  StopWatch* m_pStopWatch;
 };
 
 #endif // SPEECHDOWNLOADER_H

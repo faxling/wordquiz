@@ -1,12 +1,13 @@
 <RCC>
-    <qresource prefix="/">
-        <file>qml/pages/horn.png</file>
-        <file>qml/pages/left.png</file>
-        <file>qml/pages/r.png</file>
-        <file>qml/pages/rm.png</file>
-        <file>qml/pages/thumb.png</file>
-        <file>qml/pages/harbour-wordquiz.png</file>
-        <file>qml/pages/hornbig.png</file>
-        <file>qml/QuizFunctions.js</file>
-    </qresource>
+<qresource prefix="/">
+<file>qml/pages/horn.png</file>
+<file>qml/pages/left.png</file>
+<file>qml/pages/r.png</file>
+<file>qml/pages/rm.png</file>
+<file>qml/pages/thumb.png</file>
+<file>qml/pages/harbour-wordquiz.png</file>
+<file>qml/pages/hornbig.png</file>
+<file>qml/QuizFunctions.js</file>
+<file>welcome_en.wav</file>
+</qresource>
 </RCC>

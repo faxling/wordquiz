@@ -529,18 +529,18 @@ function updateQuiz()
 {
   idEditDlg.visible = false
   var nNumber = glosModel.get(idGlosList.currentIndex).number
-  var sQ =  idTextEdit1.displayText.trim()
-  var sA =  idTextEdit2.displayText.trim()
+  var sQ =  idTextEdit1.text.trim()
+  var sA =  idTextEdit2.text.trim()
   var sA_Org =  sA
 
-  var sE =  idTextEdit3.displayText.trim()
+  var sE =  idTextEdit3.text.trim()
 
   var nState = idGlosState.checked ? 1 :0
   db.transaction(
         function(tx) {
-          if (idTextEdit3.displayText.length > 0)
+          if (idTextEdit3.text.length > 0)
           {
-            sA = sA + "###" + idTextEdit3.displayText
+            sA = sA + "###" + idTextEdit3.text
           }
 
           tx.executeSql('UPDATE Glosa'+nDbNumber+' SET quizword=?, answer=?, state=? WHERE number = ?',[sQ,sA,nState,nNumber]);

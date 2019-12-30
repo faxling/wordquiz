@@ -469,49 +469,39 @@ Item {
     height:Theme.itemSizeExtraSmall*4
     color :Theme.overlayBackgroundColor
     onCloseClicked: idEditDlg.visible = false
-    onVisibleChanged:
-    {
 
-    }
 
     Column
     {
-      x:25
       anchors.top: idEditDlg.bottomClose
-      anchors.topMargin : 10
-      spacing : 20
-      Row
+
+      TextField
       {
-        spacing : 20
-        width:idEditDlg.width - 40
-        height: Theme.fontSizeLarge
+        id:idTextEdit3
+        width:idEditDlg.width
 
-        Label
-        {
-          id:idAddInfo
-          text: "Additional Info"
-        }
-
-        InputTextQuiz
-        {
-          id:idTextEdit3
-          width: parent.width - idAddInfo.width - 20
-        }
+        labelVisible : false
+        placeholderText : "Additional Information e.g wordclass"
       }
+
       Row
       {
-        spacing : 20
+        // spacing : 20
         width:parent.width
-        height: Theme.fontSizeLarge
-        InputTextQuiz
+       //  height: Theme.fontSizeLarge*2
+        TextField
         {
           id:idTextEdit1
-          width: parent.width / 2 - 10
+          height: Theme.fontSizeLarge * 1.5
+          labelVisible : false
+          width: parent.width / 2
         }
-        InputTextQuiz
+        TextField
         {
           id:idTextEdit2
-          width: parent.width / 2 - 10
+          height: Theme.fontSizeLarge * 1.5
+          labelVisible : false
+          width: parent.width / 2
         }
       }
     }
