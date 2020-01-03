@@ -470,7 +470,6 @@ Item {
     color :Theme.overlayBackgroundColor
     onCloseClicked: idEditDlg.visible = false
 
-
     Column
     {
       anchors.top: idEditDlg.bottomClose
@@ -479,16 +478,13 @@ Item {
       {
         id:idTextEdit3
         width:idEditDlg.width
-
         labelVisible : false
         placeholderText : "Additional Information e.g wordclass"
       }
 
       Row
       {
-        // spacing : 20
         width:parent.width
-       //  height: Theme.fontSizeLarge*2
         TextField
         {
           id:idTextEdit1

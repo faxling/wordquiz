@@ -6,7 +6,7 @@ Item {
   id:idRectTakeQuiz
   property bool bExtraInfoVisible : false
   property bool bAnswerVisible : false
-
+  Component.onCompleted: idWindow.oTakeQuiz = idRectTakeQuiz
   // May be the filler is calculated (PathLen - NoElem*sizeElem) /  (NoElem )
   Component
   {

@@ -313,6 +313,11 @@ function loadFromQuizList() {
 
   idTextSelected.text = sQuizName
 
+  if (idWindow.oTakeQuiz !== undefined)
+  {
+    idWindow.oTakeQuiz.bExtraInfoVisible = false
+    idWindow.oTakeQuiz.bAnswerVisible = false
+  }
 }
 
 
@@ -422,6 +427,7 @@ function loadFromList(nCount, oDD, sLangLoaded) {
     idImportMsg.text = "error importing"
     return
   }
+
 
 
   db.transaction(
