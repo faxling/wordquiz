@@ -624,6 +624,16 @@ function deleteWordInQuiz()
       break;
     }
   }
+
+
+  if (idQuizModel.get(nQuizIndex).number === nNumber)
+  {
+    idWindow.oTakeQuiz.bExtraInfoVisible = false
+    idWindow.oTakeQuiz.bAnswerVisible = false
+  }
+
+
+
   if (glosModel.count > 0)
   {
     for (  i = 0; i < 3;++i) {
