@@ -14,7 +14,6 @@ Item {
   {
     if (visible)
     {
-
       idGlosList.currentIndex = idWindow.nGlosaTakeQuizIndex
       idGlosList.positionViewAtIndex(idWindow.nGlosaTakeQuizIndex, ListView.Center)
     }
@@ -412,6 +411,7 @@ Item {
             idTextEdit3.text = extra
             idGlosState.checked = state1 !== 0
             idGlosList.currentIndex = index
+            idWindow.nGlosaTakeQuizIndex = index
           }
         }
         ButtonQuizImg

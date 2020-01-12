@@ -161,9 +161,10 @@ function insertGlosa(dbnumber, nC, question, answer) {
   idWindow.glosListView.currentIndex = glosModel.count - 1
   sScoreText = glosModelWorking.count + "/" + glosModel.count
 
-  if (glosModel.count === 1) {
+  idWindow.oTakeQuiz.bAllok = false
+
+  if (glosModelWorking.count === 1) {
     for (var i = 0; i < 3; ++i) {
-      idQuizModel.get(i).allok = false;
       idQuizModel.get(i).question = question;
       idQuizModel.get(i).answer = answer;
       idQuizModel.get(i).number = nC;
@@ -173,10 +174,6 @@ function insertGlosa(dbnumber, nC, question, answer) {
 }
 
 function assignQuizModel(nIndexOfNewWord) {
-  for (var i = 0; i < 3; ++i) {
-    idQuizModel.get(i).allok = false;
-  }
-
   var sNumberNewWord = glosModelWorking.get(nIndexOfNewWord).number
   idQuizModel.get(nQuizIndex).question = glosModelWorking.get(nIndexOfNewWord).question;
   idQuizModel.get(nQuizIndex).answer = glosModelWorking.get(nIndexOfNewWord).answer;
@@ -189,9 +186,11 @@ function assignQuizModel(nIndexOfNewWord) {
 
 function loadQuiz() {
   glosModelWorking.clear();
+  if (idWindow.oTakeQuiz !== undefined)
+    idWindow.oTakeQuiz.bAllok = false
+
   if (glosModel.count < 1) {
     for (var i = 0; i < 3; ++i) {
-      idQuizModel.get(i).allok = false;
       idQuizModel.get(i).question = "-";
       idQuizModel.get(i).answer = "-";
       idQuizModel.get(i).number = "-";
@@ -213,15 +212,13 @@ function loadQuiz() {
     }
   }
 
-
   var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
 
   // sScoreText =  glosModelWorking.count + "/" + nC
 
   if (glosModelWorking.count === 0) {
-    for (i = 0; i < 3; ++i) {
-      idQuizModel.get(i).allok = true;
-    }
+    if (idWindow.oTakeQuiz !== undefined)
+      idWindow.oTakeQuiz.bAllok = true
   }
   else {
     console.log("loadQuiz " + sQuizName)
@@ -525,6 +522,7 @@ function resetQuiz()
 
   var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
 
+  idWindow.oTakeQuiz.bAllok = false
   assignQuizModel(nIndexOwNewWord)
 }
 
@@ -540,8 +538,11 @@ function updateQuiz()
   var sA_Org =  sA
 
   var sE =  idTextEdit3.text.trim()
-
   var nState = idGlosState.checked ? 1 :0
+
+  if (nState === 0)
+    idWindow.oTakeQuiz.bAllok = false
+
   db.transaction(
         function(tx) {
           if (idTextEdit3.text.length > 0)
@@ -589,6 +590,17 @@ function updateQuiz()
     }
   }
 
+  idWindow.oTakeQuiz.bAllok = glosModelWorking.count === 0
+
+  if (glosModelWorking.count === 1) {
+    for (var i = 0; i < 3; ++i) {
+      idQuizModel.get(i).question = sQ;
+      idQuizModel.get(i).answer = sA_Org;
+      idQuizModel.get(i).number = nNumber;
+      idQuizModel.get(i).extra = sE;
+    }
+  }
+
   sScoreText  = glosModelWorking.count + "/" + glosModel.count
 
   MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).answer,sToLang)
@@ -625,14 +637,11 @@ function deleteWordInQuiz()
     }
   }
 
-
   if (idQuizModel.get(nQuizIndex).number === nNumber)
   {
     idWindow.oTakeQuiz.bExtraInfoVisible = false
     idWindow.oTakeQuiz.bAnswerVisible = false
   }
-
-
 
   if (glosModel.count > 0)
   {
@@ -651,7 +660,6 @@ function deleteWordInQuiz()
   else
   {
     for (  i = 0; i < 3;++i) {
-      idQuizModel.get(i).allok = false;
       idQuizModel.get(i).question = "-";
       idQuizModel.get(i).answer = "-";
       idQuizModel.get(i).number = 0;
@@ -673,10 +681,7 @@ function calcAndAssigNextQuizWord(currentIndex)
 
   if (glosModelWorking.count === 0 )
   {
-    for (var j = 0; j < 3 ;++j)
-    {
-      idQuizModel.get(j).allok = true
-    }
+    idWindow.oTakeQuiz.bAllok = true
     return;
   }
 
@@ -700,7 +705,6 @@ function calcAndAssigNextQuizWord(currentIndex)
 
   idView.nLastIndex = nI
 
-
   if (bDir ===-1)
   {
     var i = MyDownloader.indexFromGlosNr(glosModelWorking, nLastNumber);
@@ -709,12 +713,12 @@ function calcAndAssigNextQuizWord(currentIndex)
 
     if (glosModelWorking.count ===0 )
     {
+      idWindow.oTakeQuiz.bAllok = true
       for ( i = 0; i < 3 ;++i)
       {
         idQuizModel.get(i).question =  ""
         idQuizModel.get(i).answer =  ""
         idQuizModel.get(i).extra =  ""
-        idQuizModel.get(i).allok = true
       }
     }
 
@@ -732,7 +736,6 @@ function calcAndAssigNextQuizWord(currentIndex)
             })
 
     }
-
   }
 
   if (glosModelWorking.count>0)
