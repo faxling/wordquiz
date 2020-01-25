@@ -503,6 +503,7 @@ function reverseQuiz()
 function resetQuiz()
 {
   var nC = glosModel.count
+  bIsReverse = false
 
   if (nC===0)
     return
