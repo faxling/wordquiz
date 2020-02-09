@@ -5,6 +5,16 @@ function sortModel()
         )
 }
 
+function resetTakeQuizTab()
+{
+  if (idWindow.oTakeQuiz !== undefined)
+  {
+    idWindow.oTakeQuiz.bExtraInfoVisible = false
+    idWindow.oTakeQuiz.bAnswerVisible = false
+    idWindow.oTakeQuiz.bAllok = false
+  }
+}
+
 
 function getTextFromInput(oTextInput)
 {
@@ -308,11 +318,7 @@ function loadFromQuizList() {
 
   idTextSelected.text = sQuizName
 
-  if (idWindow.oTakeQuiz !== undefined)
-  {
-    idWindow.oTakeQuiz.bExtraInfoVisible = false
-    idWindow.oTakeQuiz.bAnswerVisible = false
-  }
+  resetTakeQuizTab()
 }
 
 
@@ -350,7 +356,8 @@ function loadFromServerList(nCount, oDD) {
     return;
   }
 
-  idDescText.text = oDD[1];
+  var ocDescHeader = oDD[1].split("###")
+  idDescText.text = ocDescHeader[0];
   idImport.sSelectedQ = oDD[0];
 
   for (var i = 0; i < nCount; i += 4) {
@@ -470,6 +477,7 @@ function reverseQuiz()
 {
   bIsReverse =  !bIsReverse
   glosModelWorking.clear()
+  resetTakeQuizTab()
   var nC = glosModel.count
   if (nC === 0)
     return
@@ -502,9 +510,11 @@ function resetQuiz()
 {
   var nC = glosModel.count
   bIsReverse = false
-
+  resetTakeQuizTab()
   if (nC===0)
     return
+
+
   db.transaction(
         function(tx) {
           tx.executeSql('UPDATE Glosa'+nDbNumber+' SET state=0');
@@ -521,7 +531,6 @@ function resetQuiz()
 
   var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
 
-  idWindow.oTakeQuiz.bAllok = false
   assignQuizModel(nIndexOwNewWord)
 }
 
@@ -638,8 +647,7 @@ function deleteWordInQuiz()
 
   if (idQuizModel.get(nQuizIndex).number === nNumber)
   {
-    idWindow.oTakeQuiz.bExtraInfoVisible = false
-    idWindow.oTakeQuiz.bAnswerVisible = false
+    resetTakeQuizTab()
   }
 
   if (glosModel.count > 0)
@@ -753,6 +761,5 @@ function calcAndAssigNextQuizWord(currentIndex)
 
   }
 
-  idRectTakeQuiz.bExtraInfoVisible = false
-  idRectTakeQuiz.bAnswerVisible = false
+  resetTakeQuizTab()
 }
