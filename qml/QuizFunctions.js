@@ -273,8 +273,6 @@ function loadFromQuizList() {
   if (glosModelIndex.count === 0)
     return;
 
-
-
   sQuizName = glosModelIndex.get(idQuizList.currentIndex).quizname;
   sLangLang = glosModelIndex.get(idQuizList.currentIndex).langpair;
   nDbNumber = glosModelIndex.get(idQuizList.currentIndex).number;
@@ -672,7 +670,6 @@ function deleteWordInQuiz()
 
 function calcAndAssigNextQuizWord(currentIndex)
 {
-
   var nI = (currentIndex+1) % 3
   var nLastIndex = idView.nLastIndex
 
