@@ -549,7 +549,11 @@ function updateQuiz()
   var nState = idGlosState.checked ? 1 :0
 
   if (nState === 0)
-    idWindow.oTakeQuiz.bAllok = false
+  {
+    if (idWindow.oTakeQuiz !== undefined)
+      idWindow.oTakeQuiz.bAllok = false
+  }
+
 
   db.transaction(
         function(tx) {
@@ -597,8 +601,8 @@ function updateQuiz()
       glosModelWorking.append({ "number": nNumber, "question": sQ, "answer": sA_Org, "extra": sE})
     }
   }
-
-  idWindow.oTakeQuiz.bAllok = glosModelWorking.count === 0
+  if (idWindow.oTakeQuiz !== undefined)
+    idWindow.oTakeQuiz.bAllok = glosModelWorking.count === 0
 
   if (glosModelWorking.count === 1) {
     for (var i = 0; i < 3; ++i) {
@@ -687,6 +691,7 @@ function calcAndAssigNextQuizWord(currentIndex)
 
   if (glosModelWorking.count === 0 )
   {
+    console.log(" idWindow.oTakeQuiz.bAllok ")
     idWindow.oTakeQuiz.bAllok = true
     return;
   }
@@ -759,7 +764,10 @@ function calcAndAssigNextQuizWord(currentIndex)
     else
       assignQuizModel(nIndexOwNewWord,nQuizIndex)
 
+
+    resetTakeQuizTab()
+
   }
 
-  resetTakeQuizTab()
+
 }
