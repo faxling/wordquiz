@@ -7,6 +7,8 @@ Item {
   property bool bExtraInfoVisible : false
   property bool bAnswerVisible : false
   property bool bAllok : false
+  property bool bTextMode : false
+  property bool bTextAnswerOk : false
   Component.onCompleted:
   {
     if (glosModelWorking.count === 0)
@@ -22,7 +24,8 @@ Item {
 
     Rectangle
     {
-      property alias answerVisible: idTextAnswer.visible
+
+      property alias  textEdit : idTextEditYourAnswer.text
       radius:10
       width:idView.width
       height:idRectTakeQuiz.height - 200
@@ -37,7 +40,29 @@ Item {
         anchors.topMargin:  20
         source:"image://theme/icon-m-about"
         visible :extra.length > 0
-        onClicked: bExtraInfoVisible = true
+        onClicked: bExtraInfoVisible = !bExtraInfoVisible
+      }
+      ButtonQuizImg
+      {
+        id:idTextBtn
+        anchors.right:  parent.right
+        anchors.rightMargin:  20
+        anchors.top:  parent.top
+        anchors.topMargin:  20
+        source:"image://theme/icon-m-keyboard"
+        onClicked: bTextMode = !bTextMode
+      }
+
+      ButtonQuizImg
+      {
+        id:idSoundBtn
+        visible : bTextAnswerOk && bTextMode
+        anchors.right:  parent.right
+        anchors.rightMargin:  20
+        anchors.top:  idTextBtn.bottom
+        anchors.topMargin:  20
+        source:"image://theme/icon-m-speaker"
+        onClicked: MyDownloader.playWord(answer,bIsReverse ? sFromLang : sToLang)
       }
 
       Text
@@ -50,6 +75,28 @@ Item {
         font.pixelSize: Theme.fontSizeExtraSmall
         visible:bExtraInfoVisible
         text: extra
+      }
+
+      Image {
+        y:100
+        x:10
+        visible : bTextAnswerOk && bTextMode
+        source: "image://theme/icon-m-like"
+      }
+
+      TextField
+      {
+        id:idTextEditYourAnswer
+        y:50
+        anchors.horizontalCenter: parent.horizontalCenter
+        visible:bTextMode
+        width:parent.width  - 150
+        labelVisible : false
+        placeholderText : "your answer"
+        onTextChanged:
+        {
+          bTextAnswerOk =  QuizLib.isAnswerOk(text, answer)
+        }
       }
 
       Column
@@ -74,6 +121,7 @@ Item {
           font.bold: true
           anchors.horizontalCenter: parent.horizontalCenter
           text : question
+          onTextChanged: idTextEditYourAnswer.text = ""
         }
 
         ButtonQuiz
@@ -83,7 +131,7 @@ Item {
           text:"Show Answer"
           onClicked:
           {
-            bAnswerVisible = true
+            bAnswerVisible = !bAnswerVisible
           }
         }
 
@@ -136,12 +184,15 @@ Item {
   PathView
   {
     id:idView
+    property int nLastIndex : 1
     clip:true
+    interactive: bTextAnswerOk || !bTextMode || bAnswerVisible || moving
     width:idRectTakeQuiz.width
     height:idRectTakeQuiz.height
-    property int nLastIndex : 1
+
     onCurrentIndexChanged:
     {
+      bTextAnswerOk = false
       QuizLib.calcAndAssigNextQuizWord(currentIndex)
     }
 

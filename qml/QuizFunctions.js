@@ -255,11 +255,14 @@ function loadFromDb(tx) {
     var sA;
     var sE = "";
     var ocA = rs.rows.item(i).answer.split("###")
-    sA = ocA[0]
+    sA = ocA[0].charAt(0).toUpperCase() + ocA[0].slice(1);
+    sA = sA.charAt(0).toUpperCase() + sA.slice(1);
     if (ocA.length > 1)
       sE = ocA[1]
 
-    glosModel.append({"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": sA, "extra": sE,  "state1" : rs.rows.item(i).state })
+    var sQ = rs.rows.item(i).quizword
+    sQ =  sQ.charAt(0).toUpperCase() + sQ.slice(1);
+    glosModel.append({"number": rs.rows.item(i).number, "question":  sQ, "answer": sA, "extra": sE,  "state1" : rs.rows.item(i).state })
 
   }
   if (nCurrentNumber > 0)
@@ -472,6 +475,27 @@ function loadFromList(nCount, oDD, sLangLoaded) {
 
 }
 
+
+function isAnswerOk(sAnswerToCheck, sAnswerInDb)
+{
+  var sAnswer = sAnswerInDb.toLocaleUpperCase()
+  var sText = sAnswerToCheck.toLocaleUpperCase()
+  var regExpIgnore = /[.; ?!-,]/g
+  sAnswer = sAnswer.replace(regExpIgnore,"")
+  sText = sText.replace(regExpIgnore,"")
+  var bTextAnswerOk
+
+  if (sText === sAnswer)
+  {
+    bTextAnswerOk = true
+  }
+  else
+  {
+    bTextAnswerOk = false
+  }
+
+  return bTextAnswerOk
+}
 
 function reverseQuiz()
 {
