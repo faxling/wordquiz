@@ -11,7 +11,6 @@ function resetTakeQuizTab()
   {
     idWindow.oTakeQuiz.bExtraInfoVisible = false
     idWindow.oTakeQuiz.bAnswerVisible = false
-    idWindow.oTakeQuiz.bAllok = false
   }
 }
 
@@ -35,7 +34,6 @@ function updateDesc1(sDesc)
 
   glosModelIndex.get(idQuizList.currentIndex).desc1 = sDesc
   idDescTextOnPage.text = sDesc
-
 
   db.transaction(
         function (tx) {
@@ -171,24 +169,23 @@ function insertGlosa(dbnumber, nC, question, answer) {
   idWindow.glosListView.currentIndex = glosModel.count - 1
   sScoreText = glosModelWorking.count + "/" + glosModel.count
 
-  idWindow.oTakeQuiz.bAllok = false
+  idWindow.bAllok = false
 
   if (glosModelWorking.count === 1) {
-    for (var i = 0; i < 3; ++i) {
-      idQuizModel.get(i).question = question;
-      idQuizModel.get(i).answer = answer;
-      idQuizModel.get(i).number = nC;
-      idQuizModel.get(i).extra = "";
-    }
+
+    idQuizModel.question = question;
+    idQuizModel.answer = answer;
+    idQuizModel.number = nC;
+    idQuizModel.extra = "";
   }
 }
 
 function assignQuizModel(nIndexOfNewWord) {
   var sNumberNewWord = glosModelWorking.get(nIndexOfNewWord).number
-  idQuizModel.get(nQuizIndex).question = glosModelWorking.get(nIndexOfNewWord).question;
-  idQuizModel.get(nQuizIndex).answer = glosModelWorking.get(nIndexOfNewWord).answer;
-  idQuizModel.get(nQuizIndex).number = sNumberNewWord;
-  idQuizModel.get(nQuizIndex).extra = glosModelWorking.get(nIndexOfNewWord).extra;
+  idQuizModel.question = glosModelWorking.get(nIndexOfNewWord).question;
+  idQuizModel.answer = glosModelWorking.get(nIndexOfNewWord).answer;
+  idQuizModel.number = sNumberNewWord;
+  idQuizModel.extra = glosModelWorking.get(nIndexOfNewWord).extra;
   idWindow.nGlosaTakeQuizIndex = MyDownloader.indexFromGlosNr(glosModel, sNumberNewWord)
   // idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(glosModel, sNumberNewWord)
 }
@@ -196,16 +193,13 @@ function assignQuizModel(nIndexOfNewWord) {
 
 function loadQuiz() {
   glosModelWorking.clear();
-  if (idWindow.oTakeQuiz !== undefined)
-    idWindow.oTakeQuiz.bAllok = false
+  idWindow.bAllok = false
 
   if (glosModel.count < 1) {
-    for (var i = 0; i < 3; ++i) {
-      idQuizModel.get(i).question = "-";
-      idQuizModel.get(i).answer = "-";
-      idQuizModel.get(i).number = "-";
-      idQuizModel.get(i).extra = "-";
-    }
+    idQuizModel.question = "-";
+    idQuizModel.answer = "-";
+    idQuizModel.number = "-";
+    idQuizModel.extra = "-";
     return;
   }
 
@@ -213,6 +207,7 @@ function loadQuiz() {
 
   bIsReverse = false
 
+  var i
   for (i = 0; i < nC; ++i) {
     if (glosModel.get(i).state1 === 0)
     {
@@ -227,8 +222,7 @@ function loadQuiz() {
   // sScoreText =  glosModelWorking.count + "/" + nC
 
   if (glosModelWorking.count === 0) {
-    if (idWindow.oTakeQuiz !== undefined)
-      idWindow.oTakeQuiz.bAllok = true
+    idWindow.bAllok = true
   }
   else {
     console.log("loadQuiz " + sQuizName)
@@ -476,10 +470,27 @@ function loadFromList(nCount, oDD, sLangLoaded) {
 }
 
 
+function ignoreAccent(sInStr)
+{
+  var regExpAcc = /[ÀÁÂÃÄÅ]/g
+  var regExpEcc = /[ÈÉÊË]/g
+  var regExpOcc = /[ÒÓÔÕÕ]/g
+  var regExpUcc = /[ÙÚÛ]/g
+  var regExpCcc = /[Ç]/g
+  sInStr = sInStr.replace(regExpAcc,"A")
+  sInStr = sInStr.replace(regExpEcc,"E")
+  sInStr = sInStr.replace(regExpOcc,"O")
+  sInStr = sInStr.replace(regExpUcc,"U")
+  sInStr = sInStr.replace(regExpCcc,"C")
+  return sInStr
+}
+
 function isAnswerOk(sAnswerToCheck, sAnswerInDb)
 {
   var sAnswer = sAnswerInDb.toLocaleUpperCase()
   var sText = sAnswerToCheck.toLocaleUpperCase()
+  sText = ignoreAccent(sText)
+  sAnswer = ignoreAccent(sAnswer)
   var regExpIgnore = /[.; ?!-,]/g
   sAnswer = sAnswer.replace(regExpIgnore,"")
   sText = sText.replace(regExpIgnore,"")
@@ -556,6 +567,8 @@ function resetQuiz()
   var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
 
   assignQuizModel(nIndexOwNewWord)
+  idWindow.bAllok = glosModelWorking.count === 0
+
 }
 
 
@@ -574,8 +587,7 @@ function updateQuiz()
 
   if (nState === 0)
   {
-    if (idWindow.oTakeQuiz !== undefined)
-      idWindow.oTakeQuiz.bAllok = false
+    idWindow.bAllok = false
   }
 
 
@@ -589,16 +601,14 @@ function updateQuiz()
           tx.executeSql('UPDATE Glosa'+nDbNumber+' SET quizword=?, answer=?, state=? WHERE number = ?',[sQ,sA,nState,nNumber]);
 
           // Assign The updated values
-          for ( var i = 0; i < 3;++i) {
-            if (idQuizModel.get(i).number === nNumber)
-            {
-              idQuizModel.get(i).question = sQ;
-              idQuizModel.get(i).answer = sA_Org;
-              idQuizModel.get(i).extra = sE;
-              idQuizModel.get(i).state1 = nState
-            }
+          if (idQuizModel.number === nNumber)
+          {
+            idQuizModel.question = sQ;
+            idQuizModel.answer = sA_Org;
+            idQuizModel.extra = sE;
           }
         }
+
         )
 
 
@@ -625,16 +635,16 @@ function updateQuiz()
       glosModelWorking.append({ "number": nNumber, "question": sQ, "answer": sA_Org, "extra": sE})
     }
   }
-  if (idWindow.oTakeQuiz !== undefined)
-    idWindow.oTakeQuiz.bAllok = glosModelWorking.count === 0
+
+  idWindow.bAllok = glosModelWorking.count === 0
 
   if (glosModelWorking.count === 1) {
-    for (var i = 0; i < 3; ++i) {
-      idQuizModel.get(i).question = sQ;
-      idQuizModel.get(i).answer = sA_Org;
-      idQuizModel.get(i).number = nNumber;
-      idQuizModel.get(i).extra = sE;
-    }
+
+    idQuizModel.question = sQ;
+    idQuizModel.answer = sA_Org;
+    idQuizModel.number = nNumber;
+    idQuizModel.extra = sE;
+
   }
 
   sScoreText  = glosModelWorking.count + "/" + glosModel.count
@@ -673,33 +683,30 @@ function deleteWordInQuiz()
     }
   }
 
-  if (idQuizModel.get(nQuizIndex).number === nNumber)
+  if (idQuizModel.number === nNumber)
   {
     resetTakeQuizTab()
   }
 
   if (glosModel.count > 0)
   {
-    for (  i = 0; i < 3;++i) {
-      if (idQuizModel.get(i).number === nNumber)
-      {
-        // The removed word is displayed in the Quiz tab
-        var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
-        idQuizModel.get(i).question = glosModelWorking.get(nIndexOwNewWord).question;
-        idQuizModel.get(i).answer = glosModelWorking.get(nIndexOwNewWord).answer;
-        idQuizModel.get(i).number = glosModelWorking.get(nIndexOwNewWord).number;
-        idQuizModel.get(i).extra = glosModelWorking.get(nIndexOwNewWord).extra;
-      }
+    if (idQuizModel.number === nNumber)
+    {
+      // The removed word is displayed in the Quiz tab
+      var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count);
+      idQuizModel.question = glosModelWorking.get(nIndexOwNewWord).question;
+      idQuizModel.answer = glosModelWorking.get(nIndexOwNewWord).answer;
+      idQuizModel.number = glosModelWorking.get(nIndexOwNewWord).number;
+      idQuizModel.extra = glosModelWorking.get(nIndexOwNewWord).extra;
     }
   }
   else
   {
-    for (  i = 0; i < 3;++i) {
-      idQuizModel.get(i).question = "-";
-      idQuizModel.get(i).answer = "-";
-      idQuizModel.get(i).number = 0;
-      idQuizModel.get(i).extra = "-";
-    }
+    idQuizModel.question = "-";
+    idQuizModel.answer = "-";
+    idQuizModel.number = 0;
+    idQuizModel.extra = "-";
+
   }
   sScoreText = glosModelWorking.count + "/" + glosModel.count
 }
@@ -715,8 +722,7 @@ function calcAndAssigNextQuizWord(currentIndex)
 
   if (glosModelWorking.count === 0 )
   {
-    console.log(" idWindow.oTakeQuiz.bAllok ")
-    idWindow.oTakeQuiz.bAllok = true
+    idWindow.bAllok = true
     return;
   }
 
@@ -736,7 +742,7 @@ function calcAndAssigNextQuizWord(currentIndex)
     bDir = -1
 
 
-  var nLastNumber = idQuizModel.get(nLastIndex).number
+  var nLastNumber = idQuizModel.number
 
   idView.nLastIndex = nI
 
@@ -748,13 +754,12 @@ function calcAndAssigNextQuizWord(currentIndex)
 
     if (glosModelWorking.count ===0 )
     {
-      idWindow.oTakeQuiz.bAllok = true
-      for ( i = 0; i < 3 ;++i)
-      {
-        idQuizModel.get(i).question =  ""
-        idQuizModel.get(i).answer =  ""
-        idQuizModel.get(i).extra =  ""
-      }
+      idWindow.bAllok = true
+
+      idQuizModel.question =  ""
+      idQuizModel.answer =  ""
+      idQuizModel.extra =  ""
+
     }
 
     sScoreText  = glosModelWorking.count + "/" + glosModel.count

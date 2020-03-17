@@ -46,6 +46,7 @@ Page {
   property variant quizListView
   property variant oTakeQuiz
   property int nGlosaDbLastIndex:  -1
+  property bool bAllok : false
   property string sSearchQuery
   property int nGlosaTakeQuizIndex
   onSScoreTextChanged:
@@ -64,14 +65,10 @@ Page {
 
   ListModel {
     id: glosModel
-
-
-
   }
   ListModel {
     id: glosModelWorkingRev
   }
-
   ListModel {
     id: glosModelWorking
   }
@@ -84,28 +81,25 @@ Page {
 
   // Used by idView in TakeQuiz
 
+
   ListModel {
     id:idQuizModel
+    property string question
+    property string extra
+    property string answer
+    property int number
 
     ListElement {
-      question: "-"
-      answer:"-"
-      extra:""
       number:0
     }
     ListElement {
-      question: "-"
-      answer:"-"
-      extra:""
       number:1
     }
     ListElement {
-      question: "-"
-      answer:"-"
-      extra:""
       number:2
     }
   }
+
 
 
   objectName: "idFirstPage"

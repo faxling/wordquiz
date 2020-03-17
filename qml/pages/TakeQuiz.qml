@@ -11,9 +11,6 @@ Item {
   property bool bTextAnswerOk : false
   Component.onCompleted:
   {
-    if (glosModelWorking.count === 0)
-      bAllok = true
-
     idWindow.oTakeQuiz = idRectTakeQuiz
   }
 
@@ -39,19 +36,20 @@ Item {
         anchors.top:  parent.top
         anchors.topMargin:  20
         source:"image://theme/icon-m-about"
-        visible :extra.length > 0
+        visible :idQuizModel.extra.length > 0
         onClicked: bExtraInfoVisible = !bExtraInfoVisible
       }
       ButtonQuizImg
       {
         id:idTextBtn
+        visible: !idWindow.bAllok
         anchors.right:  parent.right
         anchors.rightMargin:  20
         anchors.top:  parent.top
         anchors.topMargin:  20
         source:"image://theme/icon-m-keyboard"
         onClicked: bTextMode = !bTextMode
-      }
+      }https://www.svtplay.se/video/22513402/gaddan-som-alltid-hogg
 
       ButtonQuizImg
       {
@@ -62,7 +60,7 @@ Item {
         anchors.top:  idTextBtn.bottom
         anchors.topMargin:  20
         source:"image://theme/icon-m-speaker"
-        onClicked: MyDownloader.playWord(answer,bIsReverse ? sFromLang : sToLang)
+        onClicked: MyDownloader.playWord(idQuizModel.answer,bIsReverse ? sFromLang : sToLang)
       }
 
       Text
@@ -74,7 +72,7 @@ Item {
         color:Theme.primaryColor
         font.pixelSize: Theme.fontSizeExtraSmall
         visible:bExtraInfoVisible
-        text: extra
+        text: idQuizModel.extra
       }
 
       Image {
@@ -89,13 +87,13 @@ Item {
         id:idTextEditYourAnswer
         y:50
         anchors.horizontalCenter: parent.horizontalCenter
-        visible:bTextMode
+        visible:bTextMode && (!idWindow.bAllok)
         width:parent.width  - 150
         labelVisible : false
         placeholderText : "your answer"
         onTextChanged:
         {
-          bTextAnswerOk =  QuizLib.isAnswerOk(text, answer)
+          bTextAnswerOk =  QuizLib.isAnswerOk(text, idQuizModel.answer)
         }
       }
 
@@ -104,13 +102,13 @@ Item {
         spacing: 20
         width:parent.width
         y:parent.height / 3
-        visible: !bAllok
+        visible: !idWindow.bAllok
         ButtonQuizImg
         {
           anchors.horizontalCenter: parent.horizontalCenter
           visible:(bIsReverse ? bHasSpeech : bHasSpeechFrom)
           source:"qrc:qml/pages/hornbig.png"
-          onClicked: MyDownloader.playWord(question,bIsReverse ? sToLang : sFromLang )
+          onClicked: MyDownloader.playWord(idQuizModel.question,bIsReverse ? sToLang : sFromLang )
         }
 
         Text
@@ -120,7 +118,7 @@ Item {
           font.pixelSize: Theme.fontSizeExtraLarge
           font.bold: true
           anchors.horizontalCenter: parent.horizontalCenter
-          text : question
+          text : idQuizModel.question
           onTextChanged: idTextEditYourAnswer.text = ""
         }
 
@@ -144,7 +142,7 @@ Item {
           visible:bAnswerVisible
           anchors.horizontalCenter: parent.horizontalCenter
           horizontalAlignment: Text.AlignHCenter
-          text : answer
+          text : idQuizModel.answer
         }
 
         ButtonQuizImg
@@ -152,12 +150,12 @@ Item {
           anchors.horizontalCenter: parent.horizontalCenter
           visible: (bIsReverse ? bHasSpeechFrom : bHasSpeech) && bAnswerVisible
           source:"qrc:qml/pages/hornbig.png"
-          onClicked: MyDownloader.playWord(answer,bIsReverse ? sFromLang : sToLang )
+          onClicked: MyDownloader.playWord(idQuizModel.answer,bIsReverse ? sFromLang : sToLang )
         }
       }
 
       Image {
-        visible:bAllok
+        visible:idWindow.bAllok
         anchors.centerIn:  parent
         source: "qrc:qml/pages/thumb.png"
       }
