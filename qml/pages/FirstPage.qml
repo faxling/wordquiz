@@ -26,6 +26,8 @@ Page {
   property string sLangLangRev
   property string sToLang
   property string sFromLang
+  property string sQuestonLang : bIsReverse ? sToLang : sFromLang
+  property string sAnswerLang : bIsReverse ? sFromLang : sToLang
   property bool bIsReverse
   property bool bHasSpeech : sToLang !== "hu"
   property bool bHasSpeechFrom : sFromLang !=="hu"
@@ -45,8 +47,8 @@ Page {
   property variant glosListView
   property variant quizListView
   property variant oTakeQuiz
-  property int nGlosaDbLastIndex:  -1
   property bool bAllok : false
+  property int nGlosaDbLastIndex:  -1
   property string sSearchQuery
   property int nGlosaTakeQuizIndex
   onSScoreTextChanged:
@@ -88,7 +90,7 @@ Page {
     property string extra
     property string answer
     property int number
-
+    onQuestionChanged: MyDownloader.setImgWord(question,sQuestonLang )
     ListElement {
       number:0
     }

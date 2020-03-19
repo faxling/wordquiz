@@ -62,13 +62,30 @@ void StopWatch::Continue()
   // FIXTIT
 }
 
+
+static const QRegExp SLASH("[\\\\/]");
+QString JustFileName(const QString & sFileName) {
+  int n = sFileName.lastIndexOf(SLASH);
+  if (n < 0)
+    return sFileName;
+  return sFileName.right(sFileName.size() - n - 1);
+}
+
+QString BaseName(const QString & sFileName) {
+  return sFileName.left(sFileName.lastIndexOf('.'));
+}
+
+QString JustFileNameNoExt(const QString & sFileName) {
+  return BaseName(JustFileName(sFileName));
+}
+
 QString operator^(const QString &sIn, const QString &s2In)
 {
   QString s(sIn), s2(s2In);
   int nLen1 = s.length() - 1;
   int nLen2 = s2.length() - 1;
   bool bIsBack = true;
-  static const QRegExp SLASH("[\\\\/]");
+
   // use  the last dir separator if we need to append
   int nSP = sIn.indexOf(SLASH);
   if (nSP >= 0)

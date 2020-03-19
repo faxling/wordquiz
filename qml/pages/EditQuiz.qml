@@ -411,6 +411,7 @@ Item {
             idTextEdit3.text = extra
             idGlosState.checked = state1 !== 0
             idGlosList.currentIndex = index
+            idWordImage.visible =  MyDownloader.hasImage(idTextEdit1.text,  sQuestonLang)
             idWindow.nGlosaTakeQuizIndex = index
           }
         }
@@ -502,6 +503,14 @@ Item {
       }
     }
 
+    Image
+    {
+      id:idWordImage
+      anchors.verticalCenter: idBtnUpdate.verticalCenter
+      anchors.left: parent.left
+      anchors.leftMargin: 20
+      source: "image://theme/icon-m-image"
+    }
 
     Label
     {

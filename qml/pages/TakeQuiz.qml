@@ -6,8 +6,8 @@ Item {
   id:idRectTakeQuiz
   property bool bExtraInfoVisible : false
   property bool bAnswerVisible : false
-  property bool bAllok : false
   property bool bTextMode : false
+  property bool bImageMode : false
   property bool bTextAnswerOk : false
   Component.onCompleted:
   {
@@ -47,10 +47,25 @@ Item {
         anchors.rightMargin:  20
         anchors.top:  parent.top
         anchors.topMargin:  20
-        source:"image://theme/icon-m-keyboard"
+        source:"image://theme/icon-m-keyboard?"+ (bTextMode
+                                                  ? Theme.highlightColor
+                                                  : Theme.primaryColor)
         onClicked: bTextMode = !bTextMode
       }
 
+      ButtonQuizImg
+      {
+        id:idImgBtn
+        visible: !idWindow.bAllok
+        anchors.right:  parent.right
+        anchors.rightMargin:  20
+        anchors.top:  idTextBtn.bottom
+        anchors.topMargin:  20
+        source:"image://theme/icon-m-image?" + (bImageMode
+                                                ? Theme.highlightColor
+                                                : Theme.primaryColor)
+        onClicked: bImageMode = !bImageMode
+      }
       ButtonQuizImg
       {
         id:idSoundBtn
@@ -60,7 +75,7 @@ Item {
         anchors.top:  idTextBtn.bottom
         anchors.topMargin:  20
         source:"image://theme/icon-m-speaker"
-        onClicked: MyDownloader.playWord(idQuizModel.answer,bIsReverse ? sFromLang : sToLang)
+        onClicked: MyDownloader.playWord(idQuizModel.answer,sAnswerLang)
       }
 
       Text
@@ -99,16 +114,18 @@ Item {
 
       Column
       {
+        id:idQuizColumn
         spacing: 20
-        width:parent.width
-        y:parent.height / 3
-        visible: !idWindow.bAllok
-        ButtonQuizImg
+        anchors.horizontalCenter:  parent.horizontalCenter
+        y : parent.height / 4
+        visible:!idWindow.bAllok
+
+        Image
         {
+          id:idWordImage
           anchors.horizontalCenter: parent.horizontalCenter
-          visible:(bIsReverse ? bHasSpeech : bHasSpeechFrom)
-          source:"qrc:qml/pages/hornbig.png"
-          onClicked: MyDownloader.playWord(idQuizModel.question,bIsReverse ? sToLang : sFromLang )
+          visible : bImageMode && MyDownloader.hasImg
+          source : MyDownloader.urlImg
         }
 
         Text
@@ -150,7 +167,7 @@ Item {
           anchors.horizontalCenter: parent.horizontalCenter
           visible: (bIsReverse ? bHasSpeechFrom : bHasSpeech) && bAnswerVisible
           source:"qrc:qml/pages/hornbig.png"
-          onClicked: MyDownloader.playWord(idQuizModel.answer,bIsReverse ? sFromLang : sToLang )
+          onClicked: MyDownloader.playWord(idQuizModel.answer,sAnswerLang )
         }
       }
 

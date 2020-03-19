@@ -1,4 +1,4 @@
-#include "speechdownloader.h"
+﻿#include "speechdownloader.h"
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
@@ -40,9 +40,9 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject *pParent
   QObject::connect(&m_oListQuizNetMgr, &QNetworkAccessManager::finished, this, &Speechdownloader::listDownloaded);
   QObject::connect(&m_oDeleteQuizNetMgr, &QNetworkAccessManager::finished, this, &Speechdownloader::quizDeleted);
   m_sStoragePath = sStoragePath;
+  qDebug() << m_sStoragePath;
   QSound::play("qrc:welcome_en.wav");
   m_pStopWatch = nullptr;
-
 }
 
 static const QString sReqDictUrlBase = "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang=";
@@ -54,7 +54,6 @@ static const QString sReqUrlBase = "https://translate.yandex.net/api/v1.5/tr/tra
 
 void Speechdownloader::initUrls(QVariant p)
 {
-
   QObject* pp = qvariant_cast<QObject*>(p);
   pp->setProperty("sReqDictUrlBase", sReqDictUrlBase);
   pp->setProperty("sReqDictUrl", sReqDictUrl);
@@ -63,6 +62,28 @@ void Speechdownloader::initUrls(QVariant p)
   pp->setProperty("sReqUrlBase", sReqUrlBase);
 
 }
+
+QString Speechdownloader::ignoreAccent(QString str)
+{
+  static QString sssIn =  QString::fromWCharArray(L"ÀÁÂÃÄÅÈÉÊËÒÓÔÕÕÖÙÚÛÇ");
+  static QString sssOut = QString::fromWCharArray(L"AAAAAAEEEEOOOOOOUUUC");
+  static QRegExp oReg("[\\W]"); // Matches a non-word character.
+  str.replace(oReg,"");
+  str = str.toUpper();
+
+
+  for (auto i = str.begin(); i != str.end() ; i++)
+  {
+    int nI = sssIn.indexOf(*i);
+
+    if (nI >= 0)
+      *i = sssOut[nI];
+  }
+
+  return str;
+
+}
+
 
 void Speechdownloader::setImgWord(QString sWord, QString sLang)
 {
@@ -88,9 +109,13 @@ void Speechdownloader::setImgWord(QString sWord, QString sLang)
 
 bool Speechdownloader::hasImage(QString sWord, QString sLang)
 {
-  QString s = ImgPath(sWord, sLang);
-  bool bEx = QFile::exists(s);
+  if (sWord.isEmpty())
+    return false;
+  if (sLang.isEmpty())
+    return false;
 
+  QString s = ImgPath(sWord, sLang);
+  return  QFile::exists(s);
 }
 
 
@@ -104,8 +129,6 @@ QUrl Speechdownloader::urlImg()
   return m_oImgPath;
 }
 
-
-
 void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
 {
   m_oDownloadedData = pReply->readAll();
@@ -116,11 +139,12 @@ void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
   if ( sCT.contains("image") == false)
     return;
   QUrlQuery uQ(pReply->url());
-  QString sWord, sLang;
+  QString sWord, sLang,sWord2, sLang2;
 
   sWord = uQ.queryItemValue("text");
   sLang = uQ.queryItemValue("lang");
-
+  sWord2 = uQ.queryItemValue("text2");
+  sLang2 = uQ.queryItemValue("lang2");
   QString sFileName = ImgPath(sWord, sLang);
   QBuffer oBuff(&m_oDownloadedData);
   QImageReader oImageReader(&oBuff);
@@ -128,6 +152,7 @@ void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
   QImage oImage = oImageReader.read();
   QImage oImageScaled = oImage.scaledToHeight(128);
   oImageScaled.save(sFileName);
+  QFile::copy(sFileName, ImgPath(sWord2, sLang2));
   setImgWord(sWord, sLang);
 }
 
@@ -178,11 +203,14 @@ QString Speechdownloader::AudioPath(const QString& s, const QString& sLang)
 }
 
 
-QString Speechdownloader::ImgPath(const QString& s, const QString& sLang)
+QString Speechdownloader::ImgPath(const QString& sIn, const QString& sLang)
 {
   if (sLang.isEmpty())
-    return (m_sStoragePath ^ s) + ".jpg";
-  return (m_sStoragePath ^ s) + "_" + sLang + ".jpg";
+    return (m_sStoragePath ^ sIn) + ".jpg";
+
+  QString s = ignoreAccent(sIn);
+  QString sRet = (m_sStoragePath ^ s) + "_" + sLang + ".jpg";
+  return sRet;
 }
 
 void Speechdownloader::quizDeleted(QNetworkReply* pReply)
@@ -275,7 +303,7 @@ void Speechdownloader::deleteWord(QString sWord, QString sLang)
 
 }
 
-void Speechdownloader::downloadImage(const QList<QUrl>& vImgUrl, QString sWord, QString sLang)
+void Speechdownloader::downloadImage(const QList<QUrl>& vImgUrl, QString sWord, QString sLang, QString sWord2, QString sLang2)
 {
   if (vImgUrl.count() < 1)
     return;
@@ -283,6 +311,8 @@ void Speechdownloader::downloadImage(const QList<QUrl>& vImgUrl, QString sWord, 
   QUrlQuery oQuery(u.query());
   oQuery.addQueryItem("text", sWord);
   oQuery.addQueryItem("lang", sLang);
+  oQuery.addQueryItem("text2", sWord2);
+  oQuery.addQueryItem("lang2", sLang2);
   u.setQuery(oQuery);
   QNetworkRequest request(u);
   m_oImgNetMgr.get(request);
@@ -434,14 +464,27 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
         continue;
       ss << pp->data(pp->index(i), j);
     }
+    QString sFilePath;
     QString sWord = pp->data(pp->index(i), 0).toString();
-    if (QFile::exists(AudioPath(sWord, ocLang[1])))
-      ocAudio.append(sWord + "_" + ocLang[1]);
+
+    sFilePath = AudioPath(sWord, ocLang[1]);
+    if (QFile::exists(sFilePath))
+      ocAudio.append(JustFileNameNoExt(sFilePath));
+
+    sFilePath =ImgPath(sWord, ocLang[1]);
+    if (QFile::exists(sFilePath))
+      ocImg.append(JustFileNameNoExt(sFilePath));
+
+
+    // Question
     sWord = pp->data(pp->index(i), 3).toString();
-    if (QFile::exists(AudioPath(sWord, ocLang[0])))
-      ocAudio.append(sWord + "_" + ocLang[0]);
-    if (QFile::exists(ImgPath(sWord, ocLang[0])))
-      ocImg.append(sWord + "_" + ocLang[0]);
+    sFilePath = AudioPath(sWord, ocLang[0]);
+    if (QFile::exists(sFilePath))
+      ocAudio.append(JustFileNameNoExt(sFilePath));
+
+    sFilePath = ImgPath(sWord, ocLang[0]);
+    if (QFile::exists(sFilePath))
+      ocImg.append(JustFileNameNoExt(sFilePath));
   }
 
   ss << ocAudio.size();
@@ -465,7 +508,7 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
 
   QString sFmt = GLOS_SERVER2 ^ "%ls.php?qname=%ls&slang=%ls&qcount=%d&desc1=%ls&pwd=%ls";
   QString sUrl = QString::asprintf(sFmt.toLatin1(), sCmd.utf16(), sName.utf16(), sLang.utf16(), nC, sDesc.utf16(), sPwd.utf16());
-  qDebug() << " size " << ocArray.size();
+  qDebug() << "Cmd to glosserver " << sCmd << " size " << ocArray.size();
   ss.setVersion(2);
   QNetworkRequest request(sUrl);
   request.setRawHeader("Content-Type", "application/octet-stream");

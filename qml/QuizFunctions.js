@@ -470,42 +470,15 @@ function loadFromList(nCount, oDD, sLangLoaded) {
 }
 
 
-function ignoreAccent(sInStr)
-{
-  var regExpAcc = /[ÀÁÂÃÄÅ]/g
-  var regExpEcc = /[ÈÉÊË]/g
-  var regExpOcc = /[ÒÓÔÕÕ]/g
-  var regExpUcc = /[ÙÚÛ]/g
-  var regExpCcc = /[Ç]/g
-  sInStr = sInStr.replace(regExpAcc,"A")
-  sInStr = sInStr.replace(regExpEcc,"E")
-  sInStr = sInStr.replace(regExpOcc,"O")
-  sInStr = sInStr.replace(regExpUcc,"U")
-  sInStr = sInStr.replace(regExpCcc,"C")
-  return sInStr
-}
-
 function isAnswerOk(sAnswerToCheck, sAnswerInDb)
 {
-  var sAnswer = sAnswerInDb.toLocaleUpperCase()
-  var sText = sAnswerToCheck.toLocaleUpperCase()
-  sText = ignoreAccent(sText)
-  sAnswer = ignoreAccent(sAnswer)
-  var regExpIgnore = /[.; ?!-,]/g
-  sAnswer = sAnswer.replace(regExpIgnore,"")
-  sText = sText.replace(regExpIgnore,"")
-  var bTextAnswerOk
+  sAnswerToCheck = MyDownloader.ignoreAccent(sAnswerInDb)
+  sAnswerInDb = MyDownloader.ignoreAccent(sAnswerToCheck)
 
-  if (sText === sAnswer)
-  {
-    bTextAnswerOk = true
-  }
-  else
-  {
-    bTextAnswerOk = false
-  }
+  if (sAnswerInDb === sAnswerToCheck)
+    return true
 
-  return bTextAnswerOk
+  return false
 }
 
 function reverseQuiz()

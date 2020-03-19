@@ -16,8 +16,8 @@ class Speechdownloader : public QObject
 public:
   explicit Speechdownloader(const QString& sStoragePath, QObject *pParent);
   Q_INVOKABLE void deleteWord(QString sWord, QString sLang);
-  Q_INVOKABLE void downloadWord(QString sWord, QString sLang);
-  Q_INVOKABLE void downloadImage(const QList<QUrl>& sImgUrl, QString sLang, QString sWord);
+  Q_INVOKABLE void downloadWord(QString sWord, QString sLang); 
+  Q_INVOKABLE void downloadImage(const QList<QUrl>& sImgUrl,  QString sWord,QString sLang, QString sWord2, QString sLang2);
   Q_INVOKABLE void playWord(QString sWord, QString sLang);
   Q_INVOKABLE void exportCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
   Q_INVOKABLE void updateCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
@@ -30,6 +30,7 @@ public:
   Q_INVOKABLE int  indexFromGlosNr(QVariant p, int nNr);
   Q_INVOKABLE void startTimer();
   Q_INVOKABLE void stopTimer();
+  Q_INVOKABLE QString ignoreAccent(QString s);
   Q_INVOKABLE bool hasImage(QString sWord, QString sLang);
   Q_INVOKABLE void setImgWord(QString sWord, QString sLang);
   Q_PROPERTY(QUrl urlImg READ urlImg NOTIFY urlImgChanged)
