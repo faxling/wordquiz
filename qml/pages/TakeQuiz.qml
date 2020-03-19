@@ -49,7 +49,7 @@ Item {
         anchors.topMargin:  20
         source:"image://theme/icon-m-keyboard"
         onClicked: bTextMode = !bTextMode
-      }https://www.svtplay.se/video/22513402/gaddan-som-alltid-hogg
+      }
 
       ButtonQuizImg
       {

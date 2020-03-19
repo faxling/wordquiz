@@ -100,38 +100,53 @@ Item
       width:parent.width
       ButtonQuiz
       {
-        text:"New Quiz"
+        text:""
         width: n3BtnWidth
 
         onClicked:
         {
           QuizLib.newQuiz()
         }
+        Image
+        {
+          anchors.centerIn: parent
+          source:"image://theme/icon-m-add"
+        }
       }
 
       ButtonQuiz
       {
         width: n3BtnWidth
-        text:"Upload"
+        text:""
         onClicked:
         {
           idExport.visible = true
           idExportError.visible = false
         }
+        Image
+        {
+          anchors.centerIn: parent
+          source:"image://theme/icon-m-cloud-upload"
+        }
       }
+
 
       ButtonQuiz
       {
         id: idDownloadBtn
         width: n3BtnWidth
-        text:"Download"
+        text:""
         onClicked:
         {
           bProgVisible = true
           MyDownloader.listQuiz()
         }
+        Image
+        {
+          anchors.centerIn: parent
+          source:"image://theme/icon-m-cloud-download"
+        }
       }
-
     }
 
     Row
