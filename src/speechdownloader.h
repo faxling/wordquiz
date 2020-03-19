@@ -17,6 +17,7 @@ public:
   explicit Speechdownloader(const QString& sStoragePath, QObject *pParent);
   Q_INVOKABLE void deleteWord(QString sWord, QString sLang);
   Q_INVOKABLE void downloadWord(QString sWord, QString sLang);
+  Q_INVOKABLE void downloadImage(const QList<QUrl>& sImgUrl, QString sLang, QString sWord);
   Q_INVOKABLE void playWord(QString sWord, QString sLang);
   Q_INVOKABLE void exportCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
   Q_INVOKABLE void updateCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
@@ -26,23 +27,31 @@ public:
   Q_INVOKABLE void toClipBoard(QString s);
   Q_INVOKABLE void downLoadAllSpeech(QVariant p,QString sLang);
   Q_INVOKABLE void initUrls(QVariant p);
-  Q_INVOKABLE int indexFromGlosNr(QVariant p, int nNr);
+  Q_INVOKABLE int  indexFromGlosNr(QVariant p, int nNr);
   Q_INVOKABLE void startTimer();
   Q_INVOKABLE void stopTimer();
-
+  Q_INVOKABLE bool hasImage(QString sWord, QString sLang);
+  Q_INVOKABLE void setImgWord(QString sWord, QString sLang);
+  Q_PROPERTY(QUrl urlImg READ urlImg NOTIFY urlImgChanged)
+  Q_PROPERTY(bool hasImg READ hasImg NOTIFY hasImgChanged)
 signals:
   void quizDownloadedSignal(int nQCount, QVariantList oDD, QString sLang);
   void quizListDownloadedSignal(int nQCount, QStringList oDD);
   void downloadedSignal();
   void exportedSignal(int nResponce);
   void deletedSignal(int nResponce);
-
+  void hasImgChanged();
+  void urlImgChanged();
 private:
+  QUrl urlImg();
+  bool hasImg();
   void quizDownloaded(QNetworkReply* pReply);
   void listDownloaded(QNetworkReply* pReply);
   void quizExported(QNetworkReply* pReply);
   void quizDeleted(QNetworkReply* pReply);
+
   void wordDownloaded(QNetworkReply* pReply);
+  void imgDownloaded(QNetworkReply* pReply);
 private:
   void currentQuizCmd(QVariant p,QString sName, QString sLang,  QString sPwd,QString sDesc, QString sCmd);
   QVector<int> m_ocIndexMap;
@@ -51,6 +60,7 @@ private:
   QString m_sStoragePath;
   QNetworkAccessManager m_oQuizExpNetMgr;
   QNetworkAccessManager m_oWordNetMgr;
+  QNetworkAccessManager m_oImgNetMgr;
   QNetworkAccessManager m_oQuizNetMgr;
   QNetworkAccessManager m_oListQuizNetMgr;
   QNetworkAccessManager m_oDeleteQuizNetMgr;
@@ -59,6 +69,8 @@ private:
   bool m_bPlayAfterDownload = false;
   int NumberRole(QAbstractListModel* pp);
   StopWatch* m_pStopWatch;
+  QUrl m_oImgPath;
+  bool m_bHasImg = false;
 };
 
 #endif // SPEECHDOWNLOADER_H

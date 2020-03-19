@@ -198,7 +198,7 @@ function loadQuiz() {
   if (glosModel.count < 1) {
     idQuizModel.question = "-";
     idQuizModel.answer = "-";
-    idQuizModel.number = "-";
+    idQuizModel.number = 0;
     idQuizModel.extra = "-";
     return;
   }
@@ -644,7 +644,6 @@ function updateQuiz()
     idQuizModel.answer = sA_Org;
     idQuizModel.number = nNumber;
     idQuizModel.extra = sE;
-
   }
 
   sScoreText  = glosModelWorking.count + "/" + glosModel.count
@@ -706,7 +705,6 @@ function deleteWordInQuiz()
     idQuizModel.answer = "-";
     idQuizModel.number = 0;
     idQuizModel.extra = "-";
-
   }
   sScoreText = glosModelWorking.count + "/" + glosModel.count
 }
