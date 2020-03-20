@@ -150,7 +150,13 @@ void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
   QImageReader oImageReader(&oBuff);
   oImageReader.setAutoTransform(true);
   QImage oImage = oImageReader.read();
-  QImage oImageScaled = oImage.scaledToHeight(128);
+  QImage oImageScaled = oImage.scaledToHeight(160);
+  if (QFile::exists(sFileName) == true)
+  {
+    m_oImgPath = QUrl();
+    emit urlImgChanged();
+  }
+
   oImageScaled.save(sFileName);
   QFile::copy(sFileName, ImgPath(sWord2, sLang2));
   setImgWord(sWord, sLang);

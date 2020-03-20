@@ -463,6 +463,8 @@ function loadFromList(nCount, oDD, sLangLoaded) {
           idLoadQuiz.bProgVisible = false
           idImport.visible = false
           idQuizList.currentIndex = glosModelIndex.count -1
+          if (idQuizList.currentIndex === 0)
+             idWindow.quizListView.currentIndexChanged()
 
         }
         );
@@ -472,8 +474,8 @@ function loadFromList(nCount, oDD, sLangLoaded) {
 
 function isAnswerOk(sAnswerToCheck, sAnswerInDb)
 {
-  sAnswerToCheck = MyDownloader.ignoreAccent(sAnswerInDb)
-  sAnswerInDb = MyDownloader.ignoreAccent(sAnswerToCheck)
+  sAnswerInDb = MyDownloader.ignoreAccent(sAnswerInDb)
+  sAnswerToCheck = MyDownloader.ignoreAccent(sAnswerToCheck)
 
   if (sAnswerInDb === sAnswerToCheck)
     return true

@@ -72,7 +72,7 @@ Item {
         visible : bTextAnswerOk && bTextMode
         anchors.right:  parent.right
         anchors.rightMargin:  20
-        anchors.top:  idTextBtn.bottom
+        anchors.top:  idImgBtn.bottom
         anchors.topMargin:  20
         source:"image://theme/icon-m-speaker"
         onClicked: MyDownloader.playWord(idQuizModel.answer,sAnswerLang)
