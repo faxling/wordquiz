@@ -4,18 +4,36 @@ import QtQuick.XmlListModel 2.0
 import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0 as Sql
 import "../QuizFunctions.js" as QuizLib
+import Sailfish.Pickers 1.0
 
 Item {
-
   id:idEditQuiz
-
   property int nLastSearch : 0
-  onVisibleChanged:
+  property bool bTabActive : false
+
+  onBTabActiveChanged:
   {
-    if (visible)
-    {
-      idGlosList.currentIndex = idWindow.nGlosaTakeQuizIndex
-      idGlosList.positionViewAtIndex(idWindow.nGlosaTakeQuizIndex, ListView.Center)
+      if (bTabActive)
+      {
+        idGlosList.currentIndex = idWindow.nGlosaTakeQuizIndex
+        idGlosList.positionViewAtIndex(idWindow.nGlosaTakeQuizIndex, ListView.Center)
+      }
+      else
+      {
+        idEditDlg.visible = false
+      }
+  }
+
+  Component {
+    id: idImagePickerPage
+    ImagePickerPage {
+      onSelectedContentPropertiesChanged: {
+
+        MyDownloader.setImgFile(idTextEdit1.text, sFromLang,idTextEdit2.text, sToLang, selectedContentProperties.filePath )
+        idEditWordImage.visible = true
+        idEditWordImage.source = ""
+        idEditWordImage.source = MyDownloader.imageSrc(idTextEdit1.text,  sQuestonLang)
+      }
     }
   }
 
@@ -86,6 +104,7 @@ Item {
 
     Item
     {
+      id:idSearchResultRowItem
       height:idTextInput.height
       width:parent.width
       TextList
@@ -123,7 +142,6 @@ Item {
           sSearchQuery = idTextInput2.text
           MyDownloader.toClipBoard(idTextInput2.text)
         }
-
       }
     }
 
@@ -170,6 +188,7 @@ Item {
           idTranslateModel.oBtn = idBtn1
           idTranslateModel.source = sReqUrl + oInText
         }
+
       }
 
 
@@ -411,7 +430,8 @@ Item {
             idTextEdit3.text = extra
             idGlosState.checked = state1 !== 0
             idGlosList.currentIndex = index
-            idWordImage.visible =  MyDownloader.hasImage(idTextEdit1.text,  sQuestonLang)
+            idEditWordImage.visible =  MyDownloader.hasImage(idTextEdit1.text,  sFromLang)
+            idEditWordImage.source = idEditWordImage.visible ? MyDownloader.imageSrc(idTextEdit1.text,  sFromLang) : ""
             idWindow.nGlosaTakeQuizIndex = index
           }
         }
@@ -473,6 +493,7 @@ Item {
 
     Column
     {
+      id:idEditDldColumn
       anchors.top: idEditDlg.bottomClose
 
       TextField
@@ -503,23 +524,39 @@ Item {
       }
     }
 
+    ButtonQuizImg
+    {
+      id:idAddImgBtn
+      anchors.left:  idEditDlg.left
+      anchors.leftMargin:  20
+      anchors.top:  idEditDlg.top
+      anchors.topMargin:  20
+      source:"image://theme/icon-m-file-image"
+      onClicked: {
+        pageStack.push(idImagePickerPage)
+      }
+    }
+
     Image
     {
-      id:idWordImage
+      id:idEditWordImage
+      cache:false
+      fillMode: Image.PreserveAspectFit
       anchors.verticalCenter: idBtnUpdate.verticalCenter
       anchors.left: parent.left
       anchors.leftMargin: 20
-      source: "image://theme/icon-m-image"
+      height:100
+      width:140
     }
 
     Label
     {
+      id:idDoneLabel
       anchors.verticalCenter: idBtnUpdate.verticalCenter
       anchors.right: idGlosState.left
       anchors.rightMargin: 20
       text: "Done:"
     }
-
 
     ButtonQuiz
     {

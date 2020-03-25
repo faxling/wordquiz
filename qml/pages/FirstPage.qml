@@ -245,8 +245,9 @@ Page {
       PropertyChanges {
         target: idTab2
         visible:true
-
+        bTabActive:true
       }
+
       PropertyChanges {
         target: idTab2Btn
         color:Theme.highlightColor

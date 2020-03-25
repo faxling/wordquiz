@@ -16,6 +16,7 @@
 #include <QImageReader>
 #include <QBuffer>
 #include <QUrl>
+
 /// Faxling     Raggo100 trnsl.1.1.20190526T164138Z.e99d5807bb2acb8d.d11f94738ea722cfaddf111d2e8f756cb3b71f4f
 
 // https://cloud.yandex.com/docs/speechkit/tts/request
@@ -62,17 +63,34 @@ void Speechdownloader::initUrls(QVariant p)
   pp->setProperty("sReqUrlBase", sReqUrlBase);
 
 }
+QString Speechdownloader::ignoreAccentLC(QString str)
+{
+  static QString sssIn = QString::fromWCharArray(L"îàáâãäåèéêëòóôõõöùúûç");
+  static QString sssOut = QString::fromWCharArray(L"iaaaaaaeeeeoooooouuuc");
+  static QRegExp oReg("[\\W]"); // Matches a non-word character.
+  str.replace(oReg, "");
+  str = str.toLower();
 
+  for (auto i = str.begin(); i != str.end(); i++)
+  {
+    int nI = sssIn.indexOf(*i);
+
+    if (nI >= 0)
+      *i = sssOut[nI];
+  }
+
+  return str;
+
+}
 QString Speechdownloader::ignoreAccent(QString str)
 {
-  static QString sssIn =  QString::fromWCharArray(L"ÀÁÂÃÄÅÈÉÊËÒÓÔÕÕÖÙÚÛÇ");
-  static QString sssOut = QString::fromWCharArray(L"AAAAAAEEEEOOOOOOUUUC");
+  static QString sssIn = QString::fromWCharArray(L"ÎÀÁÂÃÄÅÈÉÊËÒÓÔÕÕÖÙÚÛÇ");
+  static QString sssOut = QString::fromWCharArray(L"IAAAAAAEEEEOOOOOOUUUC");
   static QRegExp oReg("[\\W]"); // Matches a non-word character.
-  str.replace(oReg,"");
+  str.replace(oReg, "");
   str = str.toUpper();
 
-
-  for (auto i = str.begin(); i != str.end() ; i++)
+  for (auto i = str.begin(); i != str.end(); i++)
   {
     int nI = sssIn.indexOf(*i);
 
@@ -87,14 +105,14 @@ QString Speechdownloader::ignoreAccent(QString str)
 
 void Speechdownloader::setImgWord(QString sWord, QString sLang)
 {
-  QString s = ImgPath(sWord, sLang);
-  bool bEx = QFile::exists(s);
+  m_sImgPath = ImgPath(sWord, sLang);
+  bool bEx = QFile::exists(m_sImgPath);
 
 
   if (bEx == true)
-    m_oImgPath = QUrl::fromLocalFile(s);
+    m_oImgUrl = QUrl::fromLocalFile(m_sImgPath);
   else
-    m_oImgPath = QUrl();
+    m_oImgUrl = QUrl();
 
 
   if (bEx != m_bHasImg)
@@ -106,6 +124,46 @@ void Speechdownloader::setImgWord(QString sWord, QString sLang)
   emit urlImgChanged();
 
 }
+
+QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
+{
+
+  return QUrl::fromLocalFile(ImgPath(sWord, sLang));
+
+}
+
+void Speechdownloader::checkAndEmit(QString sPath1, QString sPath2)
+{
+  if (m_sImgPath == sPath1 || m_sImgPath == sPath2)
+  {
+    if (m_bHasImg == true)
+    {
+      m_oImgUrl = QUrl();
+      emit urlImgChanged();
+    }
+    else {
+      m_bHasImg = true;
+      emit hasImgChanged();
+    }
+    m_oImgUrl = QUrl::fromLocalFile(m_sImgPath);
+    emit urlImgChanged();
+  }
+}
+
+void Speechdownloader::setImgFile(QString sWord, QString sLang, QString sWord2, QString sLang2, QString sImgFilePath)
+{
+  QImageReader oImageReader(sImgFilePath);
+  oImageReader.setAutoTransform(true);
+  QImage oImage = oImageReader.read();
+  QImage oImageScaled = oImage.scaledToHeight(230);
+  QString sImg1 = ImgPath(sWord, sLang);
+  oImageScaled.save(sImg1);
+  QString sImg2 = ImgPath(sWord2, sLang2);
+  QFile::copy(sImg1, sImg2);
+  checkAndEmit(sImg1, sImg2);
+}
+
+
 
 bool Speechdownloader::hasImage(QString sWord, QString sLang)
 {
@@ -126,7 +184,7 @@ bool Speechdownloader::hasImg()
 
 QUrl Speechdownloader::urlImg()
 {
-  return m_oImgPath;
+  return m_oImgUrl;
 }
 
 void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
@@ -136,10 +194,13 @@ void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
   if (m_oDownloadedData.size() < 5000)
     return;
   QString sCT = pReply->header(QNetworkRequest::ContentTypeHeader).toString();
-  if ( sCT.contains("image") == false)
-    return;
+
+  if (sCT.isEmpty() == false)
+    if (sCT.contains("image") == false)
+      return;
+
   QUrlQuery uQ(pReply->url());
-  QString sWord, sLang,sWord2, sLang2;
+  QString sWord, sLang, sWord2, sLang2;
 
   sWord = uQ.queryItemValue("text");
   sLang = uQ.queryItemValue("lang");
@@ -151,15 +212,19 @@ void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
   oImageReader.setAutoTransform(true);
   QImage oImage = oImageReader.read();
   QImage oImageScaled = oImage.scaledToHeight(160);
-  if (QFile::exists(sFileName) == true)
+  if (oImageScaled.height() < 100)
+    return;
+  oImageScaled.save(sFileName);
+  QString sImg2 = ImgPath(sWord2, sLang2);
+  QFile::copy(sFileName, sImg2);
+
+  checkAndEmit(sFileName, sImg2);
+
+  if (uQ.queryItemValue("emit").toInt() == 1)
   {
-    m_oImgPath = QUrl();
-    emit urlImgChanged();
+    emit downloadedImgSignal();
   }
 
-  oImageScaled.save(sFileName);
-  QFile::copy(sFileName, ImgPath(sWord2, sLang2));
-  setImgWord(sWord, sLang);
 }
 
 void Speechdownloader::wordDownloaded(QNetworkReply* pReply)
@@ -205,7 +270,8 @@ QString Speechdownloader::AudioPath(const QString& s, const QString& sLang)
 {
   if (sLang.isEmpty())
     return (m_sStoragePath ^ s) + ".wav";
-  return (m_sStoragePath ^ s) + "_" + sLang + ".wav";
+
+  return (m_sStoragePath ^ ignoreAccentLC(s)) + "_" + sLang + ".wav";
 }
 
 
@@ -214,8 +280,7 @@ QString Speechdownloader::ImgPath(const QString& sIn, const QString& sLang)
   if (sLang.isEmpty())
     return (m_sStoragePath ^ sIn) + ".jpg";
 
-  QString s = ignoreAccent(sIn);
-  QString sRet = (m_sStoragePath ^ s) + "_" + sLang + ".jpg";
+  QString sRet = (m_sStoragePath ^ ignoreAccent(sIn)) + "_" + sLang + ".jpg";
   return sRet;
 }
 
@@ -258,11 +323,11 @@ void Speechdownloader::listDownloaded(QNetworkReply* pReply)
     ocL.append(oJJ[2].toString());
     ocL.append(oJJ[3].toString());
     /*
-    "qname"
-    "desc1"
-    "slang"
-    "qcount
-    */
+                        "qname"
+                        "desc1"
+                        "slang"
+                        "qcount
+                        */
     m_ocIndexMap.append(oJJ[0].toInt());
   }
 
@@ -292,6 +357,7 @@ void Speechdownloader::playWord(QString sWord, QString sLang)
   QFileInfo oWavFile(sFileName);
   if (oWavFile.size() > 10000)
   {
+    qDebug() << sFileName;
     QSound::play(sFileName);
   }
   else
@@ -309,7 +375,7 @@ void Speechdownloader::deleteWord(QString sWord, QString sLang)
 
 }
 
-void Speechdownloader::downloadImage(const QList<QUrl>& vImgUrl, QString sWord, QString sLang, QString sWord2, QString sLang2)
+void Speechdownloader::downloadImage(const QList<QUrl>& vImgUrl, QString sWord, QString sLang, QString sWord2, QString sLang2, bool bEmitlDownloaded)
 {
   if (vImgUrl.count() < 1)
     return;
@@ -319,6 +385,8 @@ void Speechdownloader::downloadImage(const QList<QUrl>& vImgUrl, QString sWord, 
   oQuery.addQueryItem("lang", sLang);
   oQuery.addQueryItem("text2", sWord2);
   oQuery.addQueryItem("lang2", sLang2);
+  if (bEmitlDownloaded == true)
+    oQuery.addQueryItem("emit", "1");
   u.setQuery(oQuery);
   QNetworkRequest request(u);
   m_oImgNetMgr.get(request);
@@ -477,7 +545,7 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
     if (QFile::exists(sFilePath))
       ocAudio.append(JustFileNameNoExt(sFilePath));
 
-    sFilePath =ImgPath(sWord, ocLang[1]);
+    sFilePath = ImgPath(sWord, ocLang[1]);
     if (QFile::exists(sFilePath))
       ocImg.append(JustFileNameNoExt(sFilePath));
 

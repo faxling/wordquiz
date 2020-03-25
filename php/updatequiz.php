@@ -10,7 +10,7 @@ $qname = $_GET['qname'];
 $qcount = (int) $_GET['qcount'];
 $desc1 = $_GET['desc1'];
 
-$desc1 = $desc1 . "###" . date("Y-m-d:H-i");
+$desc1 = $desc1 . "###" . date("Y-m-d  H:i");
 $pwd = $_GET['pwd'];
 $sql = "SELECT ID FROM QuizIndex WHERE qname=? and pwd=?";
 

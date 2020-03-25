@@ -16,8 +16,8 @@ class Speechdownloader : public QObject
 public:
   explicit Speechdownloader(const QString& sStoragePath, QObject *pParent);
   Q_INVOKABLE void deleteWord(QString sWord, QString sLang);
-  Q_INVOKABLE void downloadWord(QString sWord, QString sLang); 
-  Q_INVOKABLE void downloadImage(const QList<QUrl>& sImgUrl,  QString sWord,QString sLang, QString sWord2, QString sLang2);
+  Q_INVOKABLE void downloadWord(QString sWord, QString sLang);
+  Q_INVOKABLE void downloadImage(const QList<QUrl>& sImgUrl,  QString sWord,QString sLang, QString sWord2, QString sLang2, bool bSignalDownloaded = false);
   Q_INVOKABLE void playWord(QString sWord, QString sLang);
   Q_INVOKABLE void exportCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
   Q_INVOKABLE void updateCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
@@ -31,14 +31,19 @@ public:
   Q_INVOKABLE void startTimer();
   Q_INVOKABLE void stopTimer();
   Q_INVOKABLE QString ignoreAccent(QString s);
+  QString ignoreAccentLC(QString s);
   Q_INVOKABLE bool hasImage(QString sWord, QString sLang);
+  Q_INVOKABLE QUrl imageSrc(QString sWord, QString sLang);
   Q_INVOKABLE void setImgWord(QString sWord, QString sLang);
+  void checkAndEmit(QString sPath1, QString sPath2);
+  Q_INVOKABLE void setImgFile(QString sWord, QString sLang,QString sWord2, QString sLang2, QString sImgFilePath);
   Q_PROPERTY(QUrl urlImg READ urlImg NOTIFY urlImgChanged)
   Q_PROPERTY(bool hasImg READ hasImg NOTIFY hasImgChanged)
 signals:
   void quizDownloadedSignal(int nQCount, QVariantList oDD, QString sLang);
   void quizListDownloadedSignal(int nQCount, QStringList oDD);
   void downloadedSignal();
+  void downloadedImgSignal();
   void exportedSignal(int nResponce);
   void deletedSignal(int nResponce);
   void hasImgChanged();
@@ -70,7 +75,8 @@ private:
   bool m_bPlayAfterDownload = false;
   int NumberRole(QAbstractListModel* pp);
   StopWatch* m_pStopWatch;
-  QUrl m_oImgPath;
+  QUrl m_oImgUrl;
+  QString m_sImgPath;
   bool m_bHasImg = false;
 };
 

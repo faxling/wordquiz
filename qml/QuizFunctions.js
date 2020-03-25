@@ -244,6 +244,7 @@ function loadFromDb(tx) {
 
   var rs = tx.executeSql("SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + sQSort);
 
+  var hasNonInt = false
   for(var i = 0; i < rs.rows.length; i++) {
 
     var sA;
@@ -256,9 +257,27 @@ function loadFromDb(tx) {
 
     var sQ = rs.rows.item(i).quizword
     sQ =  sQ.charAt(0).toUpperCase() + sQ.slice(1);
-    glosModel.append({"number": rs.rows.item(i).number, "question":  sQ, "answer": sA, "extra": sE,  "state1" : rs.rows.item(i).state })
+    var nNr = rs.rows.item(i).number;
+    if ( nNr !== Math.floor(nNr))
+    {
+      hasNonInt = true;
+    }
 
+    glosModel.append({"number": rs.rows.item(i).number, "question":  sQ, "answer": sA, "extra": sE,  "state1" : rs.rows.item(i).state })
   }
+
+  if (hasNonInt)
+  {
+    console.log("QUIZ NO " + nDbNumber + " bad numbering" )
+    /*
+    tx.executeSql("DELETE FROM Glosa" + nDbNumber);
+    for( i = 0; i < rs.rows.length; i++)
+    {
+      tx.executeSql('INSERT INTO Glosa' + nDbNumber + ' VALUES(?, ?, ?, ?)', [i+1, rs.rows.item(i).quizword, rs.rows.item(i).answer, rs.rows.item(i).state]);
+    }
+    */
+  }
+
   if (nCurrentNumber > 0)
   {
     idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(glosModel, nCurrentNumber)
@@ -353,9 +372,11 @@ function loadFromServerList(nCount, oDD) {
     return;
   }
 
-  var ocDescHeader = oDD[1].split("###")
-  idDescText.text = ocDescHeader[0];
-  idImport.sSelectedQ = oDD[0];
+
+  idDescText.text = "";
+  idImport.sSelectedQ = "";
+
+  var nIndex = 0
 
   for (var i = 0; i < nCount; i += 4) {
 
@@ -367,9 +388,19 @@ function loadFromServerList(nCount, oDD) {
     if (ocDesc.length > 1)
       sDate = ocDesc[1]
 
+    if (nIndex===nLastIndex)
+    {
+      idDescDate.text = sDate
+      idDescText.text = sDesc1
+      idImport.sSelectedQ =  oDD[i]
+    }
+
+    nIndex++
+
     idServerQModel.append({ "qname": oDD[i], "desc1": sDesc1, "code": oDD[i + 2], "state1": oDD[i + 3], "date1":sDate });
   }
   idServerListView.currentIndex = nLastIndex
+
 }
 
 
@@ -464,7 +495,7 @@ function loadFromList(nCount, oDD, sLangLoaded) {
           idImport.visible = false
           idQuizList.currentIndex = glosModelIndex.count -1
           if (idQuizList.currentIndex === 0)
-             idWindow.quizListView.currentIndexChanged()
+            idWindow.quizListView.currentIndexChanged()
 
         }
         );

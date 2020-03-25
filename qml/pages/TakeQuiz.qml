@@ -21,7 +21,6 @@ Item {
 
     Rectangle
     {
-
       property alias  textEdit : idTextEditYourAnswer.text
       radius:10
       width:idView.width
@@ -69,7 +68,7 @@ Item {
       ButtonQuizImg
       {
         id:idSoundBtn
-        visible : bTextAnswerOk && bTextMode
+        visible : bTextAnswerOk && bTextMode &&  !idWindow.bAllok
         anchors.right:  parent.right
         anchors.rightMargin:  20
         anchors.top:  idImgBtn.bottom
@@ -111,18 +110,30 @@ Item {
           bTextAnswerOk =  QuizLib.isAnswerOk(text, idQuizModel.answer)
         }
       }
-
+      ButtonQuizImg
+      {
+        visible:!idWindow.bAllok && (bIsReverse ? bHasSpeech : bHasSpeechFrom)
+        anchors.right: parent.right
+        anchors.rightMargin: 20
+        y : idBtnAnswer.y + idQuizColumn.y - 20
+        source:"qrc:qml/pages/hornbig.png"
+        onClicked: MyDownloader.playWord(idQuizModel.question,bIsReverse ? sToLang : sFromLang )
+      }
       Column
       {
         id:idQuizColumn
         spacing: 20
         anchors.horizontalCenter:  parent.horizontalCenter
-        y : parent.height / 4
-        visible:!idWindow.bAllok
+        y : parent.height / 4.5
+        visible:!idWindow.bAllok && (idWindow.nQuizIndex === index)
 
         Image
         {
           id:idWordImage
+ //         cache:false
+          height:350
+          width:500
+          fillMode: Image.PreserveAspectFit
           anchors.horizontalCenter: parent.horizontalCenter
           visible : bImageMode && MyDownloader.hasImg
           source : MyDownloader.urlImg
