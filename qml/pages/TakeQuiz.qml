@@ -8,6 +8,7 @@ Item {
   property bool bAnswerVisible : false
   property bool bTextMode : false
   property bool bImageMode : false
+  property bool bVoiceMode : false
   property bool bTextAnswerOk : false
   Component.onCompleted:
   {
@@ -38,6 +39,8 @@ Item {
         visible :idQuizModel.extra.length > 0
         onClicked: bExtraInfoVisible = !bExtraInfoVisible
       }
+
+
       ButtonQuizImg
       {
         id:idTextBtn
@@ -54,8 +57,21 @@ Item {
 
       ButtonQuizImg
       {
+        id:idVoiceModeBtn
+        anchors.left:  parent.left
+        anchors.leftMargin:  20
+        anchors.top:  parent.top
+        anchors.topMargin:  20
+        source: "image://theme/icon-m-speaker?"+ (bVoiceMode
+                                                  ? Theme.highlightColor
+                                                  : Theme.primaryColor)
+        onClicked: bVoiceMode = !bVoiceMode
+      }
+
+      ButtonQuizImg
+      {
         id:idImgBtn
-        visible: !idWindow.bAllok
+        visible: !idWindow.bAllok && !idSoundBtn.visible
         anchors.right:  parent.right
         anchors.rightMargin:  20
         anchors.top:  idTextBtn.bottom
@@ -65,13 +81,14 @@ Item {
                                                 : Theme.primaryColor)
         onClicked: bImageMode = !bImageMode
       }
+
       ButtonQuizImg
       {
         id:idSoundBtn
         visible : bTextAnswerOk && bTextMode &&  !idWindow.bAllok
         anchors.right:  parent.right
         anchors.rightMargin:  20
-        anchors.top:  idImgBtn.bottom
+        anchors.top:  idTextBtn.bottom
         anchors.topMargin:  20
         source:"image://theme/icon-m-speaker"
         onClicked: MyDownloader.playWord(idQuizModel.answer,sAnswerLang)
@@ -130,7 +147,7 @@ Item {
         Image
         {
           id:idWordImage
- //         cache:false
+          //         cache:false
           height:350
           width:500
           fillMode: Image.PreserveAspectFit
@@ -142,6 +159,7 @@ Item {
         Text
         {
           id:idTextQuestion
+          visible: !bVoiceMode
           color:Theme.highlightColor
           font.pixelSize: Theme.fontSizeExtraLarge
           font.bold: true
@@ -212,6 +230,7 @@ Item {
     id:idView
     property int nLastIndex : 1
     clip:true
+    // Making it lock if bTextMode and not correct answer
     interactive: bTextAnswerOk || !bTextMode || bAnswerVisible || moving
     width:idRectTakeQuiz.width
     height:idRectTakeQuiz.height
