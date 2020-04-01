@@ -60,9 +60,9 @@ Item {
         id:idVoiceModeBtn
         anchors.left:  parent.left
         anchors.leftMargin:  20
-        anchors.top:  parent.top
+        anchors.top:  idInfoBtn.bottom
         anchors.topMargin:  20
-        source: "image://theme/icon-m-speaker?"+ (bVoiceMode
+        source: "image://theme/icon-m-headphone?"+ (bVoiceMode
                                                   ? Theme.highlightColor
                                                   : Theme.primaryColor)
         onClicked: bVoiceMode = !bVoiceMode
@@ -159,7 +159,7 @@ Item {
         Text
         {
           id:idTextQuestion
-          visible: !bVoiceMode
+          opacity: bVoiceMode ? 0 : 1
           color:Theme.highlightColor
           font.pixelSize: Theme.fontSizeExtraLarge
           font.bold: true

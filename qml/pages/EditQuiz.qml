@@ -32,7 +32,7 @@ Item {
         MyDownloader.setImgFile(idTextEdit1.text, sFromLang,idTextEdit2.text, sToLang, selectedContentProperties.filePath )
         idEditWordImage.visible = true
         idEditWordImage.source = ""
-        idEditWordImage.source = MyDownloader.imageSrc(idTextEdit1.text,  sQuestonLang)
+        idEditWordImage.source = MyDownloader.imageSrc(idTextEdit1.text,  sFromLang)
       }
     }
   }
