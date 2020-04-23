@@ -496,7 +496,7 @@ Item {
       id:idEditDldColumn
       anchors.top: idEditDlg.bottomClose
 
-      TextField
+      InputTextQuizSilica
       {
         id:idTextEdit3
         width:idEditDlg.width
@@ -507,14 +507,14 @@ Item {
       Row
       {
         width:parent.width
-        TextField
+        InputTextQuizSilica
         {
           id:idTextEdit1
           height: Theme.fontSizeLarge * 1.5
           labelVisible : false
           width: parent.width / 2
         }
-        TextField
+        InputTextQuizSilica
         {
           id:idTextEdit2
           height: Theme.fontSizeLarge * 1.5

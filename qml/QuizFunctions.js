@@ -204,6 +204,14 @@ function assignQuizModel(nIndexOfNewWord) {
   idQuizModel.extra = glosModelWorking.get(nIndexOfNewWord).extra
   idWindow.nGlosaTakeQuizIndex = MyDownloader.indexFromGlosNr(glosModel,
                                                               sNumberNewWord)
+
+  if (glosModelWorking.count === 1)
+  {
+    idQuizModel.get(0).answer = idQuizModel.answer
+    idQuizModel.get(1).answer = idQuizModel.answer
+    idQuizModel.get(2).answer = idQuizModel.answer
+  }
+
   // idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(glosModel, sNumberNewWord)
 }
 
@@ -741,6 +749,10 @@ var g_nLastNumber
 
 function updateDbWithWordState()
 {
+  if (idWindow.bAllok===true)
+  {
+    setAllok(true)
+  }
 
   db.transaction(function (tx) {
     tx.executeSql(
@@ -762,8 +774,6 @@ function calcAndAssigNextQuizWord(currentIndex) {
   nQuizIndex = nI
 
   if (glosModelWorking.count === 0) {
-    idQuizModel.get(nI).allok = true
-    idWindow.bAllok = true
     return
   }
 
@@ -825,7 +835,10 @@ function calcAndAssigNextQuizWord(currentIndex) {
     }
 
     if (glosModelWorking.count === 1)
+    {
       assignQuizModel(0, nQuizIndex)
+
+    }
     else
       assignQuizModel(nIndexOwNewWord, nQuizIndex)
 

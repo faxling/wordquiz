@@ -32,6 +32,7 @@ DISTFILES += qml/harbour-wordquiz.qml \
     qml/pages/CreateNewQuiz.qml \
     qml/pages/EditQuiz.qml \
     qml/pages/InputTextQuiz.qml \
+    qml/pages/InputTextQuizSilica.qml \
     qml/pages/RectRounded.qml \
     qml/pages/TakeQuiz.qml \
     qml/pages/TextList.qml \
