@@ -44,7 +44,7 @@ Item {
       ButtonQuizImg
       {
         id:idTextBtn
-        visible: !idWindow.bAllok
+        visible: !allok
         anchors.right:  parent.right
         anchors.rightMargin:  20
         anchors.top:  parent.top
@@ -58,20 +58,21 @@ Item {
       ButtonQuizImg
       {
         id:idVoiceModeBtn
+        visible: !allok
         anchors.left:  parent.left
         anchors.leftMargin:  20
         anchors.top:  idInfoBtn.bottom
         anchors.topMargin:  20
         source: "image://theme/icon-m-headphone?"+ (bVoiceMode
-                                                  ? Theme.highlightColor
-                                                  : Theme.primaryColor)
+                                                    ? Theme.highlightColor
+                                                    : Theme.primaryColor)
         onClicked: bVoiceMode = !bVoiceMode
       }
 
       ButtonQuizImg
       {
         id:idImgBtn
-        visible: !idWindow.bAllok && !idSoundBtn.visible
+        visible: !allok && !idSoundBtn.visible
         anchors.right:  parent.right
         anchors.rightMargin:  20
         anchors.top:  idTextBtn.bottom
@@ -85,7 +86,7 @@ Item {
       ButtonQuizImg
       {
         id:idSoundBtn
-        visible : bTextAnswerOk && bTextMode &&  !idWindow.bAllok
+        visible : bTextAnswerOk && bTextMode &&  !allok
         anchors.right:  parent.right
         anchors.rightMargin:  20
         anchors.top:  idTextBtn.bottom
@@ -118,7 +119,7 @@ Item {
         id:idTextEditYourAnswer
         y:50
         anchors.horizontalCenter: parent.horizontalCenter
-        visible:bTextMode && (!idWindow.bAllok)
+        visible:bTextMode && (!allok)
         width:parent.width  - 150
         labelVisible : false
         placeholderText : "your answer"
@@ -129,12 +130,12 @@ Item {
       }
       ButtonQuizImg
       {
-        visible:!idWindow.bAllok && (bIsReverse ? bHasSpeech : bHasSpeechFrom)
+        visible:!allok && (bIsReverse ? bHasSpeech : bHasSpeechFrom)
         anchors.right: parent.right
         anchors.rightMargin: 20
         y : idBtnAnswer.y + idQuizColumn.y - 20
         source:"qrc:qml/pages/hornbig.png"
-        onClicked: MyDownloader.playWord(idQuizModel.question,bIsReverse ? sToLang : sFromLang )
+        onClicked: MyDownloader.playWord(question,bIsReverse ? sToLang : sFromLang )
       }
       Column
       {
@@ -142,8 +143,8 @@ Item {
         spacing: 20
         anchors.horizontalCenter:  parent.horizontalCenter
         y : parent.height / 4.5
-        visible:!idWindow.bAllok && (idWindow.nQuizIndex === index)
-
+        visible:!allok
+        // && (idWindow.nQuizIndex === index)
         Image
         {
           id:idWordImage
@@ -164,7 +165,8 @@ Item {
           font.pixelSize: Theme.fontSizeExtraLarge
           font.bold: true
           anchors.horizontalCenter: parent.horizontalCenter
-          text : idQuizModel.question
+          text : question
+
           onTextChanged: idTextEditYourAnswer.text = ""
         }
 
@@ -201,7 +203,7 @@ Item {
       }
 
       Image {
-        visible:idWindow.bAllok
+        visible:allok
         anchors.centerIn:  parent
         source: "qrc:qml/pages/thumb.png"
       }
@@ -230,6 +232,9 @@ Item {
     id:idView
     property int nLastIndex : 1
     clip:true
+
+    highlightMoveDuration:800
+
     // Making it lock if bTextMode and not correct answer
     interactive: bTextAnswerOk || !bTextMode || bAnswerVisible || moving
     width:idRectTakeQuiz.width
