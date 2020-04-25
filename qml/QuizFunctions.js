@@ -152,9 +152,14 @@ ocL.append(oJJ["desc1"].toString());
 ocL.append(oJJ["slang"].toString());
 ocL.append(oJJ["qcount"].toString());
 */
+function assignTextInputField(text) {
+  if (nLastSearch !== 1)
+    idTextInput2.text = text
+  else
+    idTextInput.text = text
+}
 
-function setAllok(bval)
-{
+function setAllok(bval) {
   idWindow.bAllok = bval
   idQuizModel.get(0).allok = bval
   idQuizModel.get(1).allok = bval
@@ -162,22 +167,25 @@ function setAllok(bval)
 }
 
 function insertGlosa(dbnumber, nC, question, answer) {
+  var sQ = question.trim()
+  var sA = answer.trim()
+
   db.transaction(function (tx) {
     tx.executeSql('INSERT INTO Glosa' + dbnumber + ' VALUES(?, ?, ?, ?)',
-                  [nC, question, answer, 0])
+                  [nC, sQ, sA, 0])
   })
 
   glosModel.append({
-                     "number": nC,
-                     "question": question,
-                     "answer": answer,
+                     "answer": sA,
                      "extra": "",
+                     "number": nC,
+                     "question": sQ,
                      "state1": 0
                    })
 
   glosModelWorking.append({
-                            "answer": answer,
-                            "question": question,
+                            "answer": sA,
+                            "question": sQ,
                             "number": nC,
                             "extra": ""
                           })
@@ -189,8 +197,8 @@ function insertGlosa(dbnumber, nC, question, answer) {
   setAllok(false)
 
   if (glosModelWorking.count === 1) {
-    idQuizModel.question = question
-    idQuizModel.answer = answer
+    idQuizModel.question = sQ
+    idQuizModel.answer = sA
     idQuizModel.number = nC
     idQuizModel.extra = ""
   }
@@ -205,11 +213,10 @@ function assignQuizModel(nIndexOfNewWord) {
   idWindow.nGlosaTakeQuizIndex = MyDownloader.indexFromGlosNr(glosModel,
                                                               sNumberNewWord)
 
-  if (glosModelWorking.count === 1)
-  {
-    idQuizModel.get(0).answer = idQuizModel.answer
-    idQuizModel.get(1).answer = idQuizModel.answer
-    idQuizModel.get(2).answer = idQuizModel.answer
+  if (glosModelWorking.count === 1) {
+    idQuizModel.get(0).question = idQuizModel.question
+    idQuizModel.get(1).question = idQuizModel.question
+    idQuizModel.get(2).question = idQuizModel.question
   }
 
   // idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(glosModel, sNumberNewWord)
@@ -266,19 +273,16 @@ function capitalizeStr(inStr) {
 }
 
 function loadFromDb(tx) {
-  // To select the right word at quiz load time
 
-  /*
-  var nn = idWindow.nGlosaTakeQuizIndex
+  // To select the right highlighted word at quiz load time
   var nCurrentNumber = -1
-
-  console.log("nn   " + nn + "   " + glosModel.count)
-
-
-  if (nn >= 0 && glosModel.count > 0)  {
-    nCurrentNumber = glosModel.get(nn).number
+  var oGlosaItem = glosModel.get(idWindow.glosListView.currentIndex)
+  if (oGlosaItem !== undefined) {
+    nCurrentNumber = oGlosaItem.number
   }
-*/
+
+  console.log("nCurrentNumber " + nCurrentNumber)
+
   glosModel.clear()
 
   var rs = tx.executeSql(
@@ -303,16 +307,17 @@ function loadFromDb(tx) {
     }
 
     glosModel.append({
-                       "number": rs.rows.item(i).number,
-                       "question": sQ,
                        "answer": sA,
                        "extra": sE,
+                       "number": nNr,
+                       "question": sQ,
                        "state1": rs.rows.item(i).state
                      })
   }
 
   if (hasNonInt) {
     console.log("QUIZ NO " + nDbNumber + " bad numbering")
+
 
     /*
     tx.executeSql("DELETE FROM Glosa" + nDbNumber);
@@ -322,12 +327,15 @@ function loadFromDb(tx) {
     }
     */
   }
-  /*
+
+  // Select hilight after eg sort
   if (nCurrentNumber > 0) {
     idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(
           glosModel, nCurrentNumber)
+    idWindow.nGlosaTakeQuizIndex = idWindow.glosListView.currentIndex
+    idWindow.glosListView.positionViewAtIndex(idWindow.nGlosaTakeQuizIndex,
+                                              ListView.Center)
   }
-  */
 }
 
 function loadFromQuizList() {
@@ -399,8 +407,6 @@ function newQuiz() {
 
     idQuizList.positionViewAtEnd()
     idQuizList.currentIndex = glosModelIndex.count - 1
-
-
   })
 }
 
@@ -525,6 +531,7 @@ function loadFromList(nCount, oDD, sLangLoaded) {
 
     // answer, question , state
 
+
     /*
               answer
               extra
@@ -616,7 +623,6 @@ function resetQuiz() {
 
   assignQuizModel(nIndexOwNewWord)
   setAllok(glosModelWorking.count === 0)
-
 }
 
 function updateQuiz() {
@@ -657,9 +663,7 @@ function updateQuiz() {
       glosModelWorking.get(i).number = nNumber
       glosModelWorking.get(i).extra = sE
     }
-  }
-  else
-  {
+  } else {
     if (nState === 0) {
       glosModelWorking.append({
                                 "number": nNumber,
@@ -669,8 +673,7 @@ function updateQuiz() {
                               })
 
       // We change the quize state  from Allok (Thumbs upp) to not allok
-      if (glosModelWorking.count === 1)
-      {
+      if (glosModelWorking.count === 1) {
         resetTakeQuizTab()
         setAllok(false)
       }
@@ -741,30 +744,24 @@ function deleteWordInQuiz() {
   sScoreText = glosModelWorking.count + "/" + glosModel.count
 }
 
-
 // To smoth the pathview
 var g_oTimer
 var g_nLastNumber
 
-
-function updateDbWithWordState()
-{
-  if (idWindow.bAllok===true)
-  {
+function updateDbWithWordState() {
+  if (idWindow.bAllok === true) {
     setAllok(true)
   }
 
   db.transaction(function (tx) {
-    tx.executeSql(
-          "UPDATE Glosa" + nDbNumber + " SET state=1 WHERE number=?",
-          g_nLastNumber)
+    tx.executeSql("UPDATE Glosa" + nDbNumber + " SET state=1 WHERE number=?",
+                  g_nLastNumber)
   })
 }
 
 function Timer() {
-  return Qt.createQmlObject("import QtQuick 2.0; Timer {}", idWindow);
+  return Qt.createQmlObject("import QtQuick 2.0; Timer {}", idWindow)
 }
-
 
 function calcAndAssigNextQuizWord(currentIndex) {
   var nI = (currentIndex + 1) % 3
@@ -815,11 +812,10 @@ function calcAndAssigNextQuizWord(currentIndex) {
 
     if (i !== -1) {
       glosModel.get(i).state1 = 1
-      if (g_oTimer === undefined)
-      {
-        g_oTimer = new Timer();
-        g_oTimer.interval = 1000;
-        g_oTimer.repeat = false;
+      if (g_oTimer === undefined) {
+        g_oTimer = new Timer()
+        g_oTimer.interval = 1000
+        g_oTimer.repeat = false
         g_oTimer.triggered.connect(updateDbWithWordState)
       }
       g_oTimer.start()
@@ -834,12 +830,9 @@ function calcAndAssigNextQuizWord(currentIndex) {
         break
     }
 
-    if (glosModelWorking.count === 1)
-    {
+    if (glosModelWorking.count === 1) {
       assignQuizModel(0, nQuizIndex)
-
-    }
-    else
+    } else
       assignQuizModel(nIndexOwNewWord, nQuizIndex)
 
     resetTakeQuizTab()

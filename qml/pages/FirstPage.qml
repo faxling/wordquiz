@@ -223,7 +223,6 @@ Page {
         width:parent.width
         height: idTabMain.height - idTabRow.height - idTitle.height - 20
         visible:false
-
       }
 
     }

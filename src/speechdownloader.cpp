@@ -305,6 +305,13 @@ void Speechdownloader::quizExported(QNetworkReply* pReply)
 
 }
 
+struct QuizInfo
+{
+  QString qname;
+  QString desc1;
+  QString slang;
+  QString qcount;
+};
 
 void Speechdownloader::listDownloaded(QNetworkReply* pReply)
 {
@@ -312,23 +319,47 @@ void Speechdownloader::listDownloaded(QNetworkReply* pReply)
   QJsonDocument oJ = QJsonDocument::fromJson(oc);
 
   QJsonArray ocJson = oJ.array();
-  QStringList ocL;
-  m_ocIndexMap.clear();
+
+  // m_ocIndexMap.clear();
+
+  QList<QuizInfo> ocQuizInfo;
+
   for (auto oI : ocJson)
   {
-    // `ID`,  desc1`, `slang`,  `qcount`,  `pwd`,  `qname`
+   //   id, desc1, slang, qcount,qname
     QJsonArray oJJ = oI.toArray();
-    ocL.append(oJJ[4].toString());
-    ocL.append(oJJ[1].toString());
-    ocL.append(oJJ[2].toString());
-    ocL.append(oJJ[3].toString());
+    QuizInfo t;
+    t.desc1 = oJJ[1].toString();
+    t.slang = oJJ[2].toString();
+    t.qcount = oJJ[3].toString();
+    t.qname = oJJ[4].toString();
+    ocQuizInfo.push_back(t);
+  }
+
+  std::sort(ocQuizInfo.begin(),ocQuizInfo.end(), [](const QuizInfo& t1, const QuizInfo& t2)
+  {
+    QString s1 = t1.slang;
+    QString s2 = t2.slang;
+    std::sort(s1.begin(), s1.end());
+    std::sort(s2.begin(), s2.end());
+    return s1 < s2;
+  }
+  );
+
+
+  QStringList ocL;
+  for (auto oI : ocQuizInfo)
+  {
+    ocL.append(oI.qname);
+    ocL.append(oI.desc1);
+    ocL.append(oI.slang);
+    ocL.append(oI.qcount);
     /*
                         "qname"
                         "desc1"
                         "slang"
                         "qcount
                         */
-    m_ocIndexMap.append(oJJ[0].toInt());
   }
 
   emit quizListDownloadedSignal(ocL.size(), ocL);

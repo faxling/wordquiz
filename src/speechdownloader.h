@@ -60,7 +60,7 @@ private:
   void imgDownloaded(QNetworkReply* pReply);
 private:
   void currentQuizCmd(QVariant p,QString sName, QString sLang,  QString sPwd,QString sDesc, QString sCmd);
-  QVector<int> m_ocIndexMap;
+ // QVector<int> m_ocIndexMap;
   QString AudioPath(const QString&s , const QString& sLang);
   QString ImgPath(const QString&s , const QString& sLang);
   QString m_sStoragePath;
