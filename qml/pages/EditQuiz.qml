@@ -225,11 +225,10 @@ Item {
 
           // Find a new Id
           var nC = 0
-
           var sNewWordFrom = QuizLib.getTextFromInput(idTextInput)
           var sNewWordTo = QuizLib.getTextFromInput(idTextInput2)
-
-          for (; i < glosModel.count; i++) {
+          var i
+          for (i = 0; i < glosModel.count; i++) {
             if (glosModel.get(i).question === sNewWordFrom && glosModel.get(
                   i).answer === sNewWordTo) {
               idErrorText2.visible = true
@@ -253,22 +252,24 @@ Item {
       }
     }
 
-    TextList {
-      id: idErrorText
-      visible: false
-      color: "red"
-      onClick: visible = false
-    }
-    TextList {
-      visible: false
-      id: idErrorText2
-      color: "red"
-      onClick: visible = false
-    }
+
     Row {
       id: idDictRow
       height: n3BtnWidth
       width: parent.width
+
+      TextList {
+        id: idErrorText
+        visible: false
+        color: "red"
+        onClick: visible = false
+      }
+      TextList {
+        id: idErrorText2
+        visible: false
+        color: "red"
+        onClick: visible = false
+      }
 
       ListViewHi {
         id: idDicList
