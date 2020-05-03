@@ -62,6 +62,38 @@ function downloadDictOnWord(sUrl, sWord) {
   doc.send()
 }
 
+function getTextInputAndAdd()
+{
+  // Find a new Id
+  var nC = 0
+
+  var sNewWordFrom = QuizLib.getTextFromInput(idTextInput)
+  var sNewWordTo = QuizLib.getTextFromInput(idTextInput2)
+
+  var i
+  for (i = 0; i < glosModel.count; i++) {
+    if (glosModel.get(i).question === sNewWordFrom && glosModel.get(
+          i).answer === sNewWordTo) {
+      idErrorText2.visible = true
+      idErrorText2.text = idTextInput.text + " Already in quiz!"
+      return
+    }
+
+    if (glosModel.get(i).number > nC)
+      nC = glosModel.get(i).number
+  }
+
+  nC += 1
+
+  if (bHasSpeech)
+    MyDownloader.downloadWord(sNewWordTo, sToLang)
+  if (bHasSpeechFrom)
+    MyDownloader.downloadWord(sNewWordFrom, sFromLang)
+
+  QuizLib.insertGlosa(nDbNumber, nC, sNewWordFrom, sNewWordTo)
+}
+
+
 function getAndInitDb() {
 
   if (idWindow.db !== undefined)
@@ -167,8 +199,8 @@ function setAllok(bval) {
 }
 
 function insertGlosa(dbnumber, nC, question, answer) {
-  var sQ = question.trim()
-  var sA = answer.trim()
+  var sQ = capitalizeStr(question)
+  var sA = capitalizeStr(answer)
 
   db.transaction(function (tx) {
     tx.executeSql('INSERT INTO Glosa' + dbnumber + ' VALUES(?, ?, ?, ?)',

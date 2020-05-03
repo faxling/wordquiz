@@ -219,36 +219,8 @@ Item {
       }
 
       ButtonQuiz {
-        width: n4BtnWidth
         text: "Add"
-        onClicked: {
-
-          // Find a new Id
-          var nC = 0
-          var sNewWordFrom = QuizLib.getTextFromInput(idTextInput)
-          var sNewWordTo = QuizLib.getTextFromInput(idTextInput2)
-          var i
-          for (i = 0; i < glosModel.count; i++) {
-            if (glosModel.get(i).question === sNewWordFrom && glosModel.get(
-                  i).answer === sNewWordTo) {
-              idErrorText2.visible = true
-              idErrorText2.text = idTextInput.text + " Already in quiz!"
-              return
-            }
-
-            if (glosModel.get(i).number > nC)
-              nC = glosModel.get(i).number
-          }
-
-          nC += 1
-
-          if (bHasSpeech)
-            MyDownloader.downloadWord(sNewWordTo, sToLang)
-          if (bHasSpeechFrom)
-            MyDownloader.downloadWord(sNewWordFrom, sFromLang)
-
-          QuizLib.insertGlosa(nDbNumber, nC, sNewWordFrom, sNewWordTo)
-        }
+        onClicked: QuizLib.getTextInputAndAdd()
       }
     }
 

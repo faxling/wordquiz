@@ -8,6 +8,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QEventLoop>
 #include <QMap>
+#include <QVector>
 class QAbstractListModel;
 class StopWatch;
 class Speechdownloader : public QObject
@@ -25,6 +26,9 @@ public:
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, QString sId);
   Q_INVOKABLE void toClipBoard(QString s);
+  Q_INVOKABLE void pushIndex(int);
+  Q_INVOKABLE int popIndex();
+  bool isStackEmpty();
   Q_INVOKABLE void downLoadAllSpeech(QVariant p,QString sLang);
   Q_INVOKABLE void initUrls(QVariant p);
   Q_INVOKABLE int  indexFromGlosNr(QVariant p, int nNr);
@@ -60,7 +64,7 @@ private:
   void imgDownloaded(QNetworkReply* pReply);
 private:
   void currentQuizCmd(QVariant p,QString sName, QString sLang,  QString sPwd,QString sDesc, QString sCmd);
- // QVector<int> m_ocIndexMap;
+  // QVector<int> m_ocIndexMap;
   QString AudioPath(const QString&s , const QString& sLang);
   QString ImgPath(const QString&s , const QString& sLang);
   QString m_sStoragePath;
@@ -70,6 +74,7 @@ private:
   QNetworkAccessManager m_oQuizNetMgr;
   QNetworkAccessManager m_oListQuizNetMgr;
   QNetworkAccessManager m_oDeleteQuizNetMgr;
+  QVector<int> m_ocIndexStack;
 
   QByteArray m_oDownloadedData;
   bool m_bPlayAfterDownload = false;

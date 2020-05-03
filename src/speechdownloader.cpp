@@ -326,7 +326,7 @@ void Speechdownloader::listDownloaded(QNetworkReply* pReply)
 
   for (auto oI : ocJson)
   {
-   //   id, desc1, slang, qcount,qname
+    //   id, desc1, slang, qcount,qname
     QJsonArray oJJ = oI.toArray();
     QuizInfo t;
     t.desc1 = oJJ[1].toString();
@@ -650,10 +650,38 @@ int Speechdownloader::indexFromGlosNr(QVariant p, int nNr)
   return -1;
 }
 
+
+void Speechdownloader::pushIndex(int nI)
+{
+  if (m_ocIndexStack.isEmpty() == false)
+  {
+    if (m_ocIndexStack.last() == nI)
+      return;
+  }
+
+  m_ocIndexStack.push_back(nI);
+}
+
+bool Speechdownloader::isStackEmpty()
+{
+  return m_ocIndexStack.isEmpty();
+}
+
+int Speechdownloader::popIndex()
+{
+
+  if (m_ocIndexStack.isEmpty())
+    return -1;
+
+  return m_ocIndexStack.takeLast();
+}
+
 void Speechdownloader::startTimer()
 {
   m_pStopWatch = new StopWatch("timing %1");
 }
+
+
 void Speechdownloader::stopTimer()
 {
   delete m_pStopWatch;
