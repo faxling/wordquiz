@@ -22,7 +22,6 @@ Item {
 
     Rectangle
     {
-      property alias  textEdit : idTextEditYourAnswer.text
       radius:10
       width:idView.width
       height:idRectTakeQuiz.height - 200
@@ -117,6 +116,10 @@ Item {
       TextField
       {
         id:idTextEditYourAnswer
+        Component.onCompleted:
+        {
+          MyDownloader.storeTextInputField(idTextEditYourAnswer)
+        }
         y:50
         anchors.horizontalCenter: parent.horizontalCenter
         visible:bTextMode && (!allok)
@@ -166,8 +169,6 @@ Item {
           font.bold: true
           anchors.horizontalCenter: parent.horizontalCenter
           text : question
-
-          onTextChanged: idTextEditYourAnswer.text = ""
         }
 
         ButtonQuiz

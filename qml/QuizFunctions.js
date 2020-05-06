@@ -8,6 +8,8 @@ function resetTakeQuizTab() {
   if (idWindow.oTakeQuiz !== undefined) {
     idWindow.oTakeQuiz.bExtraInfoVisible = false
     idWindow.oTakeQuiz.bAnswerVisible = false
+    idWindow.oTakeQuiz.bTextAnswerOk = false
+    MyDownloader.restoreTextInputFields()
   }
 }
 

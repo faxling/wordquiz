@@ -25,6 +25,8 @@ public:
   Q_INVOKABLE void importQuiz(QString sName);
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, QString sId);
+  Q_INVOKABLE void storeTextInputField(QObject* p);
+  Q_INVOKABLE void restoreTextInputFields();
   Q_INVOKABLE void toClipBoard(QString s);
   Q_INVOKABLE void pushIndex(int);
   Q_INVOKABLE int popIndex();
@@ -75,7 +77,7 @@ private:
   QNetworkAccessManager m_oListQuizNetMgr;
   QNetworkAccessManager m_oDeleteQuizNetMgr;
   QVector<int> m_ocIndexStack;
-
+  QVector<QObject*> m_ocTextInputElem;
   QByteArray m_oDownloadedData;
   bool m_bPlayAfterDownload = false;
   int NumberRole(QAbstractListModel* pp);

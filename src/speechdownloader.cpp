@@ -678,9 +678,23 @@ int Speechdownloader::popIndex()
   return m_ocIndexStack.takeLast();
 }
 
+
 void Speechdownloader::startTimer()
 {
   m_pStopWatch = new StopWatch("timing %1");
+}
+
+void Speechdownloader::restoreTextInputFields()
+{
+  for (auto oI : m_ocTextInputElem)
+  {
+    oI->setProperty("text","");
+  }
+}
+
+void Speechdownloader::storeTextInputField(QObject* p)
+{
+  m_ocTextInputElem.push_back(p);
 }
 
 
