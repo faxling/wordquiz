@@ -107,8 +107,10 @@ Item {
       }
 
       Image {
-        y:100
-        x:10
+        id:idTextAnswerOkImage
+        anchors.left: idVoiceModeBtn.left
+        anchors.top: idVoiceModeBtn.bottom
+        anchors.topMargin:  20
         visible : bTextAnswerOk && bTextMode
         source: "image://theme/icon-m-like"
       }
@@ -243,7 +245,6 @@ Item {
 
     onCurrentIndexChanged:
     {
-      bTextAnswerOk = false
       QuizLib.calcAndAssigNextQuizWord(currentIndex)
     }
 

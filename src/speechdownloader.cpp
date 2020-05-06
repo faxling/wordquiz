@@ -65,8 +65,8 @@ void Speechdownloader::initUrls(QVariant p)
 }
 QString Speechdownloader::ignoreAccentLC(QString str)
 {
-  static QString sssIn = QString::fromWCharArray(L"îàáâãäåèéêëòóôõõöùúûç");
-  static QString sssOut = QString::fromWCharArray(L"iaaaaaaeeeeoooooouuuc");
+  static QString sssIn = QString::fromWCharArray(L"íîàáâãäåèéêëòóôõõöùúûç");
+  static QString sssOut = QString::fromWCharArray(L"iiaaaaaaeeeeoooooouuuc");
   static QRegExp oReg("[\\W]"); // Matches a non-word character.
   str.replace(oReg, "");
 
@@ -85,8 +85,8 @@ QString Speechdownloader::ignoreAccentLC(QString str)
 }
 QString Speechdownloader::ignoreAccent(QString str)
 {
-  static QString sssIn = QString::fromWCharArray(L"ÎÀÁÂÃÄÅÈÉÊËÒÓÔÕÕÖÙÚÛÇ");
-  static QString sssOut = QString::fromWCharArray(L"IAAAAAAEEEEOOOOOOUUUC");
+  static QString sssIn = QString::fromWCharArray(L"ÍÎÀÁÂÃÄÅÈÉÊËÒÓÔÕÕÖÙÚÛÇ");
+  static QString sssOut = QString::fromWCharArray(L"IIAAAAAAEEEEOOOOOOUUUC");
   static QRegExp oReg("[\\W]"); // Matches a non-word character.
   str.replace(oReg, "");
 
