@@ -209,7 +209,6 @@ Item {
       onCurrentIndexChanged: {
         if (nGlosaDbLastIndex >= 0) {
           QuizLib.loadFromQuizList()
-          idQuizNameInput.text = sQuizName
         } else {
           nGlosaDbLastIndex = 0
         }
@@ -507,6 +506,7 @@ Item {
       onClicked: {
         bProgVisible = true
         idTextInputQuizName.text = idImport.sSelectedQ
+        sQuizName  = idImport.sSelectedQ
         MyDownloader.importQuiz(idImport.sSelectedQ)
       }
     }

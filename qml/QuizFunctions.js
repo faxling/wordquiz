@@ -62,8 +62,7 @@ function downloadDictOnWord(sUrl, sWord) {
   doc.send()
 }
 
-function getTextInputAndAdd()
-{
+function getTextInputAndAdd() {
   // Find a new Id
   var nC = 0
 
@@ -92,7 +91,6 @@ function getTextInputAndAdd()
 
   QuizLib.insertGlosa(nDbNumber, nC, sNewWordFrom, sNewWordTo)
 }
-
 
 function getAndInitDb() {
 

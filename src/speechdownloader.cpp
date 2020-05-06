@@ -41,7 +41,7 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject *pParent
   QObject::connect(&m_oListQuizNetMgr, &QNetworkAccessManager::finished, this, &Speechdownloader::listDownloaded);
   QObject::connect(&m_oDeleteQuizNetMgr, &QNetworkAccessManager::finished, this, &Speechdownloader::quizDeleted);
   m_sStoragePath = sStoragePath;
-  qDebug() << m_sStoragePath;
+  qDebug() << "WordQuiz StoragePath: " << m_sStoragePath;
   QSound::play("qrc:welcome_en.wav");
   m_pStopWatch = nullptr;
 }
@@ -69,6 +69,7 @@ QString Speechdownloader::ignoreAccentLC(QString str)
   static QString sssOut = QString::fromWCharArray(L"iaaaaaaeeeeoooooouuuc");
   static QRegExp oReg("[\\W]"); // Matches a non-word character.
   str.replace(oReg, "");
+
   str = str.toLower();
 
   for (auto i = str.begin(); i != str.end(); i++)
@@ -88,6 +89,7 @@ QString Speechdownloader::ignoreAccent(QString str)
   static QString sssOut = QString::fromWCharArray(L"IAAAAAAEEEEOOOOOOUUUC");
   static QRegExp oReg("[\\W]"); // Matches a non-word character.
   str.replace(oReg, "");
+
   str = str.toUpper();
 
   for (auto i = str.begin(); i != str.end(); i++)
