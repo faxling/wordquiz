@@ -219,7 +219,9 @@ Item {
       }
 
       ButtonQuiz {
+        id:idAddBtn
         text: "Add"
+        width: n4BtnWidth
         onClicked: QuizLib.getTextInputAndAdd()
       }
     }

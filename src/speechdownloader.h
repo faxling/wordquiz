@@ -26,7 +26,7 @@ public:
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, QString sId);
   Q_INVOKABLE void storeTextInputField(QObject* p);
-  Q_INVOKABLE void restoreTextInputFields();
+  Q_INVOKABLE void storeCurrentIndex(int);
   Q_INVOKABLE void toClipBoard(QString s);
   Q_INVOKABLE void pushIndex(int);
   Q_INVOKABLE int popIndex();

@@ -9,7 +9,6 @@ function resetTakeQuizTab() {
     idWindow.oTakeQuiz.bExtraInfoVisible = false
     idWindow.oTakeQuiz.bAnswerVisible = false
     idWindow.oTakeQuiz.bTextAnswerOk = false
-    MyDownloader.restoreTextInputFields()
   }
 }
 
@@ -588,6 +587,9 @@ function isAnswerOk(sAnswerToCheck, sAnswerInDb) {
   sAnswerInDb = MyDownloader.ignoreAccent(sAnswerInDb)
   sAnswerToCheck = MyDownloader.ignoreAccent(sAnswerToCheck)
 
+  if (sAnswerToCheck === "")
+    return false
+
   if (sAnswerInDb === sAnswerToCheck)
     return true
 
@@ -799,6 +801,9 @@ function calcAndAssigNextQuizWord(currentIndex) {
   var nI = (currentIndex + 1) % 3
   var nLastIndex = idView.nLastIndex
 
+  MyDownloader.storeCurrentIndex(nI)
+
+
   //nQuizIndex the index of the view with 3 items that swipes left or right
   nQuizIndex = nI
 
@@ -866,7 +871,7 @@ function calcAndAssigNextQuizWord(currentIndex) {
       assignQuizModel(0, nQuizIndex)
     } else
       assignQuizModel(nIndexOwNewWord, nQuizIndex)
-
-    resetTakeQuizTab()
   }
+
+  resetTakeQuizTab()
 }

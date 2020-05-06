@@ -111,7 +111,7 @@ Item {
         anchors.left: idVoiceModeBtn.left
         anchors.top: idVoiceModeBtn.bottom
         anchors.topMargin:  20
-        visible : bTextAnswerOk && bTextMode
+        visible : bTextAnswerOk && bTextMode && !allok
         source: "image://theme/icon-m-like"
       }
 
