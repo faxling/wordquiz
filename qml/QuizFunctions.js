@@ -299,7 +299,8 @@ function capitalizeStr(inStr) {
     return
   if (inStr.length === 0)
     return
-  var sA = inStr.charAt(0).toUpperCase() + inStr.slice(1)
+  var sA = inStr.trim()
+  sA =  sA.charAt(0).toUpperCase() + inStr.slice(1)
   return sA
 }
 
@@ -662,8 +663,8 @@ function resetQuiz() {
 function updateQuiz() {
   idEditDlg.visible = false
   var nNumber = glosModel.get(idGlosList.currentIndex).number
-  var sQ = idTextEdit1.displayText.trim()
-  var sA = idTextEdit2.displayText.trim()
+  var sQ = capitalizeStr(idTextEdit1.displayText)
+  var sA = capitalizeStr(idTextEdit2.displayText)
   var sA_Org = sA
 
   var sE = idTextEdit3.displayText.trim()

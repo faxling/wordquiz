@@ -693,7 +693,8 @@ void Speechdownloader::storeTextInputField(QObject* p)
 void Speechdownloader::storeCurrentIndex(int n)
 {
   m_ocTextInputElem[n]->setProperty("text","");
-  QMetaObject::invokeMethod(m_ocTextInputElem[n], "forceActiveFocus");
+  if (m_ocTextInputElem[n]->property("visible").toBool() == true)
+    QMetaObject::invokeMethod(m_ocTextInputElem[n], "forceActiveFocus");
 }
 
 void Speechdownloader::stopTimer()
