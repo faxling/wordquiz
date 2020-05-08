@@ -183,11 +183,12 @@ ocL.append(oJJ["desc1"].toString());
 ocL.append(oJJ["slang"].toString());
 ocL.append(oJJ["qcount"].toString());
 */
+
 function assignTextInputField(text) {
   if (nLastSearch !== 1)
-    idTextInput2.text = text
+    idTextInput2.text = text + " "
   else
-    idTextInput.text = text
+    idTextInput.text = text + " "
 }
 
 function setAllok(bval) {
@@ -425,7 +426,14 @@ function newQuiz() {
     if (rs.rows.length > 0) {
       nNr = rs.rows.item(0).newnr + 1
     }
+
     sQuizName = idTextInputQuizName.displayText.trim()
+
+    if (sQuizName.length < 3)
+      sQuizName = "New Quiz " + sLangLangSelected
+
+    idTextInputQuizName.text = " "
+    idTextInputQuizName.text =""
     tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',
                   [nNr, sQuizName, "0/0", sLangLangSelected])
     tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)', [nNr, "-"])

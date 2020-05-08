@@ -42,69 +42,7 @@ Item {
     anchors.topMargin: 20
     anchors.fill: parent
 
-    XmlListModel {
-      id: idTrTextModel
-      onStatusChanged: {
-        if (status === XmlListModel.Ready) {
-          if (idTrTextModel.count <= 0) {
-            return
-          }
 
-          QuizLib.assignTextInputField(idTrTextModel.get(0).text1)
-
-          idTrSynModel.query = "/DicResult/def/tr[1]/syn"
-          idTrMeanModel.query = "/DicResult/def/tr[1]/mean"
-        }
-      }
-
-      query: "/DicResult/def/tr"
-      XmlRole {
-        name: "count1"
-        query: "count(syn)"
-      }
-      XmlRole {
-        name: "text1"
-        query: "text/string()"
-      }
-    }
-
-    XmlListModel {
-      id: idTrSynModel
-      XmlRole {
-        name: "syn"
-        query: "text/string()"
-      }
-    }
-
-    XmlListModel {
-      id: idTrMeanModel
-      XmlRole {
-        name: "mean"
-        query: "text/string()"
-      }
-    }
-
-    // From the translation API
-    XmlListModel {
-      id: idTranslateModel
-      property var oBtn
-      query: "/Translation"
-      XmlRole {
-        name: "trans"
-        query: "text/string()"
-      }
-      onStatusChanged: {
-        if (status === XmlListModel.Ready) {
-          oBtn.bProgVisible = false
-          if (idTranslateModel.count <= 0) {
-            idTextTrans.text = "-"
-            return
-          }
-
-          idTextTrans.text = idTranslateModel.get(0).trans
-        }
-      }
-    }
 
     Item {
       id: idSearchResultRowItem
@@ -524,6 +462,70 @@ Item {
       text: "Delete"
       onClicked: {
         QuizLib.deleteWordInQuiz()
+      }
+    }
+  }
+
+  XmlListModel {
+    id: idTrTextModel
+    onStatusChanged: {
+      if (status === XmlListModel.Ready) {
+        if (idTrTextModel.count <= 0) {
+          return
+        }
+
+        QuizLib.assignTextInputField(idTrTextModel.get(0).text1)
+
+        idTrSynModel.query = "/DicResult/def/tr[1]/syn"
+        idTrMeanModel.query = "/DicResult/def/tr[1]/mean"
+      }
+    }
+
+    query: "/DicResult/def/tr"
+    XmlRole {
+      name: "count1"
+      query: "count(syn)"
+    }
+    XmlRole {
+      name: "text1"
+      query: "text/string()"
+    }
+  }
+
+  XmlListModel {
+    id: idTrSynModel
+    XmlRole {
+      name: "syn"
+      query: "text/string()"
+    }
+  }
+
+  XmlListModel {
+    id: idTrMeanModel
+    XmlRole {
+      name: "mean"
+      query: "text/string()"
+    }
+  }
+
+  // From the translation API
+  XmlListModel {
+    id: idTranslateModel
+    property var oBtn
+    query: "/Translation"
+    XmlRole {
+      name: "trans"
+      query: "text/string()"
+    }
+    onStatusChanged: {
+      if (status === XmlListModel.Ready) {
+        oBtn.bProgVisible = false
+        if (idTranslateModel.count <= 0) {
+          idTextTrans.text = "-"
+          return
+        }
+
+        idTextTrans.text = idTranslateModel.get(0).trans
       }
     }
   }

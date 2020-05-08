@@ -6,60 +6,6 @@ import "../QuizFunctions.js" as QuizLib
 Item {
   property alias nQuizListCurrentIndex: idQuizList.currentIndex
 
-  ListModel {
-    id: idServerQModel
-    ListElement {
-      qname: "-"
-      code: ""
-      state1: ""
-      desc1: ""
-      date1: ""
-    }
-  }
-
-  ListModel {
-    id: idLangModel
-    ListElement {
-      lang: "Swedish"
-      code: "sv"
-    }
-    ListElement {
-      lang: "Russian"
-      code: "ru"
-    }
-    ListElement {
-      lang: "French"
-      code: "fr"
-    }
-    ListElement {
-      lang: "Italian"
-      code: "it"
-    }
-    ListElement {
-      lang: "English"
-      code: "en"
-    }
-    ListElement {
-      lang: "Hungarian"
-      code: "hu"
-    }
-    ListElement {
-      lang: "Norvegian"
-      code: "no"
-    }
-    ListElement {
-      lang: "Spanish"
-      code: "es"
-    }
-    ListElement {
-      lang: "Polish"
-      code: "pl"
-    }
-    ListElement {
-      lang: "German"
-      code: "de"
-    }
-  }
 
   Column {
     id: idTopColumn
@@ -593,4 +539,60 @@ Item {
       idEditQuizEntryDlg.visible = false
     }
   } // Rectangle
+
+
+  ListModel {
+    id: idServerQModel
+    ListElement {
+      qname: "-"
+      code: ""
+      state1: ""
+      desc1: ""
+      date1: ""
+    }
+  }
+
+  ListModel {
+    id: idLangModel
+    ListElement {
+      lang: "Swedish"
+      code: "sv"
+    }
+    ListElement {
+      lang: "Russian"
+      code: "ru"
+    }
+    ListElement {
+      lang: "French"
+      code: "fr"
+    }
+    ListElement {
+      lang: "Italian"
+      code: "it"
+    }
+    ListElement {
+      lang: "English"
+      code: "en"
+    }
+    ListElement {
+      lang: "Hungarian"
+      code: "hu"
+    }
+    ListElement {
+      lang: "Norvegian"
+      code: "no"
+    }
+    ListElement {
+      lang: "Spanish"
+      code: "es"
+    }
+    ListElement {
+      lang: "Polish"
+      code: "pl"
+    }
+    ListElement {
+      lang: "German"
+      code: "de"
+    }
+  }
 } // Item
