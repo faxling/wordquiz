@@ -282,7 +282,7 @@ Item {
           width: n3BtnWidth
           text: question
           color: state1 === 0 ? Theme.primaryColor : "green"
-          onPressAndHold: idTextInput.text = question
+          onClick: idTextInput.text = question
         }
 
         TextList {
@@ -291,7 +291,7 @@ Item {
           text: answer
           font.bold: extra.length > 0
           color: state1 === 0 ? Theme.primaryColor : "green"
-          onPressAndHold: idTextInput2.text = answer
+          onClick: idTextInput2.text = answer
         }
 
         ButtonQuizImg {

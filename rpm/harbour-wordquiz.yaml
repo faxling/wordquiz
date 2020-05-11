@@ -1,6 +1,6 @@
 Name: harbour-wordquiz
 Summary: Word quiz
-Version: 2.0
+Version: 3.0
 Release: 1
 # The contents of the Group field should be one of the groups listed here:
 # https://github.com/mer-tools/spectacle/blob/master/data/GROUPS
@@ -12,7 +12,7 @@ License: LICENSE
 Sources:
 - '%{name}-%{version}.tar.bz2'
 Description: |
-  An application for creating and taking word quizs in different languages
+  An language study application for creating and taking word quizs in different languages.
 Configure: none
 Builder: qmake5
 

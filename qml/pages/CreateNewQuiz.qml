@@ -190,6 +190,7 @@ Item {
             height: idCol1.height
             source: "image://theme/icon-s-edit"
             onClicked: {
+              idQuizNameInput.text = quizname
               idEditQuizEntryDlg.visible = true
               idQuizList.currentIndex = index
             }

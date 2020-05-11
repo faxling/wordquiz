@@ -493,7 +493,10 @@ function loadFromServerList(nCount, oDD) {
                             "date1": sDate
                           })
   }
+
   idServerListView.currentIndex = nLastIndex
+  idServerListView.positionViewAtIndex(nLastIndex,
+                                 ListView.Center)
 }
 
 function quizDeleted(nResponce) {
@@ -810,7 +813,7 @@ function calcAndAssigNextQuizWord(currentIndex) {
   var nI = (currentIndex + 1) % 3
   var nLastIndex = idView.nLastIndex
 
-  MyDownloader.storeCurrentIndex(nI)
+
 
 
   //nQuizIndex the index of the view with 3 items that swipes left or right
@@ -867,6 +870,8 @@ function calcAndAssigNextQuizWord(currentIndex) {
       g_oTimer.start()
     }
   }
+
+  MyDownloader.storeCurrentIndex(nI)
 
   if (glosModelWorking.count > 0) {
 

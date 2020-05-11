@@ -9,7 +9,7 @@ Name:       harbour-wordquiz
 # << macros
 
 Summary:    Word quiz
-Version:    2.0
+Version:    3.0
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
@@ -25,7 +25,7 @@ BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  desktop-file-utils
 
 %description
-An application for creating and taking word quizs in different languages
+An language study application for creating and taking word quizs in different languages.
 
 
 %prep

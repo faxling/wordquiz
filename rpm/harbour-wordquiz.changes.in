@@ -19,3 +19,12 @@
 - Add Extra Info to word.
 - Add Uppload and Download from a quiz server
 - Buggfixes
+
+* Sun May 10 2020 Fredrik Axling <faxling11@gmail.com> 3.0-1
+- Possible to illustrate a quiz with images
+- Speech mode. listen to questions instead of reading
+- Spell mode. Type the answer and have it checked.
+- New symbols.
+- To Clipboard buttons in lookup field
+- Web Search on text in clipboard
+- Buggfixes
