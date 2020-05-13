@@ -167,7 +167,7 @@ Item {
 
     Row {
       id: idDictRow
-      height: n3BtnWidth
+      height: n4BtnWidth
       width: parent.width
 
       TextList {
@@ -265,7 +265,7 @@ Item {
     }
     ListViewHi {
       id: idGlosList
-      height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6
+      height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6.2
               - idTextInput.height - idHeader1Text.height - Theme.itemSizeExtraSmall
 
       width: parent.width

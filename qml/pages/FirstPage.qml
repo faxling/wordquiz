@@ -51,6 +51,7 @@ Page {
   property int nGlosaDbLastIndex:  -1
   property string sSearchQuery
   property int nGlosaTakeQuizIndex
+  property int nMargin : Screen.height > 1000 ? 50 : 25
   onSScoreTextChanged:
   {
     db.transaction(
@@ -129,9 +130,9 @@ Page {
     Column  {
       id:idTabMain
       anchors.fill : parent
-      anchors.leftMargin : 50
-      anchors.rightMargin : 50
-      anchors.topMargin : 50
+      anchors.leftMargin : nMargin
+      anchors.rightMargin : nMargin
+      anchors.topMargin : nMargin
       spacing :10
 
       Item
@@ -149,8 +150,8 @@ Page {
         {
           id: idBtnHelp
           anchors.right: parent.right
-          anchors.topMargin : -40
-          anchors.rightMargin : -40
+          anchors.topMargin : -nMargin
+          anchors.rightMargin :-nMargin
           anchors.top : parent.top
           source:"image://theme/icon-m-question"
           onClicked: Qt.openUrlExternally("https://faxling.github.io/WordQuizWin/index.html");
@@ -160,8 +161,8 @@ Page {
         {
           id: idBtnSearch
           anchors.left: parent.left
-          anchors.topMargin : -40
-          anchors.leftMargin : -40
+          anchors.topMargin : -nMargin
+          anchors.leftMargin : -nMargin
           anchors.top : parent.top
           source:"image://theme/icon-m-search"
           onClicked: Qt.openUrlExternally("https://www.google.com/search?q="+sSearchQuery);
@@ -210,12 +211,7 @@ Page {
         height: idTabMain.height - idTabRow.height - idTitle.height - 20
         visible:false
 
-        Text {
-          font.pixelSize: Theme.fontSizeTiny
-          color:Theme.primaryColor
-          y:  Screen.height - parent.y - 98
-          text: "Powered by Yandex.Translate "
-        }
+
       }
       TakeQuiz
       {
@@ -225,6 +221,14 @@ Page {
         visible:false
       }
 
+    }
+
+    Text {
+      visible:idTab2.visible
+      font.pixelSize: Theme.fontSizeTiny
+      color:Theme.primaryColor
+      y:  Screen.height - Theme.fontSizeTiny -2
+      text: "Powered by Yandex.Translate "
     }
   }
   /*

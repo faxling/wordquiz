@@ -311,14 +311,16 @@ Item {
     }
     Text {
       id: idDescText
+      font.pixelSize: Theme.fontSizeTiny
       color: Theme.highlightColor
       anchors.top: idImport.top
-      anchors.topMargin: 20
+      anchors.topMargin: 10
       x: 20
       text: "---"
     }
     Text {
       id: idDescDate
+      font.pixelSize: Theme.fontSizeTiny
       color: Theme.highlightColor
       anchors.top: idDescText.bottom
       anchors.topMargin: 5

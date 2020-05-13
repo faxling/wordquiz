@@ -138,7 +138,9 @@ Item {
         visible:!allok && (bIsReverse ? bHasSpeech : bHasSpeechFrom)
         anchors.right: parent.right
         anchors.rightMargin: 20
-        y : idBtnAnswer.y + idQuizColumn.y - 20
+        width: idBtnAnswer.width / 3
+        height: idBtnAnswer.width / 3
+        y : idBtnAnswer.y + idQuizColumn.y - 4
         source:"qrc:qml/pages/hornbig.png"
         onClicked: MyDownloader.playWord(question,bIsReverse ? sToLang : sFromLang )
       }
@@ -199,6 +201,8 @@ Item {
         ButtonQuizImg
         {
           anchors.horizontalCenter: parent.horizontalCenter
+          width: idBtnAnswer.width / 3
+          height: idBtnAnswer.width / 3
           visible: (bIsReverse ? bHasSpeechFrom : bHasSpeech) && bAnswerVisible
           source:"qrc:qml/pages/hornbig.png"
           onClicked: MyDownloader.playWord(idQuizModel.answer,sAnswerLang )
