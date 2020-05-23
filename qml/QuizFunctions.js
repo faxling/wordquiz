@@ -1,5 +1,5 @@
 function sortModel() {
-  db.transaction(function (tx) {
+  db.readTransaction(function (tx) {
     QuizLib.loadFromDb(tx)
   })
 }
@@ -496,7 +496,7 @@ function loadFromServerList(nCount, oDD) {
 
   idServerListView.currentIndex = nLastIndex
   idServerListView.positionViewAtIndex(nLastIndex,
-                                 ListView.Center)
+                                       ListView.Center)
 }
 
 function quizDeleted(nResponce) {
@@ -692,9 +692,17 @@ function updateQuiz() {
 
     // Assign The updated values
     if (idQuizModel.number === nNumber) {
-      idQuizModel.question = sQ
-      idQuizModel.answer = sA_Org
       idQuizModel.extra = sE
+      if ( bIsReverse )
+      {
+        idQuizModel.question = sA_Org
+        idQuizModel.answer = sQ
+      }
+      else
+      {
+        idQuizModel.question = sQ
+        idQuizModel.answer = sA_Org
+      }
     }
   })
 
@@ -703,13 +711,25 @@ function updateQuiz() {
   if (i >= 0) {
     if (nState !== 0) {
       glosModelWorking.remove(i)
-    } else {
-      glosModelWorking.get(i).answer = sA_Org
-      glosModelWorking.get(i).question = sQ
+    }
+    else
+    {
+      if ( bIsReverse )
+      {
+        glosModelWorking.get(i).answer = sQ
+        glosModelWorking.get(i).question = sA_Org
+      }
+      else
+      {
+        glosModelWorking.get(i).answer = sA_Org
+        glosModelWorking.get(i).question = sQ
+      }
       glosModelWorking.get(i).number = nNumber
       glosModelWorking.get(i).extra = sE
     }
-  } else {
+  }
+  else
+  {
     if (nState === 0) {
       glosModelWorking.append({
                                 "number": nNumber,

@@ -26,7 +26,7 @@ Page {
   property string sLangLangRev
   property string sToLang
   property string sFromLang
-  property string sQuestonLang : bIsReverse ? sToLang : sFromLang
+  property string sQuestionLang : bIsReverse ? sToLang : sFromLang
   property string sAnswerLang : bIsReverse ? sFromLang : sToLang
   property bool bIsReverse
   property bool bHasSpeech : sToLang !== "hu"
@@ -95,7 +95,7 @@ Page {
     onQuestionChanged:
     {
       idQuizModel.get(idWindow.nQuizIndex).question = question
-      MyDownloader.setImgWord(question,sQuestonLang )
+      MyDownloader.setImgWord(question,sQuestionLang )
     }
 
     ListElement {

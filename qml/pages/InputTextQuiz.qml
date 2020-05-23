@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 Rectangle
 {
+  signal gotFocus()
   property alias displayText : idTextInput.displayText
   property alias text : idTextInput.text
   color:"grey"
@@ -9,6 +10,11 @@ Rectangle
   height: Theme.fontSizeLarge
   TextInput
   {
+    onActiveFocusChanged:
+    {
+      if (activeFocus)
+        gotFocus()
+    }
     cursorDelegate : Rectangle
     {
       visible: idTextInput.focus

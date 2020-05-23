@@ -10,6 +10,7 @@ Item {
   id: idEditQuiz
   property int nLastSearch: 0
   property bool bTabActive: false
+  property bool bDoLookUppText1 : true
 
   onBTabActiveChanged: {
     if (bTabActive) {
@@ -41,8 +42,6 @@ Item {
     spacing: 20
     anchors.topMargin: 20
     anchors.fill: parent
-
-
 
     Item {
       id: idSearchResultRowItem
@@ -81,15 +80,18 @@ Item {
     }
 
     Row {
+      id: idIextInputToDictRow
       spacing: 20
       width: parent.width
       height: Theme.fontSizeLarge
       InputTextQuiz {
         id: idTextInput
+        onGotFocus:  bDoLookUppText1 = true
         width: parent.width / 2 - 10
       }
       InputTextQuiz {
         id: idTextInput2
+        onGotFocus:  bDoLookUppText1 = false
         width: parent.width / 2 - 10
       }
     }
@@ -140,19 +142,17 @@ Item {
       ButtonQuiz {
         id: idBtn3
         width: n4BtnWidth
-        text: sLangLangEn
+        text:   (bDoLookUppText1 ? sQuestionLang : sAnswerLang) + " Wiki"
         onClicked: {
-          nLastSearch = 2
-          var oInText = QuizLib.getTextFromInput(idTextInput)
-          if (oInText.length < 1) {
-            return
-          }
+          var oInText
+          var sLang = bDoLookUppText1 ? sQuestionLang : sAnswerLang
 
-          bProgVisible = true
-          if (bHasDictTo)
-            QuizLib.downloadDictOnWord(sReqDictUrlEn, oInText)
-          idTranslateModel.oBtn = idBtn3
-          idTranslateModel.source = sReqUrlEn + oInText
+          if (bDoLookUppText1)
+            oInText   = QuizLib.getTextFromInput(idTextInput)
+          else
+            oInText   = QuizLib.getTextFromInput(idTextInput2)
+
+          onClicked: Qt.openUrlExternally("http://"+sLang+ ".wiktionary.org/w/index.php?title=" +oInText.toLowerCase() )
         }
       }
 
@@ -167,7 +167,7 @@ Item {
 
     Row {
       id: idDictRow
-      height: n4BtnWidth
+      height: n4BtnWidth - 20
       width: parent.width
 
       TextList {
@@ -213,6 +213,7 @@ Item {
       }
       ListView {
         model: idTrSynModel
+        clip: true
         width: n3BtnWidth
         height: parent.height
         delegate: TextList {
@@ -239,12 +240,13 @@ Item {
 
     Row {
       id: idTableHeaderRow
+      height : idHeader1Text.height - 20
       spacing: 5
       TextList {
         id: idHeader1Text
         color: "steelblue"
         font.bold: bQSort
-        width: n25BtnWidth
+        width: n3BtnWidth
         text: "Question"
         onClick: {
           bQSort = true
@@ -282,7 +284,11 @@ Item {
           width: n3BtnWidth
           text: question
           color: state1 === 0 ? Theme.primaryColor : "green"
-          onClick: idTextInput.text = question
+          onClick:
+          {
+            idTextInput.text = question
+            bDoLookUppText1 = true
+          }
         }
 
         TextList {
@@ -291,7 +297,11 @@ Item {
           text: answer
           font.bold: extra.length > 0
           color: state1 === 0 ? Theme.primaryColor : "green"
-          onClick: idTextInput2.text = answer
+          onClick:
+          {
+            idTextInput2.text = answer
+            bDoLookUppText1 = false
+          }
         }
 
         ButtonQuizImg {
