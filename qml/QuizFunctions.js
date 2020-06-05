@@ -105,7 +105,6 @@ function getAndInitDb() {
   db = Sql.LocalStorage.openDatabaseSync("GlosDB", "1.0",
                                          "Glos Databas!", 1000000)
 
-  Sql.LocalStorage.openDatabaseSync()
 
   db.transaction(function (tx) {
 
@@ -123,7 +122,10 @@ function getAndInitDb() {
           'CREATE TABLE IF NOT EXISTS GlosaDbDesc( dbnumber INT , desc1 TEXT)')
     tx.executeSql(
           'CREATE TABLE IF NOT EXISTS GlosaDbIndex( dbnumber INT , quizname TEXT, state1 TEXT, langpair TEXT )')
+
     rs = tx.executeSql('SELECT * FROM GlosaDbDesc')
+
+
     var oc = []
 
     for (var i = 0; i < rs.rows.length; i++) {
@@ -145,8 +147,11 @@ function getAndInitDb() {
     }
 
     var nRowLen = rs.rows.length
+    var ocRet = new Array(nRowLen);
+    MyDownloader.sortRowset(rs.rows.item, rs.rows, nRowLen, ocRet)
 
-    for (i = 0; i < nRowLen; i++) {
+    for (var j = 0; j < nRowLen; j++) {
+      i = ocRet[j]
       var nDbnumber = rs.rows.item(i).dbnumber
       var nN = oc.indexOfObject("dbnumber", nDbnumber)
       var sDesc = "-"

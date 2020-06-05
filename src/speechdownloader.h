@@ -9,6 +9,7 @@
 #include <QEventLoop>
 #include <QMap>
 #include <QVector>
+#include <QJSValue>
 class QAbstractListModel;
 class StopWatch;
 class Speechdownloader : public QObject
@@ -31,6 +32,7 @@ public:
   Q_INVOKABLE void pushIndex(int);
   Q_INVOKABLE int popIndex();
   bool isStackEmpty();
+  Q_INVOKABLE void sortRowset(QJSValue p,QJSValue p1, int nCount,  QJSValue jsArray);
   Q_INVOKABLE void downLoadAllSpeech(QVariant p,QString sLang);
   Q_INVOKABLE void initUrls(QVariant p);
   Q_INVOKABLE int  indexFromGlosNr(QVariant p, int nNr);

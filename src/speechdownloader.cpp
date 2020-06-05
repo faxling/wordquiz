@@ -545,6 +545,41 @@ void Speechdownloader::exportCurrentQuiz(QVariant p, QString sName, QString sLan
 {
   currentQuizCmd(p, sName, sLang, sPwd, sDesc, "store");
 }
+
+
+void Speechdownloader::sortRowset(QJSValue p0, QJSValue p1 , int nCount, QJSValue jsArray)
+{
+  using QI_i = std::pair<int , QString>;
+
+  QList<QI_i> ocQuizInfo;
+
+  for (int i = 0 ; i < nCount ; ++i)
+  {
+    QJSValueList oParList {i};
+    auto oFullItem = p0.callWithInstance(p1, oParList);
+    QI_i tItem;
+    tItem.first = i;
+    tItem.second = oFullItem.property("langpair").toString();
+    ocQuizInfo.push_back(tItem);
+  }
+
+  std::sort(ocQuizInfo.begin(),ocQuizInfo.end(), [](const QI_i& t1, const QI_i& t2)
+  {
+    QString s1 = t1.second;
+    QString s2 = t2.second;
+    std::sort(s1.begin(), s1.end());
+    std::sort(s2.begin(), s2.end());
+    return s1 < s2;
+  }
+  );
+
+  for (int i = 0 ; i < nCount ; ++i)
+  {
+    jsArray.setProperty(i, ocQuizInfo[i].first);
+  }
+
+}
+
 // {"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": sA, "extra": sE, "state1" : rs.rows.item(i).state }
 //0 answer
 //1 extra
