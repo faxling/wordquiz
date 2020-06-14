@@ -25,6 +25,7 @@ public:
   Q_INVOKABLE void updateCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
   Q_INVOKABLE void importQuiz(QString sName);
   Q_INVOKABLE void listQuiz();
+  Q_INVOKABLE void listQuizLang(QString sLang);
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, QString sId);
   Q_INVOKABLE void storeTextInputField(QObject* p);
   Q_INVOKABLE void storeCurrentIndex(int);

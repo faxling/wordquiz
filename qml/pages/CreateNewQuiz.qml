@@ -297,167 +297,33 @@ Item {
     }
   }
 
-  RectRounded {
+  DownLoad
+  {
     id: idImport
     y: 20
     visible: false
     width: parent.width
     height: parent.width / 1.5
-    onCloseClicked: {
-      idPwdDialog.visible = false
-      idDeleteQuiz.bProgVisible = false
-      idImport.visible = false
-      idPwdTextInput.text = ""
-    }
-    Text {
-      id: idDescText
-      font.pixelSize: Theme.fontSizeTiny
-      color: Theme.highlightColor
-      anchors.top: idImport.top
-      anchors.topMargin: 10
-      x: 20
-      text: "---"
-    }
-    Text {
-      id: idDescDate
-      font.pixelSize: Theme.fontSizeTiny
-      color: Theme.highlightColor
-      anchors.top: idDescText.bottom
-      anchors.topMargin: 5
-      x: 20
-      text: "-"
+  }
+
+  RectRounded
+  {
+    id:idErrorDialog
+    visible:false
+    anchors.horizontalCenter: parent.horizontalCenter
+    y:20
+    height : nDlgHeight
+    width: parent.width
+
+    Label {
+      x:20
+      anchors.top : idErrorDialog.bottomClose
+      text:"'" +idTextInputQuizName.displayText + "'" + " To short Quiz name"
     }
 
-    TextList {
-      id: idImportMsg
-      x: parent.width / 2
-      anchors.top: idDescText.top
-      color: "red"
-      text: ""
-    }
-
-    TextList {
-      id: idImportTitle
-      x: 10
-      color: "steelblue"
-      anchors.top: idImport.bottomClose
-      text: "Downloadable Quiz's"
-    }
-    TextList {
-      anchors.right: idImport.right
-      anchors.top: idImport.bottomClose
-      anchors.rightMargin: 20
-      color: "steelblue"
-      text: "Questions"
-    }
-
-    property string sSelectedQ: ""
-    ListViewHi {
-      id: idServerListView
-      anchors.top: idImportTitle.bottom
-      width: idImport.width - 20
-      x: 10
-      height: parent.height - idDeleteQuiz.height * 3 + 10
-      model: idServerQModel
-      delegate: Item {
-        property int nW: idServerListView.width / 6
-        width: idServerListView.width
-        height: idServerRow.height
-        Row {
-          id: idServerRow
-          TextList {
-            width: nW * 4
-            id: idTextQname
-            text: qname
-            onClick: {
-              idImportMsg.text = ""
-              idDescText.text = desc1
-              idDescDate.text = date1
-              idImport.sSelectedQ = qname
-              idServerListView.currentIndex = index
-            }
-          }
-
-          TextList {
-            width: nW
-            text: code
-            height: parent.height
-          }
-
-          TextList {
-            width: nW
-            text: state1
-            height: parent.height
-          }
-        }
-      }
-    }
-    RectRounded {
-      id: idPwdDialog
-      border.width: 2
-      border.color: Theme.primaryColor
-      showClose: false
-      visible: false
-      height: 70
-      anchors.bottom: idDeleteQuiz.top
-      anchors.bottomMargin: 60
-      width: idServerListView.width
-      Row {
-        x: 20
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: 20
-        TextList {
-          id: idPwdLabelText
-          font.pixelSize: Theme.fontSizeExtraSmall
-          anchors.verticalCenter: parent.verticalCenter
-          text: "Password to remove '" + idImport.sSelectedQ + "'"
-        }
-
-        InputTextQuiz {
-          width: idServerListView.width - idPwdLabelText.width - 60
-          id: idPwdTextInput
-        }
-      }
-    }
-
-    ButtonQuiz {
-      id: idDeleteQuiz
-      width: n4BtnWidth
-      text: "Remove"
-      anchors.bottom: parent.bottom
-      anchors.bottomMargin: 20
-      anchors.right: idLoadQuiz.left
-      anchors.rightMargin: 20
-      onClicked: {
-
-        idTextInputQuizName.text = idImport.sSelectedQ
-        idPwdTextInput.text = idPwdTextInput.displayText
-        if (idPwdTextInput.text.length > 0) {
-          bProgVisible = true
-          idPwdDialog.visible = false
-          MyDownloader.deleteQuiz(idImport.sSelectedQ,
-                                  idPwdTextInput.displayText,
-                                  idServerListView.currentIndex)
-          idPwdTextInput.text = ""
-        } else
-          idPwdDialog.visible = true
-      }
-    }
-
-    ButtonQuiz {
-      id: idLoadQuiz
-      text: "Download"
-      width: n4BtnWidth
-      anchors.bottom: parent.bottom
-      anchors.bottomMargin: 20
-      anchors.right: parent.right
-      anchors.rightMargin: 20
-      onClicked: {
-        bProgVisible = true
-        idTextInputQuizName.text = idImport.sSelectedQ
-        sQuizName  = idImport.sSelectedQ
-        MyDownloader.importQuiz(idImport.sSelectedQ)
-      }
+    onCloseClicked:
+    {
+      idErrorDialog.visible = false
     }
   }
 
@@ -492,15 +358,7 @@ Item {
       anchors.rightMargin: 20
       text: "Rename"
       onClicked: {
-        glosModelIndex.setProperty(idQuizList.currentIndex, "quizname",
-                                   idQuizNameInput.displayText.trim())
-        db.transaction(function (tx) {
-          var nId = glosModelIndex.get(idQuizList.currentIndex).number
-          tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',
-                        [idQuizNameInput.displayText.trim(), nId])
-          idTextSelected.text = idQuizNameInput.displayText
-          sQuizName = idTextSelected.text
-        })
+        QuizLib.renameQuiz()
         idEditQuizEntryDlg.visible = false
       }
     }

@@ -27,6 +27,7 @@ HEADERS += \
 
 DISTFILES += qml/harbour-wordquiz.qml \
     qml/cover/CoverPage.qml \
+    qml/pages/DownLoad.qml \
     qml/pages/FirstPage.qml \
     qml/pages/ButtonQuiz.qml \
     qml/pages/CreateNewQuiz.qml \

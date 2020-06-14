@@ -239,6 +239,8 @@ function insertGlosa(dbnumber, nC, question, answer) {
     idQuizModel.number = nC
     idQuizModel.extra = ""
   }
+
+
 }
 
 function assignQuizModel(nIndexOfNewWord) {
@@ -262,6 +264,7 @@ function assignQuizModel(nIndexOfNewWord) {
 function loadQuiz() {
   glosModelWorking.clear()
   setAllok(false)
+  bIsReverse = false
 
   if (glosModel.count < 1) {
     idQuizModel.question = "-"
@@ -272,8 +275,6 @@ function loadQuiz() {
   }
 
   var nC = glosModel.count
-
-  bIsReverse = false
 
   var i
   for (i = 0; i < nC; ++i) {
@@ -376,6 +377,27 @@ function loadFromDb(tx) {
   }
 }
 
+
+function renameQuiz()
+{
+  if (idTextInputQuizName.displayText.length < 4)
+  {
+    idErrorDialog.visible = true
+    return;
+  }
+
+  sQuizName = idTextInputQuizName.displayText
+  glosModelIndex.setProperty(idQuizList.currentIndex,"quizname",sQuizName)
+  db.transaction(
+        function(tx) {
+          var nId = glosModelIndex.get(idQuizList.currentIndex).number;
+          console.log("name " + sQuizName)
+          tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',[sQuizName, nId]);
+          idTextSelected.text = sQuizName
+        }
+        )
+}
+
 function loadFromQuizList() {
 
   db = getAndInitDb()
@@ -386,7 +408,9 @@ function loadFromQuizList() {
   })
 
   if (glosModelIndex.count === 0)
+  {
     return
+  }
 
   sQuizName = glosModelIndex.get(idQuizList.currentIndex).quizname
   sLangLang = glosModelIndex.get(idQuizList.currentIndex).langpair
@@ -452,23 +476,25 @@ function newQuiz() {
 
     idQuizList.positionViewAtEnd()
     idQuizList.currentIndex = glosModelIndex.count - 1
+    if (idQuizList.currentIndex === 0)
+      idWindow.quizListView.currentIndexChanged()
   })
 }
 
 function loadFromServerList(nCount, oDD) {
-  var nLastIndex = idServerListView.currentIndex
+var nLastSelected = -1
+  var sLastSelectedQ =  idImport.sSelectedQ
   idServerQModel.clear()
   idDownloadBtn.bProgVisible = false
 
-  idImport.visible = true
+  // idImport.state = ""
+
   if (nCount === 0) {
-    idDescText.text = ""
+    idImport.sDescDate = ""
+    idImport.sDesc1 = ""
     idImport.sSelectedQ = ""
     return
   }
-
-  idDescText.text = ""
-  idImport.sSelectedQ = ""
 
   var nIndex = 0
 
@@ -482,10 +508,11 @@ function loadFromServerList(nCount, oDD) {
     if (ocDesc.length > 1)
       sDate = ocDesc[1]
 
-    if (nIndex === nLastIndex) {
-      idDescDate.text = sDate
-      idDescText.text = sDesc1
+    if (sLastSelectedQ === oDD[i]) {
+      idImport.sDescDate = sDate
+      idImport.sDesc1 = sDesc1
       idImport.sSelectedQ = oDD[i]
+      nLastSelected = nIndex
     }
 
     nIndex++
@@ -499,25 +526,37 @@ function loadFromServerList(nCount, oDD) {
                           })
   }
 
-  idServerListView.currentIndex = nLastIndex
-  idServerListView.positionViewAtIndex(nLastIndex,
-                                       ListView.Center)
+  console.log("nLastSelected " + nLastSelected)
+  if (nLastSelected >= 0)
+  {
+    idImport.currentIndex = nLastSelected
+    idImport.positionViewAtIndex(nLastSelected)
+  }
+  else
+  {
+    idImport.currentIndex = -1
+    idImport.sDescDate = "-"
+    idImport.sDesc1 = "-"
+    idImport.sSelectedQ = "-"
+  }
+
+  idImport.bIsDownloading = false
 }
 
 function quizDeleted(nResponce) {
-  idDeleteQuiz.bProgVisible = false
-  idDescText.text = ""
+  idImport.bIsDeleting = false
+  idImport.sDesc1 = ""
 
   if (nResponce >= 0) {
     idServerQModel.remove(nResponce)
     if (nResponce > 0) {
-      idServerListView.currentIndex = nResponce - 1
-      idDescText.text = idServerQModel.get(nResponce - 1).desc1
+      idImport.currentIndex = nResponce - 1
+      idImport.sDesc1 = idServerQModel.get(nResponce - 1).desc1
       idImport.sSelectedQ = idServerQModel.get(nResponce - 1).qname
-      idImportMsg.text = ""
+      idImport.sImportMsg = ""
     }
   } else
-    idImportMsg.text = "Not deleted"
+    idImport.sImportMsg = "Not deleted"
 }
 
 function quizExported(nResponce) {
@@ -547,7 +586,7 @@ function loadFromList(nCount, oDD, sLangLoaded) {
 
   if (nCount < 0) {
     idLoadQuiz.bProgVisible = false
-    idImportMsg.text = "error importing"
+    idImport.sImportMsg = "error importing"
     return
   }
 
@@ -565,7 +604,8 @@ function loadFromList(nCount, oDD, sLangLoaded) {
 
     var sState1 = nCount / 3 + "/" + nCount / 3
     tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)',
-                  [nDbNumber, idDescText.text])
+                  [nDbNumber, idImport.sDesc1])
+
     tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',
                   [nDbNumber, sQuizName, sState1, sLangLoaded])
 
@@ -574,7 +614,7 @@ function loadFromList(nCount, oDD, sLangLoaded) {
                             "quizname": sQuizName,
                             "state1": sState1,
                             "langpair": sLangLoaded,
-                            "desc1": idDescText.text
+                            "desc1": idImport.sDesc1
                           })
 
     // answer, question , state
@@ -592,8 +632,10 @@ function loadFromList(nCount, oDD, sLangLoaded) {
       tx.executeSql('INSERT INTO Glosa' + nNr + ' VALUES(?, ?, ?, ?)',
                     [nNumber, oDD[i + 2], sAnswString, 0])
     }
-    idLoadQuiz.bProgVisible = false
-    idImport.visible = false
+
+    idImport.bIsDownloading = false
+    idImport.state = ""
+
     idQuizList.currentIndex = glosModelIndex.count - 1
     if (idQuizList.currentIndex === 0)
       idWindow.quizListView.currentIndexChanged()

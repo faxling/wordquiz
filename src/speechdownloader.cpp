@@ -390,12 +390,12 @@ void Speechdownloader::playWord(QString sWord, QString sLang)
   QFileInfo oWavFile(sFileName);
   if (oWavFile.size() > 10000)
   {
-    qDebug() << sFileName;
     QSound::play(sFileName);
   }
   else
   {
     m_bPlayAfterDownload = true;
+    qDebug() << "Download " << sWord;
     downloadWord(sWord, sLang);
   }
 }
@@ -438,6 +438,12 @@ void Speechdownloader::downloadWord(QString sWord, QString sLang)
   m_oWordNetMgr.get(request);
 }
 
+void  Speechdownloader::listQuizLang(QString sLang)
+{
+  QString sUrl = (GLOS_SERVER2 ^ "quizlist_lang.php?qlang=") + sLang;
+  QNetworkRequest request(sUrl);
+  m_oListQuizNetMgr.get(request);
+}
 
 void  Speechdownloader::listQuiz()
 {

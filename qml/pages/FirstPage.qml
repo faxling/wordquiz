@@ -42,6 +42,7 @@ Page {
   property int n4BtnWidth: idTabMain.width / 4 - 7
   property int n25BtnWidth: idTabMain.width / 2.4 - 7
   property int n2BtnWidth: idTabMain.width / 2
+  property int nDlgHeight: idWindow.height / 5 + 45
   property bool bQSort : true
   property string sQSort : bQSort ? "UPPER(quizword)" : "UPPER(answer)"
   property variant glosListView
@@ -141,8 +142,16 @@ Page {
         height: idTitle.height
         Label {
           id: idTitle
+          font.italic: glosModelIndex.count === 0
           anchors.horizontalCenter: parent.horizontalCenter
-          text: sQuizName + " " + sFromLang + (bIsReverse ? "<-" : "->") +  sToLang + " " + sScoreText
+          text: {
+            if (glosModelIndex.count === 0)
+              return "No Quiz create one or download"
+
+            return sQuizName + " " + sFromLang + (bIsReverse ? "<-" : "->") +  sToLang + " " + sScoreText
+
+          }
+
           onTextChanged: sAppTitle = sQuizName
         }
 
@@ -185,6 +194,7 @@ Page {
         {
           id:idTab2Btn
           width: n3BtnWidth
+          enabled: glosModelIndex.count > 0
           text:"Edit"
           onClicked:  idWindow.state =  "idTab2"
         }
@@ -192,6 +202,7 @@ Page {
         {
           id:idTab3Btn
           width: n3BtnWidth
+          enabled: glosModelIndex.count > 0
           text:"Quiz"
           onClicked:  idWindow.state ="idTab3"
         }
@@ -210,8 +221,6 @@ Page {
         width:parent.width
         height: idTabMain.height - idTabRow.height - idTitle.height - 20
         visible:false
-
-
       }
       TakeQuiz
       {
