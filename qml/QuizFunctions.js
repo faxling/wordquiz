@@ -24,20 +24,28 @@ function getTextFromInput(oTextInput) {
 
 function updateDesc1(sDesc) {
 
-  var nDbId = glosModelIndex.get(idQuizList.currentIndex).number
+  var nCurIndexInQList = idWindow.quizListView.currentIndex
 
-  glosModelIndex.get(idQuizList.currentIndex).desc1 = sDesc
-  idDescTextOnPage.text = sDesc
+  var nDbId = glosModelIndex.get(nCurIndexInQList).number
+
+  glosModelIndex.get(nCurIndexInQList).desc1 = sDesc
+
+  idWindow.sQuizDesc = sDesc
+
+  var sDateStr = MyDownloader.dateStr()
+  var sDescAndDate = sDesc + "###" +sDateStr
+  glosModelIndex.get(nCurIndexInQList).descdate = sDateStr
+  idWindow.sQuizDate = glosModelIndex.get(nCurIndexInQList).descdate
 
   db.transaction(function (tx) {
     var rs = tx.executeSql("SELECT dbnumber FROM GlosaDbDesc WHERE dbnumber=?",
                            [nDbId])
     if (rs.rows.length > 0) {
       tx.executeSql("UPDATE GlosaDbDesc SET desc1=? WHERE dbnumber=?",
-                    [sDesc, nDbId])
+                    [sDescAndDate, nDbId])
     } else {
       tx.executeSql("INSERT INTO GlosaDbDesc (desc1 , dbnumber) VALUES(?,?)",
-                    [sDesc, nDbId])
+                    [sDescAndDate, nDbId])
     }
   })
 }
@@ -154,12 +162,11 @@ function getAndInitDb() {
       i = ocRet[j]
       var nDbnumber = rs.rows.item(i).dbnumber
       var nN = oc.indexOfObject("dbnumber", nDbnumber)
-      var sDesc = "-"
-      if (nN >= 0) {
-        sDesc = oc[nN].desc1
-      }
+      var vDescDate
 
-      console.debug("quizname - " + rs.rows.item(i).quizname)
+      if (nN >= 0) {
+        vDescDate = oc[nN].desc1
+      }
 
       glosModelIndex.append({
                               "number": nDbnumber,
@@ -167,7 +174,8 @@ function getAndInitDb() {
                                                           i).quizname),
                               "state1": rs.rows.item(i).state1,
                               "langpair": rs.rows.item(i).langpair,
-                              "desc1": sDesc
+                              "desc1": getDesc(vDescDate),
+                              "descdate":getDate(vDescDate)
                             })
     }
 
@@ -296,16 +304,15 @@ function loadQuiz() {
   if (glosModelWorking.count === 0) {
     setAllok(true)
   } else {
-    console.log("loadQuiz " + sQuizName)
     assignQuizModel(nIndexOwNewWord)
   }
 }
 
 function capitalizeStr(inStr) {
   if (inStr === null)
-    return
+    return ""
   if (inStr.length === 0)
-    return
+    return ""
   var sA = inStr.trim()
   sA =  sA.charAt(0).toUpperCase() + inStr.slice(1)
   return sA
@@ -319,8 +326,6 @@ function loadFromDb(tx) {
   if (oGlosaItem !== undefined) {
     nCurrentNumber = oGlosaItem.number
   }
-
-  console.log("nCurrentNumber " + nCurrentNumber)
 
   glosModel.clear()
 
@@ -378,20 +383,20 @@ function loadFromDb(tx) {
 }
 
 
-function renameQuiz()
+function renameQuiz(sQuizName)
 {
-  if (idTextInputQuizName.displayText.length < 4)
+  sQuizName = capitalizeStr(sQuizName)
+  if (sQuizName.length < 4)
   {
     idErrorDialog.visible = true
     return;
   }
 
-  sQuizName = idTextInputQuizName.displayText
+
   glosModelIndex.setProperty(idQuizList.currentIndex,"quizname",sQuizName)
   db.transaction(
         function(tx) {
           var nId = glosModelIndex.get(idQuizList.currentIndex).number;
-          console.log("name " + sQuizName)
           tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',[sQuizName, nId]);
           idTextSelected.text = sQuizName
         }
@@ -416,9 +421,9 @@ function loadFromQuizList() {
   sLangLang = glosModelIndex.get(idQuizList.currentIndex).langpair
   nDbNumber = glosModelIndex.get(idQuizList.currentIndex).number
   sScoreText = glosModelIndex.get(idQuizList.currentIndex).state1
-  idDescTextOnPage.text = glosModelIndex.get(idQuizList.currentIndex).desc1
-  idTextInputQuizDesc.text = idDescTextOnPage.text
-
+  idWindow.sQuizDesc = glosModelIndex.get(idQuizList.currentIndex).desc1
+  idWindow.sQuizDate = glosModelIndex.get(idQuizList.currentIndex).descdate
+  idTextInputQuizDesc.text = idWindow.sQuizDesc
   var res = sLangLang.split("-")
   sLangLangRev = res[1] + "-" + res[0]
   sToLang = res[1]
@@ -448,6 +453,7 @@ function loadFromQuizList() {
 }
 
 function newQuiz() {
+
   db.transaction(function (tx) {
     glosModel.clear()
     var rs = tx.executeSql('SELECT MAX(dbnumber) as newnr FROM GlosaDbIndex')
@@ -456,22 +462,22 @@ function newQuiz() {
       nNr = rs.rows.item(0).newnr + 1
     }
 
-    sQuizName = idTextInputQuizName.displayText.trim()
+    sQuizName = capitalizeStr(idTextInputQuizName.displayText)
 
     if (sQuizName.length < 3)
       sQuizName = "New Quiz " + sLangLangSelected
 
-    idTextInputQuizName.text = " "
-    idTextInputQuizName.text =""
     tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',
                   [nNr, sQuizName, "0/0", sLangLangSelected])
     tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)', [nNr, "-"])
-    glosModelIndex.append({
+
+    glosModelIndex.append( {
                             "number": nNr,
                             "quizname": sQuizName,
                             "state1": "0/0",
                             "langpair": sLangLangSelected,
-                            "desc1": "-"
+                            "desc1": "-",
+                            "descdate":MyDownloader.dateStr()
                           })
 
     idQuizList.positionViewAtEnd()
@@ -481,13 +487,37 @@ function newQuiz() {
   })
 }
 
+function getDesc(sDescAndDate)
+{
+  if (sDescAndDate === undefined)
+    return "-"
+
+  var ocDesc = sDescAndDate.split("###")
+
+  return ocDesc[0]
+}
+
+
+function getDate(sDescAndDate)
+{
+  if (sDescAndDate === undefined)
+    return "-"
+
+  var ocDesc = sDescAndDate.split("###")
+
+  if (ocDesc.length > 1)
+    return ocDesc[1]
+  else
+    return "-"
+}
+
 function loadFromServerList(nCount, oDD) {
-var nLastSelected = -1
+  var nLastSelected = -1
   var sLastSelectedQ =  idImport.sSelectedQ
   idServerQModel.clear()
   idDownloadBtn.bProgVisible = false
-
-  // idImport.state = ""
+  idImport.bIsDownloadingList = false
+  idImport.state = "Back"
 
   if (nCount === 0) {
     idImport.sDescDate = ""
@@ -499,18 +529,11 @@ var nLastSelected = -1
   var nIndex = 0
 
   for (var i = 0; i < nCount; i += 4) {
-
-    var ocDesc = oDD[i + 1].split("###")
-    var sDate = "-"
-
-    var sDesc1 = ocDesc[0]
-
-    if (ocDesc.length > 1)
-      sDate = ocDesc[1]
+    var sDescAndDate = oDD[i + 1]
 
     if (sLastSelectedQ === oDD[i]) {
-      idImport.sDescDate = sDate
-      idImport.sDesc1 = sDesc1
+      idImport.sDescDate = getDate(sDescAndDate)
+      idImport.sDesc1 = getDesc(sDescAndDate)
       idImport.sSelectedQ = oDD[i]
       nLastSelected = nIndex
     }
@@ -519,14 +542,13 @@ var nLastSelected = -1
 
     idServerQModel.append({
                             "qname": oDD[i],
-                            "desc1": sDesc1,
+                            "desc1": getDesc(sDescAndDate),
                             "code": oDD[i + 2],
                             "state1": oDD[i + 3],
-                            "date1": sDate
+                            "date1": getDate(sDescAndDate)
                           })
   }
 
-  console.log("nLastSelected " + nLastSelected)
   if (nLastSelected >= 0)
   {
     idImport.currentIndex = nLastSelected
@@ -540,7 +562,7 @@ var nLastSelected = -1
     idImport.sSelectedQ = "-"
   }
 
-  idImport.bIsDownloading = false
+
 }
 
 function quizDeleted(nResponce) {
@@ -604,7 +626,7 @@ function loadFromList(nCount, oDD, sLangLoaded) {
 
     var sState1 = nCount / 3 + "/" + nCount / 3
     tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)',
-                  [nDbNumber, idImport.sDesc1])
+                  [nDbNumber, idImport.sDesc1 +"###" + idImport.sDescDate])
 
     tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',
                   [nDbNumber, sQuizName, sState1, sLangLoaded])
@@ -614,7 +636,8 @@ function loadFromList(nCount, oDD, sLangLoaded) {
                             "quizname": sQuizName,
                             "state1": sState1,
                             "langpair": sLangLoaded,
-                            "desc1": idImport.sDesc1
+                            "desc1": idImport.sDesc1,
+                            "descdate":idImport.sDescDate
                           })
 
     // answer, question , state
@@ -806,9 +829,17 @@ function updateQuiz() {
                           sToLang)
   MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).question,
                           sFromLang)
-  glosModel.get(idGlosList.currentIndex).question = sQ
-  glosModel.get(idGlosList.currentIndex).answer = sA_Org
-  glosModel.get(idGlosList.currentIndex).extra = sE
+
+  if (glosModel.get(idGlosList.currentIndex).question !== sQ
+      || glosModel.get(idGlosList.currentIndex).answer !== sA_Org
+      || glosModel.get(idGlosList.currentIndex).extra !== sE)
+  {
+    glosModel.get(idGlosList.currentIndex).question = sQ
+    glosModel.get(idGlosList.currentIndex).answer = sA_Org
+    glosModel.get(idGlosList.currentIndex).extra = sE
+    updateDesc1(idWindow.sQuizDesc)
+  }
+
   glosModel.get(idGlosList.currentIndex).state1 = nState
 }
 
@@ -879,9 +910,6 @@ function Timer() {
 function calcAndAssigNextQuizWord(currentIndex) {
   var nI = (currentIndex + 1) % 3
   var nLastIndex = idView.nLastIndex
-
-
-
 
   //nQuizIndex the index of the view with 3 items that swipes left or right
   nQuizIndex = nI

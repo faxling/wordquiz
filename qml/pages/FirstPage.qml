@@ -13,12 +13,9 @@ Page {
   property string sReqDictUrlRev
   property string sReqDictUrlEn
   property string sReqUrlBase
-
-
   property string sReqUrl
   property string sReqUrlRev
   property string sReqUrlEn
-
 
   property variant db
   property string sLangLangSelected
@@ -35,6 +32,8 @@ Page {
   property bool bHasDictFrom : sFromLang ==="ru" || sFromLang ==="en"
   property string sLangLangEn
   property string sQuizName : "-"
+  property string sQuizDate : "-"
+  property string sQuizDesc : "-"
   property string sScoreText : "-"
   property int nDbNumber : 0;
   property int nQuizIndex: 1
@@ -65,6 +64,7 @@ Page {
           }
           )
   }
+
 
 
   ListModel {

@@ -48,6 +48,7 @@ public:
   Q_INVOKABLE void setImgFile(QString sWord, QString sLang,QString sWord2, QString sLang2, QString sImgFilePath);
   Q_PROPERTY(QUrl urlImg READ urlImg NOTIFY urlImgChanged)
   Q_PROPERTY(bool hasImg READ hasImg NOTIFY hasImgChanged)
+  Q_INVOKABLE QString dateStr();
 signals:
   void quizDownloadedSignal(int nQCount, QVariantList oDD, QString sLang);
   void quizListDownloadedSignal(int nQCount, QStringList oDD);

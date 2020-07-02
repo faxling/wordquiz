@@ -2,12 +2,13 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 RectRounded {
-  id: idImport
+  id: idContainer
   y: 20
   visible: false
   width: parent.width
   height: parent.width / 1.5
   property bool bIsDownloading : false
+  property bool bIsDownloadingList
   property bool bIsDeleting : false
   property string sSelectedQ
   property string sImportMsg: ""
@@ -22,10 +23,11 @@ RectRounded {
                                          ListView.Center)
   }
 
+
   onCloseClicked: {
+    idContainer.visible = false
     idPwdDialog.visible = false
     bIsDeleting = false
-    idImport.state = ""
     idPwdTextInput.text = ""
   }
 
@@ -36,7 +38,7 @@ RectRounded {
     anchors.top: idImport.top
     anchors.topMargin: 10
     x: 20
-    text: "---"
+    text: sDesc1
   }
 
   Text {
@@ -46,7 +48,7 @@ RectRounded {
     anchors.top: idDescText.bottom
     anchors.topMargin: 5
     x: 20
-    text: "-"
+    text: sDescDate
   }
 
   TextList {
@@ -54,7 +56,7 @@ RectRounded {
     x: parent.width / 2
     anchors.top: idDescText.top
     color: "red"
-    text: ""
+    text: sImportMsg
   }
 
   TextList {
@@ -90,10 +92,10 @@ RectRounded {
           id: idTextQname
           text: qname
           onClick: {
-            idImportMsg.text = ""
-            idDescText.text = desc1
-            idDescDate.text = date1
-            idImport.sSelectedQ = qname
+            idContainer.sImportMsg = ""
+            idContainer.sDesc1 = desc1
+            idContainer.sDescDate = date1
+            idContainer.sSelectedQ = qname
             idServerListView.currentIndex = index
           }
         }
@@ -184,10 +186,10 @@ RectRounded {
     }
   }
 
-
-  states:
+  states: [
     State {
-      name: "Show"
+      name: "Back"
       PropertyChanges { target: idContainer; visible: true }
-    }
+    } ]
+
 }

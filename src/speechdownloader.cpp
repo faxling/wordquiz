@@ -104,6 +104,14 @@ QString Speechdownloader::ignoreAccent(QString str)
 
 }
 
+QString Speechdownloader::dateStr()
+{
+  const wchar_t* szFormat = L"%Y-%m-%d  %H:%M";
+  wchar_t szStr[20];
+  time_t tNow = time(0);
+  wcsftime(szStr, 20, szFormat, localtime(&tNow));
+  return  QString::fromWCharArray(szStr);
+}
 
 void Speechdownloader::setImgWord(QString sWord, QString sLang)
 {
@@ -129,9 +137,7 @@ void Speechdownloader::setImgWord(QString sWord, QString sLang)
 
 QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
 {
-
   return QUrl::fromLocalFile(ImgPath(sWord, sLang));
-
 }
 
 void Speechdownloader::checkAndEmit(QString sPath1, QString sPath2)
@@ -344,6 +350,8 @@ void Speechdownloader::listDownloaded(QNetworkReply* pReply)
     QString s2 = t2.slang;
     std::sort(s1.begin(), s1.end());
     std::sort(s2.begin(), s2.end());
+    if (s1 == s2)
+      return t1.qname < t2.qname;
     return s1 < s2;
   }
   );
@@ -555,7 +563,12 @@ void Speechdownloader::exportCurrentQuiz(QVariant p, QString sName, QString sLan
 
 void Speechdownloader::sortRowset(QJSValue p0, QJSValue p1 , int nCount, QJSValue jsArray)
 {
-  using QI_i = std::pair<int , QString>;
+  struct QI_i
+  {
+    int nNr;
+    QString sLangPair;
+    QString sQname;
+  };
 
   QList<QI_i> ocQuizInfo;
 
@@ -564,24 +577,27 @@ void Speechdownloader::sortRowset(QJSValue p0, QJSValue p1 , int nCount, QJSValu
     QJSValueList oParList {i};
     auto oFullItem = p0.callWithInstance(p1, oParList);
     QI_i tItem;
-    tItem.first = i;
-    tItem.second = oFullItem.property("langpair").toString();
+    tItem.nNr = i;
+    tItem.sLangPair = oFullItem.property("langpair").toString();
+    tItem.sQname = oFullItem.property("quizname").toString();
     ocQuizInfo.push_back(tItem);
   }
 
   std::sort(ocQuizInfo.begin(),ocQuizInfo.end(), [](const QI_i& t1, const QI_i& t2)
   {
-    QString s1 = t1.second;
-    QString s2 = t2.second;
+    QString s1 = t1.sLangPair;
+    QString s2 = t2.sLangPair;
     std::sort(s1.begin(), s1.end());
     std::sort(s2.begin(), s2.end());
+    if (s1 == s2)
+      return t1.sQname < t2.sQname;
     return s1 < s2;
   }
   );
 
   for (int i = 0 ; i < nCount ; ++i)
   {
-    jsArray.setProperty(i, ocQuizInfo[i].first);
+    jsArray.setProperty(i, ocQuizInfo[i].nNr);
   }
 
 }

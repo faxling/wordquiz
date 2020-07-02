@@ -267,8 +267,8 @@ Item {
     }
     ListViewHi {
       id: idGlosList
-      height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6.2
-              - idTextInput.height - idHeader1Text.height - Theme.itemSizeExtraSmall
+      height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6 - 40
+              - idTextInput.height - idHeader1Text.height
 
       width: parent.width
       spacing: 3

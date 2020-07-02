@@ -4,7 +4,7 @@ import QtQuick.LocalStorage 2.0 as Sql
 import "../QuizFunctions.js" as QuizLib
 
 Item {
-  property alias nQuizListCurrentIndex: idQuizList.currentIndex
+
 
 
   Column {
@@ -14,7 +14,15 @@ Item {
     anchors.bottomMargin: 50
     anchors.fill: parent
 
+    TextList
+    {
+      x:idDescText.x
+      id:idDateDesc1
+      text: idWindow.sQuizDate
+    }
+
     Row {
+      id:idDescText
       TextList {
         id: idTextSelected
         width: idTopColumn.width / 2
@@ -23,14 +31,14 @@ Item {
 
       TextList {
         id: idDescTextOnPage
-        text: "---"
+        text: idWindow.sQuizDesc
       }
     }
 
     InputTextQuiz {
       id: idTextInputQuizName
+      visible: idLangListRow.visible
       width: parent.width
-      text: "new"
     }
 
     Row {
@@ -42,11 +50,11 @@ Item {
         width: n3BtnWidth
 
         onClicked: {
-          QuizLib.newQuiz()
+          idLangListRow.visible = !idLangListRow.visible
         }
         Image {
           anchors.centerIn: parent
-          source: "image://theme/icon-m-add"
+          source: "image://theme/icon-m-add?" + (idLangListRow.visible ? Theme.highlightColor : Theme.primaryColor)
         }
       }
 
@@ -82,7 +90,8 @@ Item {
       id: idLangListRow
       width: parent.width
       height: n3BtnWidth
-      spacing: 20
+      spacing: 10
+      visible:false
 
       function doCurrentIndexChanged() {
         if (idLangList1.currentIndex < 0 || idLangList1.currentIndex < 0)
@@ -90,6 +99,7 @@ Item {
         sLangLangSelected = idLangModel.get(
               idLangList1.currentIndex).code + "-" + idLangModel.get(
               idLangList2.currentIndex).code
+        idTextInputQuizName.text =  "New Quiz " + sLangLangSelected
       }
 
       ListViewHi {
@@ -102,16 +112,28 @@ Item {
         model: idLangModel
         delegate: TextList {
           text: lang
+          width: idLangList1.width
           onClick: idLangList1.currentIndex = index
         }
       }
 
-      Text {
-        id: idLangPair
-        font.pixelSize: Theme.fontSizeLarge
-        width: n3BtnWidth
-        text: sLangLangSelected
-        color: Theme.primaryColor
+      Column
+      {
+        Text {
+          id: idLangPair
+          horizontalAlignment : Text.AlignHCenter
+          font.pixelSize: Theme.fontSizeLarge
+          width: n3BtnWidth
+          text: sLangLangSelected
+          color:Theme.primaryColor
+        }
+
+        ButtonQuiz
+        {
+          width: n3BtnWidth
+          text: "Create"
+          onClicked:  QuizLib.newQuiz()
+        }
       }
 
       ListViewHi {
@@ -125,6 +147,8 @@ Item {
 
         delegate: TextList {
           text: lang
+          width: idLangList1.width
+          horizontalAlignment: Text.AlignRight
           onClick: idLangList2.currentIndex = index
         }
       }
@@ -139,7 +163,7 @@ Item {
     ListViewHi {
       id: idQuizList
       width: parent.width
-      height: Theme.itemSizeMedium * 4
+      height: parent.height - idTextAvailable.x - idTextAvailable.height - idDownloadBtn.height*3 - (idLangListRow.visible ? n2BtnWidth : 0)
       model: glosModelIndex
       spacing: 5
 
@@ -318,7 +342,7 @@ Item {
     Label {
       x:20
       anchors.top : idErrorDialog.bottomClose
-      text:"'" +idTextInputQuizName.displayText + "'" + " To short Quiz name"
+      text:"'" +idQuizNameInput.displayText + "'" + " To short Quiz name"
     }
 
     onCloseClicked:
@@ -358,7 +382,7 @@ Item {
       anchors.rightMargin: 20
       text: "Rename"
       onClicked: {
-        QuizLib.renameQuiz()
+        QuizLib.renameQuiz(idQuizNameInput.displayText)
         idEditQuizEntryDlg.visible = false
       }
     }
@@ -390,8 +414,6 @@ Item {
                                        glosModelIndex.remove(
                                              idQuizList.currentIndex)
 
-                                       if (idQuizList.currentIndex > 0)
-                                         idQuizList.currentIndex = idQuizList.currentIndex - 1
                                        idEditQuizEntryDlg.visible = false
                                      })
     }
