@@ -99,7 +99,11 @@ Item {
         sLangLangSelected = idLangModel.get(
               idLangList1.currentIndex).code + "-" + idLangModel.get(
               idLangList2.currentIndex).code
-        idTextInputQuizName.text =  "New Quiz " + sLangLangSelected
+
+        var sPreFix = "New Quiz "
+        var nL = sPreFix.length
+        if ((idTextInputQuizName.text.substring(0,nL) === sPreFix) || idTextInputQuizName.text.length < 3)
+          idTextInputQuizName.text =  sPreFix + sLangLangSelected
       }
 
       ListViewHi {

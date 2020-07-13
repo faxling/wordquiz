@@ -109,9 +109,8 @@ Item {
           nLastSearch = 0
 
           var oInText = QuizLib.getTextFromInput(idTextInput)
-          if (oInText.length < 1) {
+          if (oInText === "")
             return
-          }
 
           bProgVisible = true
           if (bHasDictTo)
@@ -128,9 +127,8 @@ Item {
         onClicked: {
           nLastSearch = 1
           var oInText = QuizLib.getTextFromInput(idTextInput2)
-          if (oInText.length < 1) {
+          if (oInText === "")
             return
-          }
           bProgVisible = true
           if (bHasDictFrom)
             QuizLib.downloadDictOnWord(sReqDictUrlRev, oInText)
@@ -152,6 +150,8 @@ Item {
           else
             oInText   = QuizLib.getTextFromInput(idTextInput2)
 
+          if (oInText === "")
+            return
           onClicked: Qt.openUrlExternally("http://"+sLang+ ".wiktionary.org/w/index.php?title=" +oInText.toLowerCase() )
         }
       }
@@ -164,24 +164,25 @@ Item {
       }
     }
 
+    TextList {
+      id: idErrorText
+      visible: false
+      color: "red"
+      onClick: visible = false
+    }
+
+    TextList {
+      id: idErrorText2
+      visible: false
+      color: "red"
+      onClick: visible = false
+    }
 
     Row {
       id: idDictRow
       height: n4BtnWidth - 20
       width: parent.width
 
-      TextList {
-        id: idErrorText
-        visible: false
-        color: "red"
-        onClick: visible = false
-      }
-      TextList {
-        id: idErrorText2
-        visible: false
-        color: "red"
-        onClick: visible = false
-      }
 
       ListViewHi {
         id: idDicList

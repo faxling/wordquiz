@@ -1,3 +1,15 @@
+String.prototype.equalIgnoreCase = function(str) {
+  return this.toUpperCase() === str.toUpperCase();
+}
+
+Array.prototype.indexOfObject = function arrayObjectIndexOf(property, value) {
+  for (var i = 0, len = this.length; i < len; i++) {
+    if (this[i][property] === value)
+      return i
+  }
+  return -1
+}
+
 function sortModel() {
   db.readTransaction(function (tx) {
     QuizLib.loadFromDb(tx)
@@ -13,7 +25,7 @@ function resetTakeQuizTab() {
 }
 
 function getTextFromInput(oTextInput) {
-  var oInText = oTextInput.displayText.trim()
+  var oInText =  capitalizeStr(oTextInput.displayText)
   if (oInText.length < 1) {
     idErrorText.visible = true
     idErrorText.text = "No input to lookup in dictionary"
@@ -76,12 +88,15 @@ function getTextInputAndAdd() {
   var nC = 0
 
   var sNewWordFrom = QuizLib.getTextFromInput(idTextInput)
+  if (sNewWordFrom === "")
+    return
   var sNewWordTo = QuizLib.getTextFromInput(idTextInput2)
-
+  if (sNewWordTo === "")
+    return
   var i
   for (i = 0; i < glosModel.count; i++) {
-    if (glosModel.get(i).question === sNewWordFrom && glosModel.get(
-          i).answer === sNewWordTo) {
+    if (sNewWordFrom.equalIgnoreCase(glosModel.get(i).question) && sNewWordTo.equalIgnoreCase(glosModel.get(
+                                                                                              i).answer) ){
       idErrorText2.visible = true
       idErrorText2.text = idTextInput.text + " Already in quiz!"
       return
@@ -146,13 +161,7 @@ function getAndInitDb() {
 
     rs = tx.executeSql('SELECT * FROM GlosaDbIndex')
 
-    Array.prototype.indexOfObject = function arrayObjectIndexOf(property, value) {
-      for (var i = 0, len = this.length; i < len; i++) {
-        if (this[i][property] === value)
-          return i
-      }
-      return -1
-    }
+
 
     var nRowLen = rs.rows.length
     var ocRet = new Array(nRowLen);
@@ -211,6 +220,8 @@ function setAllok(bval) {
   idQuizModel.get(2).allok = bval
 }
 
+
+// Updates the description of the Quiz
 function insertGlosa(dbnumber, nC, question, answer) {
   var sQ = capitalizeStr(question)
   var sA = capitalizeStr(answer)
@@ -248,6 +259,7 @@ function insertGlosa(dbnumber, nC, question, answer) {
     idQuizModel.extra = ""
   }
 
+  updateDesc1(idWindow.sQuizDesc)
 
 }
 
@@ -313,8 +325,8 @@ function capitalizeStr(inStr) {
     return ""
   if (inStr.length === 0)
     return ""
-  var sA = inStr.trim()
-  sA =  sA.charAt(0).toUpperCase() + inStr.slice(1)
+  var sA = inStr.trim().toLowerCase()
+  sA =  sA.charAt(0).toUpperCase() + sA.slice(1)
   return sA
 }
 
@@ -335,16 +347,10 @@ function loadFromDb(tx) {
   var hasNonInt = false
   for (var i = 0; i < rs.rows.length; i++) {
 
-    var sA
-    var sE = ""
-    var ocA = rs.rows.item(i).answer.split("###")
-    sA = capitalizeStr(ocA[0])
-
-    if (ocA.length > 1)
-      sE = ocA[1]
-
-    var sQ = rs.rows.item(i).quizword
-    sQ = capitalizeStr(sQ)
+    var sWordAndExtra  = rs.rows.item(i).answer
+    var sA  = capitalizeStr(getWord(sWordAndExtra))
+    var sE = getExtra(sWordAndExtra)
+    var sQ = capitalizeStr(rs.rows.item(i).quizword)
     var nNr = rs.rows.item(i).number
     if (nNr !== Math.floor(nNr)) {
       hasNonInt = true
@@ -486,6 +492,35 @@ function newQuiz() {
       idWindow.quizListView.currentIndexChanged()
   })
 }
+
+function getExtra(sWordAndExtra)
+{
+  if (sWordAndExtra === undefined)
+    return ""
+  if (sWordAndExtra === null)
+    return ""
+
+  var ocWord = sWordAndExtra.split("###")
+
+  if (ocWord.length > 1)
+    return ocWord[1]
+  else
+    return ""
+}
+
+
+function getWord(sWordAndExtra)
+{
+  if (sWordAndExtra === undefined)
+    return ""
+  if (sWordAndExtra === null)
+    return ""
+
+  var ocWord = sWordAndExtra.split("###")
+
+  return ocWord[0]
+}
+
 
 function getDesc(sDescAndDate)
 {

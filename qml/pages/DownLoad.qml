@@ -25,7 +25,7 @@ RectRounded {
 
 
   onCloseClicked: {
-    idContainer.visible = false
+    idContainer.state = ""
     idPwdDialog.visible = false
     bIsDeleting = false
     idPwdTextInput.text = ""
