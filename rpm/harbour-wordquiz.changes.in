@@ -28,3 +28,12 @@
 - To Clipboard buttons in lookup field
 - Web Search on text in clipboard
 - Buggfixes
+
+* Mon Jul 13 2020 Fredrik Axling <faxling11@gmail.com> 3.1-1
+- Rename to WordQuiz Studio
+- Quiz Modify time
+- Sort Quiz list on Langauage pair
+- Lookup in wiktionary
+- Adjust for Jolla Phone
+- Buggfixes
+

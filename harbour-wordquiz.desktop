@@ -3,4 +3,4 @@ Type=Application
 X-Nemo-Application-Type=silica-qt5
 Icon=harbour-wordquiz
 Exec=harbour-wordquiz
-Name=WordQuiz
+Name=WordQuiz Studio

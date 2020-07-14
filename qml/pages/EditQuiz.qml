@@ -54,6 +54,7 @@ Item {
           QuizLib.assignTextInputField(idTextTrans.text)
         }
       }
+
       ButtonQuizImg {
         anchors.bottom: parent.bottom
         x: idTextInput.width - width
@@ -63,6 +64,17 @@ Item {
           focus = true
           sSearchQuery = idTextInput.text
           MyDownloader.toClipBoard(idTextInput.text)
+        }
+      }
+
+      ButtonQuizImg {
+        x: idTextInput2.x
+        source: "image://theme/icon-cover-transfers"
+        anchors.bottom: parent.bottom
+        onClicked: {
+          var sFirst = idTextInput.displayText
+          idTextInput.text = idTextInput2.displayText
+          idTextInput2.text = sFirst
         }
       }
 
@@ -77,6 +89,7 @@ Item {
           MyDownloader.toClipBoard(idTextInput2.text)
         }
       }
+
     }
 
     Row {

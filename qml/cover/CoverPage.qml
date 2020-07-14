@@ -10,7 +10,7 @@ CoverBackground {
     anchors.centerIn: parent
     Label {
       anchors.horizontalCenter: parent.horizontalCenter
-      text: "Word Quiz"
+      text: "WordQuiz Studio"
     }
     Image
     {
