@@ -96,7 +96,7 @@ function getTextInputAndAdd() {
   var i
   for (i = 0; i < glosModel.count; i++) {
     if (sNewWordFrom.equalIgnoreCase(glosModel.get(i).question) && sNewWordTo.equalIgnoreCase(glosModel.get(
-                                                                                              i).answer) ){
+                                                                                                i).answer) ){
       idErrorText2.visible = true
       idErrorText2.text = idTextInput.text + " Already in quiz!"
       return
@@ -394,6 +394,7 @@ function renameQuiz(sQuizName)
   sQuizName = capitalizeStr(sQuizName)
   if (sQuizName.length < 4)
   {
+    idErrorDialog.text = "'" +idTextInputQuizName.displayText + "'" + " To short Quiz name"
     idErrorDialog.visible = true
     return;
   }
@@ -459,6 +460,13 @@ function loadFromQuizList() {
 }
 
 function newQuiz() {
+
+  if (idLangModel.get(idLangList1.currentIndex).code === idLangModel.get(idLangList2.currentIndex).code)
+  {
+    idErrorDialog.text = "A WordQuiz should be of different languages e.g en-ru"
+    idErrorDialog.visible = true
+    return;
+  }
 
   db.transaction(function (tx) {
     glosModel.clear()
@@ -924,18 +932,25 @@ function deleteWordInQuiz() {
 }
 
 // To smoth the pathview
-var g_oTimer
-var g_nLastNumber
 
-function updateDbWithWordState() {
-  if (idWindow.bAllok === true) {
-    setAllok(true)
+function getFunctionU(nLastNumber, oTimer)
+{
+
+  return function updateDbWithWordState() {
+
+    if (idWindow.bAllok === true) {
+      setAllok(true)
+    }
+
+    db.transaction(function (tx) {
+      tx.executeSql("UPDATE Glosa" + nDbNumber + " SET state=1 WHERE number=?",
+                    nLastNumber)
+    })
+
+    oTimer.stop();
+    oTimer.destroy();
+
   }
-
-  db.transaction(function (tx) {
-    tx.executeSql("UPDATE Glosa" + nDbNumber + " SET state=1 WHERE number=?",
-                  g_nLastNumber)
-  })
 }
 
 function Timer() {
@@ -968,12 +983,12 @@ function calcAndAssigNextQuizWord(currentIndex) {
   if (nLastIndex === 2 && nI === 1)
     bDir = -1
 
-  g_nLastNumber = idQuizModel.number
+  var nLastNumber = idQuizModel.number
 
   idView.nLastIndex = nI
 
   if (bDir === -1) {
-    var i = MyDownloader.indexFromGlosNr(glosModelWorking, g_nLastNumber)
+    var i = MyDownloader.indexFromGlosNr(glosModelWorking, nLastNumber)
 
     glosModelWorking.remove(i)
 
@@ -987,17 +1002,15 @@ function calcAndAssigNextQuizWord(currentIndex) {
 
     sScoreText = glosModelWorking.count + "/" + glosModel.count
 
-    i = MyDownloader.indexFromGlosNr(glosModel, g_nLastNumber)
+    i = MyDownloader.indexFromGlosNr(glosModel, nLastNumber)
 
     if (i !== -1) {
       glosModel.get(i).state1 = 1
-      if (g_oTimer === undefined) {
-        g_oTimer = new Timer()
-        g_oTimer.interval = 1000
-        g_oTimer.repeat = false
-        g_oTimer.triggered.connect(updateDbWithWordState)
-      }
-      g_oTimer.start()
+      var oTimer = new Timer()
+      oTimer.interval = 1000
+      oTimer.repeat = false
+      oTimer.triggered.connect(getFunctionU(nLastNumber, oTimer))
+      oTimer.start()
     }
   }
 
@@ -1007,7 +1020,7 @@ function calcAndAssigNextQuizWord(currentIndex) {
 
     while (glosModelWorking.count > 1) {
       var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
-      if (glosModelWorking.get(nIndexOwNewWord).number !== g_nLastNumber)
+      if (glosModelWorking.get(nIndexOwNewWord).number !== nLastNumber)
         break
     }
 

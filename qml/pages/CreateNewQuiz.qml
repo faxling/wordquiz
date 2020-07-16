@@ -337,6 +337,7 @@ Item {
   RectRounded
   {
     id:idErrorDialog
+    property alias text : idWhiteText.text
     visible:false
     anchors.horizontalCenter: parent.horizontalCenter
     y:20
@@ -344,6 +345,7 @@ Item {
     width: parent.width
 
     Label {
+      id:idWhiteText
       x:20
       anchors.top : idErrorDialog.bottomClose
       text:"'" +idQuizNameInput.displayText + "'" + " To short Quiz name"
