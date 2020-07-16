@@ -1,3 +1,13 @@
+function connectMyDownloader()
+{
+  MyDownloader.exportedSignal.connect(QuizLib.quizExported)
+  MyDownloader.quizDownloadedSignal.connect(QuizLib.loadFromList)
+  MyDownloader.quizListDownloadedSignal.connect(
+        QuizLib.loadFromServerList)
+  MyDownloader.deletedSignal.connect(QuizLib.quizDeleted)
+  idWindow.quizListView = idQuizList
+}
+
 String.prototype.equalIgnoreCase = function(str) {
   return this.toUpperCase() === str.toUpperCase();
 }

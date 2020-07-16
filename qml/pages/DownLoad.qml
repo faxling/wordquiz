@@ -91,13 +91,6 @@ RectRounded {
           width: nW * 4
           id: idTextQname
           text: qname
-          onClick: {
-            idContainer.sImportMsg = ""
-            idContainer.sDesc1 = desc1
-            idContainer.sDescDate = date1
-            idContainer.sSelectedQ = qname
-            idServerListView.currentIndex = index
-          }
         }
 
         TextList {
@@ -110,6 +103,18 @@ RectRounded {
           width: nW
           text: state1
           height: parent.height
+        }
+      }
+      MouseArea
+      {
+        anchors.fill: idServerRow
+        onClicked:
+        {
+          idContainer.sImportMsg = ""
+          idContainer.sDesc1 = desc1
+          idContainer.sDescDate = date1
+          idContainer.sSelectedQ = qname
+          idServerListView.currentIndex = index
         }
       }
     }

@@ -172,12 +172,7 @@ Item {
       spacing: 5
 
       Component.onCompleted: {
-        MyDownloader.exportedSignal.connect(QuizLib.quizExported)
-        MyDownloader.quizDownloadedSignal.connect(QuizLib.loadFromList)
-        MyDownloader.quizListDownloadedSignal.connect(
-              QuizLib.loadFromServerList)
-        MyDownloader.deletedSignal.connect(QuizLib.quizDeleted)
-        idWindow.quizListView = idQuizList
+        QuizLib.connectMyDownloader()
       }
 
       onCurrentIndexChanged: {
@@ -188,40 +183,49 @@ Item {
         }
       }
 
-      delegate: Row {
-        id: idQuizListRow
+      delegate:Item {
+        height : idQuizListRow.height
+        width : idQuizListRow.width
+        Row {
+          id: idQuizListRow
 
-        TextList {
-          id: idCol1
-          width: n4BtnWidth * 2
-          text: quizname
-          onClick: idQuizList.currentIndex = index
-        }
-        TextList {
-          id: idCol2
-          width: n4BtnWidth
-          text: langpair
-          onClick: idQuizList.currentIndex = index
-        }
-        Item {
-          width: n4BtnWidth
-          height: idCol1.height
           TextList {
-            id: idCol3
-            text: state1
-            onClick: idQuizList.currentIndex = index
+            id: idCol1
+            width: n4BtnWidth * 2
+            text: quizname
           }
-
-          ButtonQuizImg {
-            id: idEdtBtn
-            anchors.right: parent.right
+          TextList {
+            id: idCol2
+            width: n4BtnWidth
+            text: langpair
+          }
+          Item {
+            width: n4BtnWidth
             height: idCol1.height
-            source: "image://theme/icon-s-edit"
-            onClicked: {
-              idQuizNameInput.text = quizname
-              idEditQuizEntryDlg.visible = true
-              idQuizList.currentIndex = index
+            TextList {
+              id: idCol3
+              text: state1
             }
+
+            ButtonQuizImg {
+              id: idEdtBtn
+              anchors.right: parent.right
+              height: idCol1.height
+              source: "image://theme/icon-s-edit"
+              onClicked: {
+                idQuizNameInput.text = quizname
+                idEditQuizEntryDlg.visible = true
+                idQuizList.currentIndex = index
+              }
+            }
+          }
+        }
+        MouseArea
+        {
+          anchors.fill:idQuizListRow
+          anchors.rightMargin: idEdtBtn.width
+          onClicked: {
+            idQuizList.currentIndex = index
           }
         }
       }
