@@ -241,7 +241,7 @@ function insertGlosa(dbnumber, nC, question, answer) {
                   [nC, sQ, sA, 0])
   })
 
-  glosModel.append({
+  glosModel.insert(0,{
                      "answer": sA,
                      "extra": "",
                      "number": nC,
@@ -256,8 +256,8 @@ function insertGlosa(dbnumber, nC, question, answer) {
                             "extra": ""
                           })
 
-  idWindow.glosListView.positionViewAtEnd()
-  idWindow.glosListView.currentIndex = glosModel.count - 1
+  // idWindow.glosListView.positionViewAtBeginning()
+  idWindow.glosListView.currentIndex = 0
   sScoreText = glosModelWorking.count + "/" + glosModel.count
 
   setAllok(false)
@@ -401,7 +401,9 @@ function loadFromDb(tx) {
 
 function renameQuiz(sQuizName)
 {
+
   sQuizName = capitalizeStr(sQuizName)
+
   if (sQuizName.length < 4)
   {
     idErrorDialog.text = "'" +idTextInputQuizName.displayText + "'" + " To short Quiz name"
@@ -409,8 +411,10 @@ function renameQuiz(sQuizName)
     return;
   }
 
+  idWindow.sQuizName = sQuizName
 
   glosModelIndex.setProperty(idQuizList.currentIndex,"quizname",sQuizName)
+
   db.transaction(
         function(tx) {
           var nId = glosModelIndex.get(idQuizList.currentIndex).number;
@@ -418,6 +422,8 @@ function renameQuiz(sQuizName)
           idTextSelected.text = sQuizName
         }
         )
+
+
 }
 
 function loadFromQuizList() {

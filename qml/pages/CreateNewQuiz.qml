@@ -102,7 +102,7 @@ Item {
 
         var sPreFix = "New Quiz "
         var nL = sPreFix.length
-        if ((idTextInputQuizName.text.substring(0,nL) === sPreFix) || idTextInputQuizName.text.length < 3)
+        if ((idTextInputQuizName.displayText.substring(0,nL) === sPreFix) || idTextInputQuizName.displayText.length < 3)
           idTextInputQuizName.text =  sPreFix + sLangLangSelected
       }
 
