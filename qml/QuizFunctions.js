@@ -44,6 +44,88 @@ function getTextFromInput(oTextInput) {
   return oInText
 }
 
+
+function reqTranslation(oBtnIn, bIsSecond)
+{
+  var oInText
+  var sUrl
+  if (bIsSecond)
+  {
+    nLastSearch = 1
+    oInText = getTextFromInput(idTextInput2)
+    sUrl =  sReqUrlRev + oInText
+  }
+  else
+  {
+    nLastSearch = 0
+    oInText = getTextFromInput(idTextInput)
+    sUrl =  sReqUrl + oInText
+  }
+
+  if (oInText === "")
+    return
+
+  oBtnIn.bProgVisible = true
+  if (bIsSecond)
+  {
+    if (bHasDictFrom)
+      QuizLib.downloadDictOnWord(sReqDictUrlRev, oInText)
+  }
+  else
+  {
+    if (bHasDictTo)
+      downloadDictOnWord(sReqDictUrl, oInText)
+  }
+
+  idTranslateModel.oBtn = oBtnIn
+
+  var sOldUrl = idTranslateModel.source.toString()
+// this would fail if not the conversion above
+
+  if ( sOldUrl === sUrl )
+  {
+    idTranslateModel.reload()  
+  }
+  else
+  {
+    idTranslateModel.source = sUrl
+  }
+
+}
+
+function assignTranslation(status, oBtn)
+{
+  if (status === XmlListModel.Ready) {
+    oBtn.bProgVisible = false
+    if (idTranslateModel.count <= 0) {
+      idTextTrans.text = "-"
+      return
+    }
+    var sTransText = idTranslateModel.get(0).trans
+    idTextTrans.text = sTransText
+    assignTextInputField(sTransText)
+  }
+}
+
+
+function lookUppInWiki()
+{
+  var oInText
+
+  var sLang = bDoLookUppText1 ? sFromLang : sToLang
+
+  if (bDoLookUppText1)
+    oInText = getTextFromInput(idTextInput)
+  else
+    oInText = getTextFromInput(idTextInput2)
+
+  if (oInText === "")
+    return
+
+  Qt.openUrlExternally("http://"+sLang+ ".wiktionary.org/w/index.php?title=" +oInText.toLowerCase() )
+
+}
+
 function updateDesc1(sDesc) {
 
   var nCurIndexInQList = idWindow.quizListView.currentIndex
@@ -217,6 +299,7 @@ ocL.append(oJJ["qcount"].toString());
 */
 
 function assignTextInputField(text) {
+  text = text.trim()
   if (nLastSearch !== 1)
     idTextInput2.text = text + " "
   else

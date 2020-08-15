@@ -19,7 +19,7 @@ public:
   explicit Speechdownloader(const QString& sStoragePath, QObject *pParent);
   Q_INVOKABLE void deleteWord(QString sWord, QString sLang);
   Q_INVOKABLE void downloadWord(QString sWord, QString sLang);
-  Q_INVOKABLE void downloadImage(const QList<QUrl>& sImgUrl,  QString sWord,QString sLang, QString sWord2, QString sLang2, bool bSignalDownloaded = false);
+
   Q_INVOKABLE void playWord(QString sWord, QString sLang);
   Q_INVOKABLE void exportCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
   Q_INVOKABLE void updateCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
@@ -49,7 +49,9 @@ public:
   Q_PROPERTY(QUrl urlImg READ urlImg NOTIFY urlImgChanged)
   Q_PROPERTY(bool hasImg READ hasImg NOTIFY hasImgChanged)
   Q_INVOKABLE QString dateStr();
+  void downloadImageSlot(const QList<QUrl>& sImgUrl,  QString sWord,QString sLang, QString sWord2, QString sLang2, bool bSignalDownloaded);
 signals:
+  void downloadImage(const QList<QUrl>& sImgUrl,  QString sWord,QString sLang, QString sWord2, QString sLang2, bool bSignalDownloaded = false);
   void quizDownloadedSignal(int nQCount, QVariantList oDD, QString sLang);
   void quizListDownloadedSignal(int nQCount, QStringList oDD);
   void downloadedSignal();
@@ -68,6 +70,7 @@ private:
 
   void wordDownloaded(QNetworkReply* pReply);
   void imgDownloaded(QNetworkReply* pReply);
+
 private:
   void currentQuizCmd(QVariant p,QString sName, QString sLang,  QString sPwd,QString sDesc, QString sCmd);
   // QVector<int> m_ocIndexMap;

@@ -119,17 +119,7 @@ Item {
         width: n4BtnWidth
         text: sLangLang
         onClicked: {
-          nLastSearch = 0
-
-          var oInText = QuizLib.getTextFromInput(idTextInput)
-          if (oInText === "")
-            return
-
-          bProgVisible = true
-          if (bHasDictTo)
-            QuizLib.downloadDictOnWord(sReqDictUrl, oInText)
-          idTranslateModel.oBtn = idBtn1
-          idTranslateModel.source = sReqUrl + oInText
+          QuizLib.reqTranslation(idBtn1, false)
         }
       }
 
@@ -138,34 +128,16 @@ Item {
         width: n4BtnWidth
         text: sLangLangRev
         onClicked: {
-          nLastSearch = 1
-          var oInText = QuizLib.getTextFromInput(idTextInput2)
-          if (oInText === "")
-            return
-          bProgVisible = true
-          if (bHasDictFrom)
-            QuizLib.downloadDictOnWord(sReqDictUrlRev, oInText)
-          idTranslateModel.oBtn = idBtn2
-          idTranslateModel.source = sReqUrlRev + oInText
+          QuizLib.reqTranslation(idBtn2, true)
         }
       }
 
       ButtonQuiz {
         id: idBtn3
         width: n4BtnWidth
-        text:   (bDoLookUppText1 ? sQuestionLang : sAnswerLang) + " Wiki"
+        text:   (bDoLookUppText1 ?  sFromLang : sToLang) + " Wiki"
         onClicked: {
-          var oInText
-          var sLang = bDoLookUppText1 ? sQuestionLang : sAnswerLang
-
-          if (bDoLookUppText1)
-            oInText   = QuizLib.getTextFromInput(idTextInput)
-          else
-            oInText   = QuizLib.getTextFromInput(idTextInput2)
-
-          if (oInText === "")
-            return
-          onClicked: Qt.openUrlExternally("http://"+sLang+ ".wiktionary.org/w/index.php?title=" +oInText.toLowerCase() )
+          QuizLib.lookUppInWiki()
         }
       }
 
@@ -497,9 +469,6 @@ Item {
         if (idTrTextModel.count <= 0) {
           return
         }
-
-        QuizLib.assignTextInputField(idTrTextModel.get(0).text1)
-
         idTrSynModel.query = "/DicResult/def/tr[1]/syn"
         idTrMeanModel.query = "/DicResult/def/tr[1]/mean"
       }
@@ -542,15 +511,7 @@ Item {
       query: "text/string()"
     }
     onStatusChanged: {
-      if (status === XmlListModel.Ready) {
-        oBtn.bProgVisible = false
-        if (idTranslateModel.count <= 0) {
-          idTextTrans.text = "-"
-          return
-        }
-
-        idTextTrans.text = idTranslateModel.get(0).trans
-      }
+      QuizLib.assignTranslation(status, oBtn)
     }
   }
 }

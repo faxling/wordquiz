@@ -17,6 +17,7 @@
 #include <QBuffer>
 #include <QUrl>
 
+
 // Faxling     Raggo100 trnsl.1.1.20190526T164138Z.e99d5807bb2acb8d.d11f94738ea722cfaddf111d2e8f756cb3b71f4f
 
 // https://cloud.yandex.com/docs/speechkit/tts/request
@@ -170,7 +171,6 @@ void Speechdownloader::setImgFile(QString sWord, QString sLang, QString sWord2, 
   QFile::copy(sImg1, sImg2);
   checkAndEmit(sImg1, sImg2);
 }
-
 
 
 bool Speechdownloader::hasImage(QString sWord, QString sLang)
@@ -416,8 +416,10 @@ void Speechdownloader::deleteWord(QString sWord, QString sLang)
 
 }
 
-void Speechdownloader::downloadImage(const QList<QUrl>& vImgUrl, QString sWord, QString sLang, QString sWord2, QString sLang2, bool bEmitlDownloaded)
+void Speechdownloader::downloadImageSlot(const QList<QUrl>& vImgUrl, QString sWord, QString sLang, QString sWord2, QString sLang2, bool bEmitlDownloaded)
 {
+// Must use a signal slot for shifting threads
+
   if (vImgUrl.count() < 1)
     return;
   QUrl u = vImgUrl.first();
