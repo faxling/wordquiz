@@ -16,7 +16,10 @@
 #include <QImageReader>
 #include <QBuffer>
 #include <QUrl>
-
+// https://cloud.ibm.com/resources
+// https://api.eu-gb.language-translator.watson.cloud.ibm.com
+// https://cloud.ibm.com/apidocs/language-translator
+// Softfrax2020 ibm     key 5oqs7wWEFhW37qCqqXTI5xncIPT69580V3l1998ScAWv
 
 // Faxling     Raggo100 trnsl.1.1.20190526T164138Z.e99d5807bb2acb8d.d11f94738ea722cfaddf111d2e8f756cb3b71f4f
 
@@ -62,8 +65,8 @@ void Speechdownloader::initUrls(QVariant p)
   pp->setProperty("sReqDictUrlRev", sReqDictUrlRev);
   pp->setProperty("sReqDictUrlEn", sReqDictUrlEn);
   pp->setProperty("sReqUrlBase", sReqUrlBase);
-
 }
+
 QString Speechdownloader::ignoreAccentLC(QString str)
 {
   static QString sssIn = QString::fromWCharArray(L"íîàáâãäåèéêëòóôõõöùúûç");
@@ -82,8 +85,8 @@ QString Speechdownloader::ignoreAccentLC(QString str)
   }
 
   return str;
-
 }
+
 QString Speechdownloader::ignoreAccent(QString str)
 {
   static QString sssIn = QString::fromWCharArray(L"ÍÎÀÁÂÃÄÅÈÉÊËÒÓÔÕÕÖÙÚÛÇ");
@@ -198,6 +201,7 @@ QUrl Speechdownloader::urlImg()
 void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
 {
   m_oDownloadedData = pReply->readAll();
+  pReply->deleteLater();
 
   if (m_oDownloadedData.size() < 5000)
     return;
@@ -238,7 +242,7 @@ void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
 void Speechdownloader::wordDownloaded(QNetworkReply* pReply)
 {
   m_oDownloadedData = pReply->readAll();
-
+  pReply->deleteLater();
   if (m_oDownloadedData.size() < 10000)
     return;
 
@@ -371,7 +375,7 @@ void Speechdownloader::listDownloaded(QNetworkReply* pReply)
                         "qcount
                         */
   }
-
+  pReply->deleteLater();
   emit quizListDownloadedSignal(ocL.size(), ocL);
 
 }
@@ -418,7 +422,7 @@ void Speechdownloader::deleteWord(QString sWord, QString sLang)
 
 void Speechdownloader::downloadImageSlot(const QList<QUrl>& vImgUrl, QString sWord, QString sLang, QString sWord2, QString sLang2, bool bEmitlDownloaded)
 {
-// Must use a signal slot for shifting threads
+  // Must use a signal slot for shifting threads
 
   if (vImgUrl.count() < 1)
     return;
@@ -466,6 +470,7 @@ void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
 {
   m_oDownloadedData = pReply->readAll();
   QVariantList oDataDownloaded;
+	pReply->deleteLater();
   if (m_oDownloadedData.size() < 1000)
   {
     emit quizDownloadedSignal(-1, oDataDownloaded, "");
@@ -604,6 +609,8 @@ void Speechdownloader::sortRowset(QJSValue p0, QJSValue p1 , int nCount, QJSValu
 
 }
 
+
+
 // {"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": sA, "extra": sE, "state1" : rs.rows.item(i).state }
 //0 answer
 //1 extra
@@ -682,6 +689,29 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
   m_oQuizExpNetMgr.post(request, ocArray);
 }
 
+void Speechdownloader::transDownloaded()
+{
+  QNetworkReply* pReply = static_cast<QNetworkReply*>(sender());
+  QByteArray oc = pReply->readAll();
+  QJsonDocument oJ = QJsonDocument::fromJson(oc);
+  QJsonObject ocJson = oJ.object();
+  auto js = ocJson["responseData"];
+  m_sTranslatedText->setProperty("text",js.toObject()["translatedText"].toVariant());
+  QObject* pO =  qvariant_cast<QObject*>(pReply->property("button"));
+  pO->setProperty("bProgVisible",false);
+  pReply->deleteLater();
+}
+
+void Speechdownloader::translateWord(QString sWord, QString sFromLang, QString sToLang, QObject *pBtn)
+{
+  QString sFmt = "https://api.mymemory.translated.net/get?q=%ls&langpair=%ls|%ls";
+  QString sUrl = QString::asprintf(sFmt.toLatin1(), sWord.utf16(), sFromLang.utf16(), sToLang.utf16());
+  QNetworkRequest request(sUrl);
+  QNetworkReply* pNR = m_oTransNetMgr.get(request);
+  pNR->setProperty("button", QVariant::fromValue(pBtn));
+  QObject::connect(pNR, &QNetworkReply::finished, this, &Speechdownloader::transDownloaded);
+}
+
 int Speechdownloader::NumberRole(QAbstractListModel* pp)
 {
   auto oc = pp->roleNames();
@@ -741,6 +771,11 @@ int Speechdownloader::popIndex()
 void Speechdownloader::startTimer()
 {
   m_pStopWatch = new StopWatch("timing %1");
+}
+
+void Speechdownloader::storeTransText(QObject* p)
+{
+  m_sTranslatedText = p;
 }
 
 

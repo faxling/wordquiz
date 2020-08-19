@@ -19,7 +19,7 @@ public:
   explicit Speechdownloader(const QString& sStoragePath, QObject *pParent);
   Q_INVOKABLE void deleteWord(QString sWord, QString sLang);
   Q_INVOKABLE void downloadWord(QString sWord, QString sLang);
-
+  Q_INVOKABLE void translateWord(QString sWord, QString sFromLang, QString sToLang, QObject*);
   Q_INVOKABLE void playWord(QString sWord, QString sLang);
   Q_INVOKABLE void exportCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
   Q_INVOKABLE void updateCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
@@ -27,6 +27,7 @@ public:
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void listQuizLang(QString sLang);
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, QString sId);
+  Q_INVOKABLE void storeTransText(QObject* p);
   Q_INVOKABLE void storeTextInputField(QObject* p);
   Q_INVOKABLE void storeCurrentIndex(int);
   Q_INVOKABLE void toClipBoard(QString s);
@@ -60,6 +61,7 @@ signals:
   void deletedSignal(int nResponce);
   void hasImgChanged();
   void urlImgChanged();
+
 private:
   QUrl urlImg();
   bool hasImg();
@@ -70,7 +72,7 @@ private:
 
   void wordDownloaded(QNetworkReply* pReply);
   void imgDownloaded(QNetworkReply* pReply);
-
+  void transDownloaded();
 private:
   void currentQuizCmd(QVariant p,QString sName, QString sLang,  QString sPwd,QString sDesc, QString sCmd);
   // QVector<int> m_ocIndexMap;
@@ -83,8 +85,10 @@ private:
   QNetworkAccessManager m_oQuizNetMgr;
   QNetworkAccessManager m_oListQuizNetMgr;
   QNetworkAccessManager m_oDeleteQuizNetMgr;
+  QNetworkAccessManager m_oTransNetMgr;
   QVector<int> m_ocIndexStack;
   QVector<QObject*> m_ocTextInputElem;
+  QObject* m_sTranslatedText;
   QByteArray m_oDownloadedData;
   bool m_bPlayAfterDownload = false;
   int NumberRole(QAbstractListModel* pp);

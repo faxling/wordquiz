@@ -68,43 +68,24 @@ function reqTranslation(oBtnIn, bIsSecond)
   oBtnIn.bProgVisible = true
   if (bIsSecond)
   {
+    MyDownloader.translateWord(oInText,idWindow.sToLang,idWindow.sFromLang, oBtnIn)
     if (bHasDictFrom)
-      QuizLib.downloadDictOnWord(sReqDictUrlRev, oInText)
+      downloadDictOnWord(sReqDictUrlRev, oInText)
   }
   else
   {
+    MyDownloader.translateWord(oInText,idWindow.sFromLang,idWindow.sToLang, oBtnIn)
     if (bHasDictTo)
       downloadDictOnWord(sReqDictUrl, oInText)
   }
-
-  idTranslateModel.oBtn = oBtnIn
-
-  var sOldUrl = idTranslateModel.source.toString()
-// this would fail if not the conversion above
-
-  if ( sOldUrl === sUrl )
-  {
-    idTranslateModel.reload()  
-  }
-  else
-  {
-    idTranslateModel.source = sUrl
-  }
-
 }
 
-function assignTranslation(status, oBtn)
+
+function assignTranslation(sTransText)
 {
-  if (status === XmlListModel.Ready) {
-    oBtn.bProgVisible = false
-    if (idTranslateModel.count <= 0) {
-      idTextTrans.text = "-"
-      return
-    }
-    var sTransText = idTranslateModel.get(0).trans
-    idTextTrans.text = sTransText
-    assignTextInputField(sTransText)
-  }
+
+  console.log("assignTranslation " + sTransText)
+
 }
 
 
