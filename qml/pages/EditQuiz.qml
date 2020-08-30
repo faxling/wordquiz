@@ -49,7 +49,9 @@ Item {
       width: parent.width
       TextList {
         id: idTextTrans
+        Component.onCompleted: MyDownloader.storeTransText(idTextTrans)
         text: "-"
+        onTextChanged:  QuizLib.assignTextInputField(idTextTrans.text)
         onClick: {
           QuizLib.assignTextInputField(idTextTrans.text)
         }
@@ -313,14 +315,12 @@ Item {
         ButtonQuizImg {
           height: idAnswer.height
           width: idAnswer.height
-          visible: bHasSpeechFrom
           source: "qrc:qml/pages/horn.png"
           onClicked: MyDownloader.playWord(question, sFromLang)
         }
         ButtonQuizImg {
           height: idAnswer.height
           width: idAnswer.height
-          visible: bHasSpeech
           source: "qrc:qml/pages/horn.png"
           onClicked: MyDownloader.playWord(answer, sToLang)
         }
@@ -498,20 +498,6 @@ Item {
     XmlRole {
       name: "mean"
       query: "text/string()"
-    }
-  }
-
-  // From the translation API
-  XmlListModel {
-    id: idTranslateModel
-    property var oBtn
-    query: "/Translation"
-    XmlRole {
-      name: "trans"
-      query: "text/string()"
-    }
-    onStatusChanged: {
-      QuizLib.assignTranslation(status, oBtn)
     }
   }
 }

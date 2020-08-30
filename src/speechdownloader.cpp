@@ -395,6 +395,7 @@ QString sVoicetechIt(QStringLiteral("http://api.voicerss.org?key=0f8ca674a191458
 QString sVoicetechDe(QStringLiteral("http://api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=de-de&src="));
 QString sVoicetechPl(QStringLiteral("http://api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=pl-pl&src="));
 QString sVoicetechEs(QStringLiteral("http://api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=es-es&src="));
+QString sVoicetechHu(QStringLiteral("http://api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=hu-hu&src="));
 
 void Speechdownloader::playWord(QString sWord, QString sLang)
 {
@@ -442,7 +443,7 @@ void Speechdownloader::downloadImageSlot(const QList<QUrl>& vImgUrl, QString sWo
 
 void Speechdownloader::downloadWord(QString sWord, QString sLang)
 {
-  static QMap<QString, QString> ocUrlMap{ { "no", sVoicetechNo }, { "ru", sVoicetechRu }, { "en", sVoicetechEn }, { "sv", sVoicetechSe }, { "fr", sVoicetechFr }, { "pl", sVoicetechPl }, { "de", sVoicetechDe }, { "it", sVoicetechIt }, { "es", sVoicetechEs } };
+  static QMap<QString, QString> ocUrlMap{ { "no", sVoicetechNo }, { "ru", sVoicetechRu }, { "en", sVoicetechEn }, { "sv", sVoicetechSe }, { "fr", sVoicetechFr }, { "pl", sVoicetechPl }, { "de", sVoicetechDe }, { "it", sVoicetechIt }, { "es", sVoicetechEs }, { "hu", sVoicetechHu } };
 
   QString sUrl = ocUrlMap[sLang] + sWord;
   if (m_bPlayAfterDownload == true)

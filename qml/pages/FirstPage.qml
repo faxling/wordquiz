@@ -26,8 +26,6 @@ Page {
   property string sQuestionLang : bIsReverse ? sToLang : sFromLang
   property string sAnswerLang : bIsReverse ? sFromLang : sToLang
   property bool bIsReverse
-  property bool bHasSpeech : sToLang !== "hu"
-  property bool bHasSpeechFrom : sFromLang !=="hu"
   property bool bHasDictTo : sToLang ==="ru" || sToLang ==="en"
   property bool bHasDictFrom : sFromLang ==="ru" || sFromLang ==="en"
   property string sLangLangEn
@@ -230,14 +228,6 @@ Page {
         visible:false
       }
 
-    }
-
-    Text {
-      visible:idTab2.visible
-      font.pixelSize: Theme.fontSizeTiny
-      color:Theme.primaryColor
-      y:  Screen.height - Theme.fontSizeTiny -2
-      text: "Powered by Yandex.Translate "
     }
   }
   /*

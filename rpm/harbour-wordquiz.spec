@@ -9,7 +9,7 @@ Name:       harbour-wordquiz
 # << macros
 
 Summary:    WordQuiz Studio
-Version:    3.1
+Version:    3.2
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE

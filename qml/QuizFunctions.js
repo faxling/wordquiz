@@ -80,15 +80,6 @@ function reqTranslation(oBtnIn, bIsSecond)
   }
 }
 
-
-function assignTranslation(sTransText)
-{
-
-  console.log("assignTranslation " + sTransText)
-
-}
-
-
 function lookUppInWiki()
 {
   var oInText
@@ -181,10 +172,8 @@ function getTextInputAndAdd() {
 
   nC += 1
 
-  if (bHasSpeech)
-    MyDownloader.downloadWord(sNewWordTo, sToLang)
-  if (bHasSpeechFrom)
-    MyDownloader.downloadWord(sNewWordFrom, sFromLang)
+  MyDownloader.downloadWord(sNewWordTo, sToLang)
+  MyDownloader.downloadWord(sNewWordFrom, sFromLang)
 
   QuizLib.insertGlosa(nDbNumber, nC, sNewWordFrom, sNewWordTo)
 }
