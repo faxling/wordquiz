@@ -304,6 +304,7 @@ void Speechdownloader::quizDeleted(QNetworkReply* pReply)
     emit deletedSignal(oc.toInt());
   else
     emit deletedSignal(-1);
+  pReply->deleteLater();
 }
 
 void Speechdownloader::quizExported(QNetworkReply* pReply)
@@ -314,7 +315,9 @@ void Speechdownloader::quizExported(QNetworkReply* pReply)
     emit exportedSignal(pReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt());
   else
     emit exportedSignal(0);
-
+  QObject* pProgressIndicator =  qvariant_cast<QObject*>(pReply->property("progressIndicator"));
+  pProgressIndicator->setProperty("visible",false);
+  pReply->deleteLater();
 }
 
 struct QuizInfo
@@ -470,8 +473,12 @@ void  Speechdownloader::listQuiz()
 void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
 {
   m_oDownloadedData = pReply->readAll();
+
+  QObject* p0 = qvariant_cast<QObject*>(pReply->property("progressIndicator"));
+  p0->setProperty("visible",false);
+
   QVariantList oDataDownloaded;
-	pReply->deleteLater();
+  pReply->deleteLater();
   if (m_oDownloadedData.size() < 1000)
   {
     emit quizDownloadedSignal(-1, oDataDownloaded, "");
@@ -531,11 +538,23 @@ void Speechdownloader::deleteQuiz(QString sName, QString sPwd, QString nDbId)
   m_oDeleteQuizNetMgr.get(request);
 }
 
-void Speechdownloader::importQuiz(QString sName)
+void Speechdownloader::loadProgressSlot(qint64 bytes, qint64 bytesTotal)
+{
+  QNetworkReply* pReply = static_cast<QNetworkReply*>(sender());
+  QObject* pO =  qvariant_cast<QObject*>(pReply->property("progressIndicator"));
+  pO->setProperty("progress",  bytes / (double)bytesTotal);
+  //  qDebug() << "progress " <<  bytesTotal;
+}
+
+void Speechdownloader::importQuiz(QString sName, QObject* pProgressIndicator)
 {
   QString sUrl = GLOS_SERVER2 ^ ("quizload.php?qname=" + sName + ".txt");
   QNetworkRequest request(sUrl);
-  m_oQuizNetMgr.get(request);
+  QNetworkReply* pNR = m_oQuizNetMgr.get(request);
+  pNR->setProperty("progressIndicator", QVariant::fromValue(pProgressIndicator));
+  pProgressIndicator->setProperty("progress",  0);
+  pProgressIndicator->setProperty("visible",true);
+  QObject::connect(pNR, &QNetworkReply::downloadProgress, this,&Speechdownloader::loadProgressSlot);
 }
 
 void Speechdownloader::toClipBoard(QString s)
@@ -558,14 +577,14 @@ void Speechdownloader::downLoadAllSpeech(QVariant p, QString sLang)
   }
 }
 
-void Speechdownloader::updateCurrentQuiz(QVariant p, QString sName, QString sLang, QString sPwd, QString sDesc)
+void Speechdownloader::updateCurrentQuiz(QVariant p, QString sName, QString sLang, QString sPwd, QString sDesc, QObject* pProgressIndicator)
 {
-  currentQuizCmd(p, sName, sLang, sPwd, sDesc, "updatequiz");
+  currentQuizCmd(p, sName, sLang, sPwd, sDesc, "updatequiz", pProgressIndicator);
 }
 
-void Speechdownloader::exportCurrentQuiz(QVariant p, QString sName, QString sLang, QString sPwd, QString sDesc)
+void Speechdownloader::exportCurrentQuiz(QVariant p, QString sName, QString sLang, QString sPwd, QString sDesc, QObject* pProgressIndicator)
 {
-  currentQuizCmd(p, sName, sLang, sPwd, sDesc, "store");
+  currentQuizCmd(p, sName, sLang, sPwd, sDesc, "store", pProgressIndicator);
 }
 
 
@@ -619,7 +638,7 @@ void Speechdownloader::sortRowset(QJSValue p0, QJSValue p1 , int nCount, QJSValu
 //3 question
 //4 state
 
-void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, QString sPwd, QString sDesc, QString sCmd)
+void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, QString sPwd, QString sDesc, QString sCmd, QObject* pProgressIndicator)
 {
   QAbstractListModel* pp = qvariant_cast<QAbstractListModel*>(p);
   QByteArray ocArray;
@@ -682,12 +701,16 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
 
   QString sFmt = GLOS_SERVER2 ^ "%ls.php?qname=%ls&slang=%ls&qcount=%d&desc1=%ls&pwd=%ls";
   QString sUrl = QString::asprintf(sFmt.toLatin1(), sCmd.utf16(), sName.utf16(), sLang.utf16(), nC, sDesc.utf16(), sPwd.utf16());
-  qDebug() << "Cmd to glosserver " << sCmd << " size " << ocArray.size();
+  // qDebug() << "Cmd to glosserver " << sCmd << " size " << ocArray.size();
   ss.setVersion(2);
   QNetworkRequest request(sUrl);
   request.setRawHeader("Content-Type", "application/octet-stream");
   request.setRawHeader("Content-Length", QByteArray::number(ocArray.size()));
-  m_oQuizExpNetMgr.post(request, ocArray);
+  QNetworkReply* pNR = m_oQuizExpNetMgr.post(request, ocArray);
+  pNR->setProperty("progressIndicator",QVariant::fromValue(pProgressIndicator));
+  QObject::connect(pNR, &QNetworkReply::uploadProgress, this,&Speechdownloader::loadProgressSlot);
+  pProgressIndicator->setProperty("progress",0);
+  pProgressIndicator->setProperty("visible",true);
 }
 
 void Speechdownloader::transDownloaded()
@@ -697,7 +720,17 @@ void Speechdownloader::transDownloaded()
   QJsonDocument oJ = QJsonDocument::fromJson(oc);
   QJsonObject ocJson = oJ.object();
   auto js = ocJson["responseData"];
-  m_sTranslatedText->setProperty("text",js.toObject()["translatedText"].toVariant());
+  if (js.isNull() == true)
+  {
+    m_pErrorTextField->setProperty("text","Error in translation");
+    m_pErrorTextField->setProperty("visible",true);
+  }
+  else
+  {
+    m_pErrorTextField->setProperty("visible",false);
+    m_sTranslatedText->setProperty("text",js.toObject()["translatedText"].toVariant());
+  }
+
   QObject* pO =  qvariant_cast<QObject*>(pReply->property("button"));
   pO->setProperty("bProgVisible",false);
   pReply->deleteLater();
@@ -774,8 +807,9 @@ void Speechdownloader::startTimer()
   m_pStopWatch = new StopWatch("timing %1");
 }
 
-void Speechdownloader::storeTransText(QObject* p)
+void Speechdownloader::storeTransText(QObject* p, QObject* pErrorTextField )
 {
+  m_pErrorTextField = pErrorTextField;
   m_sTranslatedText = p;
 }
 

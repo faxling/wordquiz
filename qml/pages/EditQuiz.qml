@@ -49,7 +49,7 @@ Item {
       width: parent.width
       TextList {
         id: idTextTrans
-        Component.onCompleted: MyDownloader.storeTransText(idTextTrans)
+        Component.onCompleted: MyDownloader.storeTransText(idTextTrans, idErrorText)
         text: "-"
         onTextChanged:  QuizLib.assignTextInputField(idTextTrans.text)
         onClick: {
@@ -188,10 +188,8 @@ Item {
               anchors.fill: parent
               onClicked: {
                 idDicList.currentIndex = index
-
                 var sText = idSearchItem.text.replace("...", "")
                 QuizLib.assignTextInputField(sText)
-
                 idTrSynModel.query = "/DicResult/def/tr[" + (index + 1) + "]/syn"
                 idTrMeanModel.query = "/DicResult/def/tr[" + (index + 1) + "]/mean"
               }

@@ -307,7 +307,8 @@ Item {
         QuizLib.updateDesc1(idTextInputQuizDesc.displayText)
         MyDownloader.updateCurrentQuiz(glosModel, sQuizName, sLangLang,
                                        idTextInputQuizPwd.displayText,
-                                       idTextInputQuizDesc.displayText)
+                                       idTextInputQuizDesc.displayText,
+                                       idProgressUpload)
       }
     }
 
@@ -324,8 +325,21 @@ Item {
         QuizLib.updateDesc1(idTextInputQuizDesc.displayText)
         MyDownloader.exportCurrentQuiz(glosModel, sQuizName, sLangLang,
                                        idTextInputQuizPwd.displayText,
-                                       idTextInputQuizDesc.displayText)
+                                       idTextInputQuizDesc.displayText,
+                                       idProgressUpload)
       }
+    }
+
+    Rectangle
+    {
+      id:idProgressUpload
+      x:10
+      anchors.bottom: idExportBtn.top
+      anchors.bottomMargin: 5
+      property double progress
+      color : "orange"
+      height: Theme.paddingSmall
+      width: (parent.width - 20) * progress
     }
   }
 

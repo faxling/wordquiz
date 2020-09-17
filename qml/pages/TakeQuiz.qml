@@ -135,7 +135,7 @@ Item {
       }
       ButtonQuizImg
       {
-        visible:!allok && bIsReverse
+        visible:!allok
         anchors.right: parent.right
         anchors.rightMargin: 20
         width: idBtnAnswer.width / 3
@@ -203,7 +203,7 @@ Item {
           anchors.horizontalCenter: parent.horizontalCenter
           width: idBtnAnswer.width / 3
           height: idBtnAnswer.width / 3
-          visible: bIsReverse && bAnswerVisible
+          visible: bAnswerVisible
           source:"qrc:qml/pages/hornbig.png"
           onClicked: MyDownloader.playWord(idQuizModel.answer,sAnswerLang )
         }

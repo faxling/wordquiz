@@ -187,9 +187,22 @@ RectRounded {
       bIsDownloading = true
       idTextInputQuizName.text = idImport.sSelectedQ
       sQuizName  = idImport.sSelectedQ
-      MyDownloader.importQuiz(idImport.sSelectedQ)
+      MyDownloader.importQuiz(idImport.sSelectedQ, idProgress)
     }
   }
+
+  Rectangle
+  {
+    id:idProgress
+    anchors.bottom: idLoadQuiz.top
+    anchors.bottomMargin: 10
+    x:20
+    property double progress
+    color : "orange"
+    height: Theme.paddingSmall
+    width: (parent.width - 40) * progress
+  }
+
 
   states: [
     State {

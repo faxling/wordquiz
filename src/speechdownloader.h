@@ -19,15 +19,15 @@ public:
   explicit Speechdownloader(const QString& sStoragePath, QObject *pParent);
   Q_INVOKABLE void deleteWord(QString sWord, QString sLang);
   Q_INVOKABLE void downloadWord(QString sWord, QString sLang);
-  Q_INVOKABLE void translateWord(QString sWord, QString sFromLang, QString sToLang, QObject*);
+  Q_INVOKABLE void translateWord(QString sWord, QString sFromLang, QString sToLang, QObject* oButton);
   Q_INVOKABLE void playWord(QString sWord, QString sLang);
-  Q_INVOKABLE void exportCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
-  Q_INVOKABLE void updateCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc);
-  Q_INVOKABLE void importQuiz(QString sName);
+  Q_INVOKABLE void exportCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc, QObject* pProgressIndicator);
+  Q_INVOKABLE void updateCurrentQuiz(QVariant p, QString sName, QString sLang,  QString sPwd,QString sDesc, QObject* pProgressIndicator);
+  Q_INVOKABLE void importQuiz(QString sName, QObject* pProgressIndicator);
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void listQuizLang(QString sLang);
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, QString sId);
-  Q_INVOKABLE void storeTransText(QObject* p);
+  Q_INVOKABLE void storeTransText(QObject* p, QObject* pErrorTextField);
   Q_INVOKABLE void storeTextInputField(QObject* p);
   Q_INVOKABLE void storeCurrentIndex(int);
   Q_INVOKABLE void toClipBoard(QString s);
@@ -50,6 +50,9 @@ public:
   Q_PROPERTY(QUrl urlImg READ urlImg NOTIFY urlImgChanged)
   Q_PROPERTY(bool hasImg READ hasImg NOTIFY hasImgChanged)
   Q_INVOKABLE QString dateStr();
+
+  void loadProgressSlot(qint64 bytesReceived, qint64 bytesTotal);
+
   void downloadImageSlot(const QList<QUrl>& sImgUrl,  QString sWord,QString sLang, QString sWord2, QString sLang2, bool bSignalDownloaded);
 signals:
   void downloadImage(const QList<QUrl>& sImgUrl,  QString sWord,QString sLang, QString sWord2, QString sLang2, bool bSignalDownloaded = false);
@@ -74,7 +77,7 @@ private:
   void imgDownloaded(QNetworkReply* pReply);
   void transDownloaded();
 private:
-  void currentQuizCmd(QVariant p,QString sName, QString sLang,  QString sPwd,QString sDesc, QString sCmd);
+  void currentQuizCmd(QVariant p,QString sName, QString sLang,  QString sPwd,QString sDesc, QString sCmd, QObject* pProgressIndicator);
   // QVector<int> m_ocIndexMap;
   QString AudioPath(const QString&s , const QString& sLang);
   QString ImgPath(const QString&s , const QString& sLang);
@@ -89,6 +92,7 @@ private:
   QVector<int> m_ocIndexStack;
   QVector<QObject*> m_ocTextInputElem;
   QObject* m_sTranslatedText;
+  QObject* m_pErrorTextField;
   QByteArray m_oDownloadedData;
   bool m_bPlayAfterDownload = false;
   int NumberRole(QAbstractListModel* pp);
