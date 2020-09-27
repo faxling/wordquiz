@@ -707,7 +707,12 @@ function quizExported(nResponce) {
     } else if (nResponce === 207) {
       idExportError.text = "Can not update '" + sQuizName + "'"
       idExportError.visible = true
-    } else if (nResponce === 200) {
+    }
+    else if (nResponce === 208) {
+      idExportError.text = "Error in Quizdb"
+      idExportError.visible = true
+    }
+    else if (nResponce === 200) {
       idExport.visible = false
     } else {
       idExportError.text = nResponce
@@ -865,7 +870,7 @@ function updateQuiz() {
 
   db.transaction(function (tx) {
     if (idTextEdit3.displayText.length > 0) {
-      sA = sA + "###" + idTextEdit3.displayText
+      sA = sA + "###" + sE
     }
 
     tx.executeSql(

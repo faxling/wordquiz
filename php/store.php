@@ -30,8 +30,10 @@ $myfile = fopen($qname . ".txt", "w");
 $sql = "INSERT INTO quizindex (qname, slang, qcount,pwd,desc1) VALUES (?,?,?,?,?)";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ssiss", $qname, $slang, $qcount, $pwd, $desc1);
-$stmt->execute();
-
+$retBool = $stmt->execute();
+if (!$retBool) {
+  http_response_code(208);
+}
 
 error_log($conn->error);
 fwrite($myfile, $post);
