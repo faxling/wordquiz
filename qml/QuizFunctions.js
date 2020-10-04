@@ -278,9 +278,6 @@ function assignTextInputField(text) {
 
 function setAllok(bval) {
   idWindow.bAllok = bval
-  idQuizModel.get(0).allok = bval
-  idQuizModel.get(1).allok = bval
-  idQuizModel.get(2).allok = bval
 }
 
 
@@ -334,12 +331,6 @@ function assignQuizModel(nIndexOfNewWord) {
   idQuizModel.extra = glosModelWorking.get(nIndexOfNewWord).extra
   idWindow.nGlosaTakeQuizIndex = MyDownloader.indexFromGlosNr(glosModel,
                                                               sNumberNewWord)
-
-  if (glosModelWorking.count === 1) {
-    idQuizModel.get(0).question = idQuizModel.question
-    idQuizModel.get(1).question = idQuizModel.question
-    idQuizModel.get(2).question = idQuizModel.question
-  }
 
   // idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(glosModel, sNumberNewWord)
 }
@@ -1068,8 +1059,6 @@ function calcAndAssigNextQuizWord(currentIndex) {
 
     if (glosModelWorking.count === 0) {
       idWindow.bAllok = true
-      idQuizModel.get(nI).allok = true
-      idQuizModel.question = ""
       idQuizModel.answer = ""
       idQuizModel.extra = ""
     }
