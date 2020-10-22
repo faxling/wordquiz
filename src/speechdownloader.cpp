@@ -16,6 +16,9 @@
 #include <QImageReader>
 #include <QBuffer>
 #include <QUrl>
+#include <QTextDocument>
+
+
 // https://cloud.ibm.com/resources
 // https://api.eu-gb.language-translator.watson.cloud.ibm.com
 // https://cloud.ibm.com/apidocs/language-translator
@@ -720,6 +723,7 @@ void Speechdownloader::transDownloaded()
   QJsonDocument oJ = QJsonDocument::fromJson(oc);
   QJsonObject ocJson = oJ.object();
   auto js = ocJson["responseData"];
+
   if (js.isNull() == true)
   {
     m_pErrorTextField->setProperty("text","Error in translation");
@@ -728,7 +732,9 @@ void Speechdownloader::transDownloaded()
   else
   {
     m_pErrorTextField->setProperty("visible",false);
-    m_sTranslatedText->setProperty("text",js.toObject()["translatedText"].toVariant());
+    QTextDocument text;
+    text.setHtml(js.toObject()["translatedText"].toString());
+    m_sTranslatedText->setProperty("text",text.toPlainText());
   }
 
   QObject* pO =  qvariant_cast<QObject*>(pReply->property("button"));
