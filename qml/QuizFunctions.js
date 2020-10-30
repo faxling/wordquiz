@@ -622,13 +622,20 @@ function loadFromServerList(nCount, oDD) {
   idImport.bIsDownloadingList = false
   idImport.state = "Back"
 
-  if (nCount === 0) {
+  if (nCount <= 0) {
+
+    if (nCount === -1)
+      idImport.nError = 1
+    else
+      idImport.nError = 2
+
     idImport.sDescDate = ""
     idImport.sDesc1 = ""
     idImport.sSelectedQ = ""
     return
   }
 
+  idImport.nError = 0
   var nIndex = 0
 
   for (var i = 0; i < nCount; i += 4) {
@@ -670,9 +677,10 @@ function loadFromServerList(nCount, oDD) {
 
 function quizDeleted(nResponce) {
   idImport.bIsDeleting = false
-  idImport.sDesc1 = ""
 
   if (nResponce >= 0) {
+    idImport.sDesc1 = ""
+    idImport.sDescDate = ""
     idServerQModel.remove(nResponce)
     if (nResponce > 0) {
       idImport.currentIndex = nResponce - 1
@@ -681,7 +689,12 @@ function quizDeleted(nResponce) {
       idImport.sImportMsg = ""
     }
   } else
-    idImport.sImportMsg = "Not deleted"
+  {
+    if (nResponce === -1)
+      idImport.sImportMsg = "Wrong password"
+    else
+      idImport.sImportMsg = "Network Error deleting"
+  }
 }
 
 function quizExported(nResponce) {
@@ -715,7 +728,7 @@ function quizExported(nResponce) {
 function loadFromList(nCount, oDD, sLangLoaded) {
 
   if (nCount < 0) {
-    idLoadQuiz.bProgVisible = false
+    idImport.bIsDownloading = false
     idImport.sImportMsg = "error importing"
     return
   }

@@ -20,6 +20,7 @@ $row = $result->fetch_row();
 
 if ($row[0]> 0)
 {
+  unlink ($qname.".txt");
   echo($dbid);
 }
 else {
@@ -27,7 +28,6 @@ else {
 }
 
 
-unlink ($qname.".txt");
 $stmt->close();
 $conn->close();
 ?>

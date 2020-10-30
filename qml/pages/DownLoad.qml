@@ -14,6 +14,7 @@ RectRounded {
   property string sImportMsg: ""
   property string sDesc1: ""
   property string sDescDate : ""
+  property int nError
 
   property alias currentIndex : idServerListView.currentIndex
 
@@ -23,6 +24,21 @@ RectRounded {
                                          ListView.Center)
   }
 
+  onNErrorChanged:
+  {
+    if (nError === 0)
+    {
+      sImportMsg = ""
+    }
+    if (nError === 1)
+    {
+      sImportMsg = "Network Error!"
+    }
+    if (nError === 2)
+    {
+      sImportMsg = "No Quiz aviailable!"
+    }
+  }
 
   onCloseClicked: {
     idContainer.state = ""

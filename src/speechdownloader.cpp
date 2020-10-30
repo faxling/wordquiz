@@ -306,7 +306,7 @@ void Speechdownloader::quizDeleted(QNetworkReply* pReply)
   if (nRet == QNetworkReply::NoError)
     emit deletedSignal(oc.toInt());
   else
-    emit deletedSignal(-1);
+    emit deletedSignal(-2);
   pReply->deleteLater();
 }
 
@@ -333,6 +333,14 @@ struct QuizInfo
 
 void Speechdownloader::listDownloaded(QNetworkReply* pReply)
 {
+  int nRet = pReply->error();
+
+  if (nRet != QNetworkReply::NoError)
+  {
+    emit  quizListDownloadedSignal(-1, QStringList());
+    return;
+  }
+
   QByteArray oc = pReply->readAll();
   QJsonDocument oJ = QJsonDocument::fromJson(oc);
 
