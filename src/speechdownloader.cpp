@@ -747,16 +747,39 @@ void Speechdownloader::transDownloaded()
 
   QObject* pO =  qvariant_cast<QObject*>(pReply->property("button"));
   pO->setProperty("bProgVisible",false);
+  QString sLang = pReply->property("tolang").toString();
+  if (sLang !="ru" &&  sLang !="en")
+  {
+    auto addText = [](const QJsonValue& s)
+    {
+      return "<tr><text>" + s.toString() + "</text></tr>";
+    };
+
+    static QString sDictXmlBegin("<DicResult><def>");
+    static QString sDictXmlEnd("</def></DicResult>");
+    QJsonArray jsMatches = ocJson["matches"].toArray();
+    QString sDictXml(sDictXmlBegin);
+    for (auto& oI : jsMatches)
+    {
+      sDictXml.append(addText(oI.toObject()["translation"]));
+    }
+    sDictXml.append(sDictXmlEnd);
+    m_pTrTextModel->setProperty("xml", sDictXml);
+
+  }
+
+
   pReply->deleteLater();
 }
 
 void Speechdownloader::translateWord(QString sWord, QString sFromLang, QString sToLang, QObject *pBtn)
 {
-  QString sFmt = "https://api.mymemory.translated.net/get?q=%ls&langpair=%ls|%ls";
+  QString sFmt = "https://api.mymemory.translated.net/get?q=%ls&mt=1&langpair=%ls|%ls";
   QString sUrl = QString::asprintf(sFmt.toLatin1(), sWord.utf16(), sFromLang.utf16(), sToLang.utf16());
   QNetworkRequest request(sUrl);
   QNetworkReply* pNR = m_oTransNetMgr.get(request);
   pNR->setProperty("button", QVariant::fromValue(pBtn));
+  pNR->setProperty("tolang", sToLang);
   QObject::connect(pNR, &QNetworkReply::finished, this, &Speechdownloader::transDownloaded);
 }
 
@@ -821,10 +844,11 @@ void Speechdownloader::startTimer()
   m_pStopWatch = new StopWatch("timing %1");
 }
 
-void Speechdownloader::storeTransText(QObject* p, QObject* pErrorTextField )
+void Speechdownloader::storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTrTextModel)
 {
   m_pErrorTextField = pErrorTextField;
   m_sTranslatedText = p;
+  m_pTrTextModel = pTrTextModel;
 }
 
 

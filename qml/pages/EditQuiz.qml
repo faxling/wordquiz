@@ -49,7 +49,7 @@ Item {
       width: parent.width
       TextList {
         id: idTextTrans
-        Component.onCompleted: MyDownloader.storeTransText(idTextTrans, idErrorText)
+        Component.onCompleted: MyDownloader.storeTransText(idTextTrans, idErrorText, idTrTextModel)
         text: "-"
         onTextChanged:  QuizLib.assignTextInputField(idTextTrans.text)
         onClick: {
@@ -465,6 +465,7 @@ Item {
     onStatusChanged: {
       if (status === XmlListModel.Ready) {
         if (idTrTextModel.count <= 0) {
+          idTextTrans.text = "-"
           return
         }
         idTrSynModel.query = "/DicResult/def/tr[1]/syn"
