@@ -27,7 +27,7 @@ public:
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void listQuizLang(QString sLang);
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, QString sId);
-  Q_INVOKABLE void storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTrTextModel );
+  Q_INVOKABLE void storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTrTextModel, QObject* pTrSynModel, QObject* pTrMeanModel );
   Q_INVOKABLE void storeTextInputField(QObject* p);
   Q_INVOKABLE void storeCurrentIndex(int);
   Q_INVOKABLE void toClipBoard(QString s);
@@ -94,6 +94,9 @@ private:
   QObject* m_sTranslatedText;
   QObject* m_pErrorTextField;
   QObject* m_pTrTextModel;
+  QObject* m_pTrSynModel;
+  QObject* m_pTrMeanModel;
+
   QByteArray m_oDownloadedData;
 
   bool m_bPlayAfterDownload = false;

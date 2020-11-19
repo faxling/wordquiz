@@ -49,7 +49,8 @@ Item {
       width: parent.width
       TextList {
         id: idTextTrans
-        Component.onCompleted: MyDownloader.storeTransText(idTextTrans, idErrorText, idTrTextModel)
+        Component.onCompleted: MyDownloader.storeTransText(idTextTrans, idErrorText, idTrTextModel, idTrSynModel,
+                                                           idTrMeanModel)
         text: "-"
         onTextChanged:  QuizLib.assignTextInputField(idTextTrans.text)
         onClick: {

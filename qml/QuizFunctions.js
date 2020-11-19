@@ -67,12 +67,6 @@ function reqTranslation(oBtnIn, bIsSecond)
 
   oBtnIn.bProgVisible = true
 
-  if (!bHasDictFrom)
-  {
-    idTrSynModel.xml = ""
-    idTrMeanModel.xml = ""
-  }
-
   if (bIsSecond)
   {
     MyDownloader.translateWord(oInText,idWindow.sToLang,idWindow.sFromLang, oBtnIn)

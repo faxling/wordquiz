@@ -759,13 +759,14 @@ void Speechdownloader::transDownloaded()
     static QString sDictXmlEnd("</def></DicResult>");
     QJsonArray jsMatches = ocJson["matches"].toArray();
     QString sDictXml(sDictXmlBegin);
-    for (auto& oI : jsMatches)
+    for (const auto& oI : jsMatches)
     {
       sDictXml.append(addText(oI.toObject()["translation"]));
     }
     sDictXml.append(sDictXmlEnd);
     m_pTrTextModel->setProperty("xml", sDictXml);
-
+    m_pTrSynModel->setProperty("xml", "");
+    m_pTrMeanModel->setProperty("xml", "");
   }
 
 
@@ -844,11 +845,14 @@ void Speechdownloader::startTimer()
   m_pStopWatch = new StopWatch("timing %1");
 }
 
-void Speechdownloader::storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTrTextModel)
+void Speechdownloader::storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTrTextModel
+                                      , QObject* pTrSynModel, QObject* pTrMeanModel)
 {
   m_pErrorTextField = pErrorTextField;
   m_sTranslatedText = p;
   m_pTrTextModel = pTrTextModel;
+  m_pTrSynModel = pTrSynModel;
+  m_pTrMeanModel = pTrMeanModel;
 }
 
 
