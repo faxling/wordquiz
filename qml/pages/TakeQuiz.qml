@@ -10,6 +10,7 @@ Item {
   property bool bImageMode : false
   property bool bVoiceMode : false
   property bool bTextAnswerOk : false
+  property bool allok : idWindow.bAllok
   Component.onCompleted:
   {
     idWindow.oTakeQuiz = idRectTakeQuiz
@@ -142,7 +143,7 @@ Item {
         height: idBtnAnswer.width / 3
         y : idBtnAnswer.y + idQuizColumn.y - 4
         source:"qrc:qml/pages/hornbig.png"
-        onClicked: MyDownloader.playWord(question,bIsReverse ? sToLang : sFromLang )
+        onClicked: MyDownloader.playWord(idQuizModel.question,bIsReverse ? sToLang : sFromLang )
       }
       Column
       {
@@ -172,7 +173,7 @@ Item {
           font.pixelSize: Theme.fontSizeExtraLarge
           font.bold: true
           anchors.horizontalCenter: parent.horizontalCenter
-          text : question
+          text : idQuizModel.question
         }
 
         ButtonQuiz

@@ -93,24 +93,17 @@ Page {
 
     onQuestionChanged:
     {
-      idQuizModel.get(idWindow.nQuizIndex).question = question
       MyDownloader.setImgWord(question,sQuestionLang )
     }
 
     ListElement {
       number:0
-      question:"-"
-      allok:false
     }
     ListElement {
       number:1
-      question:"-"
-      allok:false
     }
     ListElement {
       number:2
-      question:"-"
-      allok:false
     }
   }
 

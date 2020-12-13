@@ -903,6 +903,8 @@ function updateQuiz() {
   if (i >= 0) {
     if (nState !== 0) {
       glosModelWorking.remove(i)
+      if ( glosModelWorking.count === 0)
+        setAllok(true)
     }
     else
     {
@@ -1017,10 +1019,6 @@ function getFunctionU(nLastNumber, oTimer)
 
   return function updateDbWithWordState() {
 
-    if (idWindow.bAllok === true) {
-      setAllok(true)
-    }
-
     db.transaction(function (tx) {
       tx.executeSql("UPDATE Glosa" + nDbNumber + " SET state=1 WHERE number=?",
                     nLastNumber)
@@ -1072,7 +1070,7 @@ function calcAndAssigNextQuizWord(currentIndex) {
     glosModelWorking.remove(i)
 
     if (glosModelWorking.count === 0) {
-      idWindow.bAllok = true
+      setAllok(true)
       idQuizModel.answer = ""
       idQuizModel.extra = ""
     }
