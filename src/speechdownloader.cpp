@@ -17,7 +17,7 @@
 #include <QBuffer>
 #include <QUrl>
 #include <QTextDocument>
-
+#include <QRandomGenerator>
 
 // https://cloud.ibm.com/resources
 // https://api.eu-gb.language-translator.watson.cloud.ibm.com
@@ -89,6 +89,15 @@ QString Speechdownloader::ignoreAccentLC(QString str)
 
   return str;
 }
+
+
+bool  Speechdownloader::isSpecial(QString str)
+{
+  static QString sssIn = QString::fromWCharArray(L"\".! '?");
+  return sssIn.indexOf(str) >= 0;
+}
+
+
 
 QString Speechdownloader::ignoreAccent(QString str)
 {
@@ -813,6 +822,20 @@ int Speechdownloader::indexFromGlosNr(QVariant p, int nNr)
   return -1;
 }
 
+void Speechdownloader::showKey(bool b)
+{
+  QInputMethod *keyboard = QGuiApplication::inputMethod();
+  if (b == true)
+    keyboard->show();
+  else
+    keyboard->hide();
+}
+
+
+double Speechdownloader::rand()
+{
+  return QRandomGenerator::global()->generateDouble();
+}
 
 void Speechdownloader::pushIndex(int nI)
 {

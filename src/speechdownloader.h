@@ -29,6 +29,7 @@ public:
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, QString sId);
   Q_INVOKABLE void storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTrTextModel, QObject* pTrSynModel, QObject* pTrMeanModel );
   Q_INVOKABLE void storeTextInputField(QObject* p);
+  Q_INVOKABLE bool isSpecial(QString s);
   Q_INVOKABLE void storeCurrentIndex(int);
   Q_INVOKABLE void toClipBoard(QString s);
   Q_INVOKABLE void pushIndex(int);
@@ -50,7 +51,8 @@ public:
   Q_PROPERTY(QUrl urlImg READ urlImg NOTIFY urlImgChanged)
   Q_PROPERTY(bool hasImg READ hasImg NOTIFY hasImgChanged)
   Q_INVOKABLE QString dateStr();
-
+  Q_INVOKABLE double rand();
+  Q_INVOKABLE void showKey(bool b);
   void loadProgressSlot(qint64 bytesReceived, qint64 bytesTotal);
 
   void downloadImageSlot(const QList<QUrl>& sImgUrl,  QString sWord,QString sLang, QString sWord2, QString sLang2, bool bSignalDownloaded);
