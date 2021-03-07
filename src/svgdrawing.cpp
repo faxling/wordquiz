@@ -66,11 +66,30 @@ void SvgDrawing::setOpacityOnId(const QString& id, const QString& op)
   tS->second.setNodeValue(sStyle);
 }
 
+QString SvgDrawing::getRating()
+{
+  if (m_bAnswerShown == true)
+    return "Well";
+
+  if (m_nIndex < 4)
+    return "Fantastic!";
+  else if (m_nIndex < 8)
+    return "Great!";
+
+  return "You Made it!";
+}
+
+void SvgDrawing::answerShown()
+{
+  m_bAnswerShown = true;
+}
+
 bool SvgDrawing::renderId(int sId)
 {
   bool bRet = true;
   if (sId == 0)
   {
+    m_bAnswerShown = false;
     m_nIndex = 0;
     for (auto& oI : m_oSvgIds)
       setOpacityOnId(oI,"0");
@@ -81,11 +100,11 @@ bool SvgDrawing::renderId(int sId)
   }
   else if (sId == 1)
   {
+    m_bAnswerShown = false;
     m_nIndex = 0;
     for (auto& oI : m_oSvgIds)
       setOpacityOnId(oI,"0");
     setOpacityOnId("path891-8","0");
-
   }
   else if (sId == 2)
   {
@@ -114,11 +133,6 @@ bool SvgDrawing::renderId(int sId)
   m_oSvg.render(&oImgPainter);
   update();
   return bRet;
-}
-
-
-void SvgDrawing::clearSvg()
-{
 }
 
 

@@ -15,8 +15,8 @@ function hangUpdateImage()
 function hangClearThings()
 {
   idHangBtn3.bAV = false
-  idGameOver.visible = false
-  idGameOverTimer.stop()
+  idResultMsg.visible = false
+  idResultMsgTimer.stop()
   idOrdRow.children = []
   idOrdCol.children = []
   idOrdCol2.children = []
@@ -130,6 +130,24 @@ function hangEnterChar()
 
     ++nValidCount
 
+    if (idOrdRow.children[i].text !== "")
+      nOKCount += 1
+  }
+
+  if (nOKCount === nValidCount)
+  {
+    return
+  }
+
+  nOKCount = 0
+  nValidCount = 0
+  for (i = 0; i < n; ++i)
+  {
+    if (idOrdRow.children[i].bIsSpecial)
+      continue
+
+    ++nValidCount
+
     if (MyDownloader.ignoreAccent(sHangWord[i]) === MyDownloader.ignoreAccent(idCharRect.text[0]))
     {
       nC+=1
@@ -143,6 +161,8 @@ function hangEnterChar()
 
   if (nOKCount === nValidCount)
   {
+    idResultMsg.visible = true
+    idResultMsg.text = idDrawing.getRating()
     idDrawing.renderId(0)
     return
   }
@@ -169,8 +189,9 @@ function hangEnterChar()
 
     if (!bRet)
     {
-      idGameOver.visible = true
-      idGameOverTimer.start()
+      idResultMsg.visible = true
+      idResultMsg.text = "Game Over!"
+      idResultMsgTimer.start()
     }
   }
 }
