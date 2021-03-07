@@ -14,7 +14,7 @@ SvgDrawing::SvgDrawing()
   file.open(QIODevice::ReadOnly);
   QByteArray oSvgXml = file.readAll();
   // "path839", "path839-4"  path893
-  m_oSvgIds = {"path817", "path946","path946-6","path946-3", "path946-0",   "path881", "path839", "path839-4","path893","path883", "path887", "path889", "path887-0", "path887-0-8","path891", "path891-8"};
+  m_oSvgIds = {"path817", "path946","path946-6","path946-3", "path946-0", "path881","path883", "path887", "path889", "path887-0", "path887-0-8","path891",  "path839-4","path893", "path839"};
   m_oSvgHIds = {"path891-8", "path881","path893", "path839","path839-4" };
   file.close();
   m_oSvg.setViewBox(QRect(0,0,200,200));
@@ -84,14 +84,17 @@ bool SvgDrawing::renderId(int sId)
     m_nIndex = 0;
     for (auto& oI : m_oSvgIds)
       setOpacityOnId(oI,"0");
+    setOpacityOnId("path891-8","0");
+
   }
   else if (sId == 2)
   {
     setOpacityOnId(m_oSvgIds[m_nIndex],"1");
-    if (m_nIndex == 6)
+    if (m_nIndex == m_oSvgIds.size()- 4)
     {
-       setOpacityOnId(m_oSvgIds[++m_nIndex],"1");
-       setOpacityOnId(m_oSvgIds[++m_nIndex],"1");
+      setOpacityOnId(m_oSvgIds[++m_nIndex],"1");
+      setOpacityOnId(m_oSvgIds[++m_nIndex],"1");
+      setOpacityOnId(m_oSvgIds[++m_nIndex],"1");
     }
 
     if (m_nIndex < (m_oSvgIds.size()- 1))

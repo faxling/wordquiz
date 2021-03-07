@@ -1,3 +1,204 @@
+function hangUpdateImage()
+{
+  const n = idLangModel.count
+  let sL = bIsReverseHang ? sToLang : sFromLang
+  for (let i = 0 ; i < n ; ++i)
+  {
+    if (idLangModel.get(i).code === sL)
+    {
+      idFlagImg.source = idLangModel.get(i).imgsource
+      break;
+    }
+  }
+}
+
+function hangClearThings()
+{
+  idHangBtn3.bAV = false
+  idGameOver.visible = false
+  idGameOverTimer.stop()
+  idOrdRow.children = []
+  idOrdCol.children = []
+  idOrdCol2.children = []
+  idOrdCol3.children = []
+  idTTrans.visible = false
+  idCharRect.text = ""
+}
+
+function hangNewQ()
+{
+  bIsReverseHang = false
+  hangClearThings()
+  idDrawing.renderId(1)
+  hangUpdateImage()
+  idHangBtn.visible = true
+}
+
+function hangAddWord()
+{
+  hangClearThings()
+  let n = 0
+  let i = 0
+  let nIndexOfNewWord = 0
+  for ( i = 0 ; i < 10; ++i)
+  {
+    nIndexOfNewWord = Math.floor(MyDownloader.rand() * glosModel.count)
+
+    if (bIsReverseHang)
+    {
+      sHangWord = glosModel.get(nIndexOfNewWord).answer
+      idTTrans.text = glosModel.get(nIndexOfNewWord).question
+    }
+    else
+    {
+      sHangWord = glosModel.get(nIndexOfNewWord).question
+      idTTrans.text = glosModel.get(nIndexOfNewWord).answer
+    }
+
+    sHangWord = sHangWord.toUpperCase()
+    n = sHangWord.length
+    if (n < 14)
+      break
+  }
+
+  if (i === 10)
+  {
+    idErrorDialogHangMan.text = "Create or Select a Word Quiz that contains short words!"
+    idErrorDialogHangMan.visible = true
+    return;
+  }
+
+  sCurrentRow = []
+
+  for (i = 0; i < n; ++i)
+  {
+    const ch = sHangWord[i]
+
+    if (MyDownloader.isSpecial(ch))
+    {
+      sCurrentRow.push((ch))
+      idChar.createObject(idOrdRow, {text : ch , bIsSpecial:true })
+    }
+    else
+    {
+      sCurrentRow.push(" ")
+      idChar.createObject(idOrdRow)
+    }
+  }
+  idWindow.nGlosaTakeQuizIndex = nIndexOfNewWord;
+
+}
+
+function hangCheckCharInColumn(sChar, oColumn)
+{
+  let n = oColumn.children.length
+  let i
+  for ( i = 0; i < n; ++i)
+  {
+    if (MyDownloader.ignoreAccent(oColumn.children[i].text) === MyDownloader.ignoreAccent(sChar))
+      return true
+  }
+  return false
+}
+
+function hangCheckChar(sChar)
+{
+  if (hangCheckCharInColumn(sChar, idOrdCol))
+    return true
+
+  if (hangCheckCharInColumn(sChar, idOrdCol2))
+    return true
+
+  if (hangCheckCharInColumn(sChar, idOrdCol3))
+    return true
+
+  return false
+}
+
+function hangEnterChar()
+{
+  Qt.inputMethod.hide()
+  let n = sHangWord.length
+  let nValidCount = 0
+  let nOKCount = 0
+  let nC = 0
+  var i = 0
+  for (i = 0; i < n; ++i)
+  {
+    if (idOrdRow.children[i].bIsSpecial)
+      continue
+
+    ++nValidCount
+
+    if (MyDownloader.ignoreAccent(sHangWord[i]) === MyDownloader.ignoreAccent(idCharRect.text[0]))
+    {
+      nC+=1
+      idOrdRow.children[i].text = sHangWord[i]
+      sCurrentRow[i] = sHangWord[i]
+    }
+
+    if (idOrdRow.children[i].text !== "")
+      nOKCount += 1
+  }
+
+  if (nOKCount === nValidCount)
+  {
+    idDrawing.renderId(0)
+    return
+  }
+
+  if (nC === 0)
+  {
+    let n = idOrdCol.children.length
+    let hRet = hangCheckChar(idCharRect.text)
+    if (hRet)
+      return
+    if (n === 1)
+    {
+      nUsedCharColLen = idHangMan.height / (idOrdCol.children[0].width * 1.8)
+    }
+
+    if (n < nUsedCharColLen)
+      idChar.createObject(idOrdCol, {text: idCharRect.text})
+    else if (n < nUsedCharColLen*2)
+      idChar.createObject(idOrdCol2, {text: idCharRect.text})
+    else
+      idChar.createObject(idOrdCol3, {text: idCharRect.text})
+
+    let bRet = idDrawing.renderId(2)
+
+    if (!bRet)
+    {
+      idGameOver.visible = true
+      idGameOverTimer.start()
+    }
+  }
+}
+
+function hangShowAnswer(bAV)
+{
+  let n = idOrdRow.children.length
+  if (bAV)
+  {
+    for (let j = 0; j < n; ++j)
+    {
+      idOrdRow.children[j].text = sHangWord[j]
+    }
+  }
+  else
+  {
+    for (let i = 0; i < n; ++i)
+    {
+      if (sCurrentRow[i] !== " ")
+        idOrdRow.children[i].text =  sCurrentRow[i]
+      else
+        idOrdRow.children[i].text = ""
+    }
+
+  }
+}
+
+
 function connectMyDownloader()
 {
   MyDownloader.exportedSignal.connect(QuizLib.quizExported)
