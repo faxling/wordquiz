@@ -87,50 +87,55 @@ void SvgDrawing::answerShown()
 bool SvgDrawing::renderId(int sId)
 {
   bool bRet = true;
-  if (sId == 0)
   {
-    m_bAnswerShown = false;
-    m_nIndex = 0;
-    for (auto& oI : m_oSvgIds)
-      setOpacityOnId(oI,"0");
+    QMutexLocker o(&m_Mutex);
 
-    for (auto& oI : m_oSvgHIds)
-      setOpacityOnId(oI,"1");
-
-  }
-  else if (sId == 1)
-  {
-    m_bAnswerShown = false;
-    m_nIndex = 0;
-    for (auto& oI : m_oSvgIds)
-      setOpacityOnId(oI,"0");
-    setOpacityOnId("path891-8","0");
-  }
-  else if (sId == 2)
-  {
-    setOpacityOnId(m_oSvgIds[m_nIndex],"1");
-    if (m_nIndex == m_oSvgIds.size()- 4)
+    if (sId == 0)
     {
-      setOpacityOnId(m_oSvgIds[++m_nIndex],"1");
-      setOpacityOnId(m_oSvgIds[++m_nIndex],"1");
-      setOpacityOnId(m_oSvgIds[++m_nIndex],"1");
+      m_bAnswerShown = false;
+      m_nIndex = 0;
+      for (auto& oI : m_oSvgIds)
+        setOpacityOnId(oI,"0");
+
+      for (auto& oI : m_oSvgHIds)
+        setOpacityOnId(oI,"1");
+
+    }
+    else if (sId == 1)
+    {
+      m_bAnswerShown = false;
+      m_nIndex = 0;
+      for (auto& oI : m_oSvgIds)
+        setOpacityOnId(oI,"0");
+      setOpacityOnId("path891-8","0");
+    }
+    else if (sId == 2)
+    {
+      setOpacityOnId(m_oSvgIds[m_nIndex],"1");
+      if (m_nIndex == m_oSvgIds.size()- 4)
+      {
+        setOpacityOnId(m_oSvgIds[++m_nIndex],"1");
+        setOpacityOnId(m_oSvgIds[++m_nIndex],"1");
+        setOpacityOnId(m_oSvgIds[++m_nIndex],"1");
+      }
+
+      if (m_nIndex < (m_oSvgIds.size()- 1))
+        ++m_nIndex;
+
+      if (m_nIndex >= (m_oSvgIds.size()-1))
+        bRet = false;
     }
 
-    if (m_nIndex < (m_oSvgIds.size()- 1))
-      ++m_nIndex;
+    m_oSvg.load(m_oDomSvg.toByteArray());
 
-    if (m_nIndex >= (m_oSvgIds.size()-1))
-      bRet = false;
+    m_oSvgImage = QImage(width(), height(), QImage::Format_ARGB32_Premultiplied);
+    m_oSvgImage.fill(Qt::transparent);
+    QPainter oImgPainter(&m_oSvgImage);
+    if (oImgPainter.isActive() == false)
+      return true;
+
+    m_oSvg.render(&oImgPainter);
   }
-
-  m_oSvg.load(m_oDomSvg.toByteArray());
-  QMutexLocker o(&m_Mutex);
-  m_oSvgImage = QImage(width(), height(), QImage::Format_ARGB32_Premultiplied);
-  QPainter oImgPainter(&m_oSvgImage);
-  if (oImgPainter.isActive() == false)
-    return true;
-
-  m_oSvg.render(&oImgPainter);
   update();
   return bRet;
 }
@@ -150,6 +155,7 @@ void SvgDrawing::geometryChanged(const QRectF &newGeometry,
   if (oImgPainter.isActive() == false)
     return;
 
+  m_oSvgImage.fill(Qt::transparent);
   m_oSvg.render(&oImgPainter);
 }
 

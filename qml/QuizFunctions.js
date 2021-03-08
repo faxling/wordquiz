@@ -1,7 +1,7 @@
 function hangUpdateImage()
 {
   const n = idLangModel.count
-  let sL = bIsReverseHang ? sToLang : sFromLang
+  const sL = bIsReverseHang ? sToLang : sFromLang
   for (let i = 0 ; i < n ; ++i)
   {
     if (idLangModel.get(i).code === sL)
@@ -118,6 +118,9 @@ function hangCheckChar(sChar)
 function hangEnterChar()
 {
   Qt.inputMethod.hide()
+  if (idCharRect.text === " " || idCharRect.text === "")
+    return
+
   let n = sHangWord.length
   let nValidCount = 0
   let nOKCount = 0

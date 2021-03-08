@@ -17,7 +17,7 @@
 #include <QBuffer>
 #include <QUrl>
 #include <QTextDocument>
-#include <QRandomGenerator>
+#include <random>
 
 // https://cloud.ibm.com/resources
 // https://api.eu-gb.language-translator.watson.cloud.ibm.com
@@ -48,9 +48,11 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject *pParent
   QObject::connect(&m_oListQuizNetMgr, &QNetworkAccessManager::finished, this, &Speechdownloader::listDownloaded);
   QObject::connect(&m_oDeleteQuizNetMgr, &QNetworkAccessManager::finished, this, &Speechdownloader::quizDeleted);
   m_sStoragePath = sStoragePath;
+
   qDebug() << "WordQuiz StoragePath: " << m_sStoragePath;
   QSound::play("qrc:welcome_en.wav");
   m_pStopWatch = nullptr;
+
 }
 
 static const QString sReqDictUrlBase = "https://dictionary.yandex.net/api/v1/dicservice/lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739&lang=";
@@ -834,7 +836,10 @@ void Speechdownloader::showKey(bool b)
 
 double Speechdownloader::rand()
 {
-  return QRandomGenerator::global()->generateDouble();
+  static std::mt19937 gen(time(0));
+  static std::uniform_real_distribution<> dis(0, 1.0);
+  double d =  dis(gen);
+  return d;
 }
 
 void Speechdownloader::pushIndex(int nI)
