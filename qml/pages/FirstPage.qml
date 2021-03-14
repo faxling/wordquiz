@@ -107,12 +107,15 @@ Page {
     }
   }
 
-
+  ListModel {
+    id:idLangModel
+  }
 
   objectName: "idFirstPage"
 
   Component.onCompleted:
   {
+    QuizLib.initLangList()
     QuizLib.getAndInitDb();
   }
 
@@ -176,7 +179,7 @@ Page {
         Button
         {
           id:idTab1Btn
-          width: n3BtnWidth
+          width: n4BtnWidth
           text:"Home"
           onClicked: idWindow.state = "idTab1"
         }
@@ -184,7 +187,7 @@ Page {
         Button
         {
           id:idTab2Btn
-          width: n3BtnWidth
+          width: n4BtnWidth
           enabled: glosModelIndex.count > 0
           text:"Edit"
           onClicked:  idWindow.state =  "idTab2"
@@ -192,10 +195,21 @@ Page {
         Button
         {
           id:idTab3Btn
-          width: n3BtnWidth
+          width: n4BtnWidth
           enabled: glosModelIndex.count > 0
           text:"Quiz"
           onClicked:  idWindow.state ="idTab3"
+        }
+        Button
+        {
+          id:idTab4Btn
+          width: n4BtnWidth
+          enabled: glosModelIndex.count > 0
+          text:"Hang\n Man"
+          onClicked:  {
+            idWindow.state ="idTab4"
+            idTab4.newQ()
+          }
         }
       }
 
@@ -216,6 +230,14 @@ Page {
       TakeQuiz
       {
         id:idTab3
+        width:parent.width
+        height: idTabMain.height - idTabRow.height - idTitle.height - 20
+        visible:false
+      }
+
+      HangMan
+      {
+        id:idTab4
         width:parent.width
         height: idTabMain.height - idTabRow.height - idTitle.height - 20
         visible:false
@@ -272,7 +294,18 @@ Page {
         target: idTab3Btn
         color:Theme.highlightColor
       }
+    },
+    State {
+      name: "idTab4"
+      PropertyChanges {
+        target: idTab4
+        visible:true
+      }
 
+      PropertyChanges {
+        target: idTab4Btn
+        color:Theme.highlightColor
+      }
     }
 
   ]

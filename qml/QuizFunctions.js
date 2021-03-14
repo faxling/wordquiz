@@ -1,8 +1,94 @@
+function initLangList()
+{
+    // https://www.countryflags.com/
+
+  idLangModel.append(
+        {
+          lang: "Swedish",
+          imgsource:"qrc:/sweden-flag-button-round-icon-128.png",
+          code:"sv"
+        }
+        )
+
+  idLangModel.append(
+        {
+          lang: "Russian",
+          imgsource:"qrc:/russia-flag-button-round-icon-128.png",
+          code:"ru"
+        }
+        )
+
+
+  idLangModel.append(
+        {
+          lang: "French",
+          imgsource:"qrc:/france-flag-button-round-icon-128.png",
+          code:"fr"
+        }
+        )
+  idLangModel.append(
+        {
+          lang: "Italian",
+          imgsource:"qrc:/italy-flag-button-round-icon-128.png",
+          code:"it"
+        }
+        )
+
+  idLangModel.append(
+        {
+          lang: "English",
+          imgsource:"qrc:/united-kingdom-flag-button-round-icon-128.png",
+          code:"en"
+        }
+        )
+
+  idLangModel.append(
+        {
+          lang: "German",
+          imgsource:"qrc:/germany-flag-button-round-icon-128.png",
+          code:"de"
+        }
+        )
+  idLangModel.append(
+        {
+          lang: "Polish",
+          imgsource:"qrc:/poland-flag-button-round-icon-128.png",
+          code:"pl"
+        }
+        )
+
+  idLangModel.append(
+        {
+          lang: "Norvegian",
+          imgsource:"qrc:/norway-flag-button-round-icon-128.png",
+          code:"no"
+        }
+        )
+
+
+  idLangModel.append(
+        {
+          lang: "Spanish",
+          imgsource:"qrc:/spain-flag-button-round-icon-128.png",
+          code:"es"
+        }
+        )
+
+  idLangModel.append(
+        {
+          lang: "Hungarian",
+          imgsource:"qrc:/hungary-flag-button-round-icon-128.png",
+          code:"hu"
+        }
+        )
+}
+
 function hangUpdateImage()
 {
-  const n = idLangModel.count
-  const sL = bIsReverseHang ? sToLang : sFromLang
-  for (let i = 0 ; i < n ; ++i)
+  var n = idLangModel.count
+  var sL = bIsReverseHang ? sToLang : sFromLang
+  var i = 0
+  for (i = 0 ; i < n ; ++i)
   {
     if (idLangModel.get(i).code === sL)
     {
@@ -37,9 +123,9 @@ function hangNewQ()
 function hangAddWord()
 {
   hangClearThings()
-  let n = 0
-  let i = 0
-  let nIndexOfNewWord = 0
+  var n = 0
+  var i = 0
+  var nIndexOfNewWord = 0
   for ( i = 0 ; i < 10; ++i)
   {
     nIndexOfNewWord = Math.floor(MyDownloader.rand() * glosModel.count)
@@ -72,7 +158,7 @@ function hangAddWord()
 
   for (i = 0; i < n; ++i)
   {
-    const ch = sHangWord[i]
+    var ch = sHangWord[i]
 
     if (MyDownloader.isSpecial(ch))
     {
@@ -91,8 +177,8 @@ function hangAddWord()
 
 function hangCheckCharInColumn(sChar, oColumn)
 {
-  let n = oColumn.children.length
-  let i
+  var n = oColumn.children.length
+  var i
   for ( i = 0; i < n; ++i)
   {
     if (MyDownloader.ignoreAccent(oColumn.children[i].text) === MyDownloader.ignoreAccent(sChar))
@@ -121,10 +207,10 @@ function hangEnterChar()
   if (idCharRect.text === " " || idCharRect.text === "")
     return
 
-  let n = sHangWord.length
-  let nValidCount = 0
-  let nOKCount = 0
-  let nC = 0
+  var n = sHangWord.length
+  var nValidCount = 0
+  var nOKCount = 0
+  var nC = 0
   var i = 0
   for (i = 0; i < n; ++i)
   {
@@ -172,8 +258,8 @@ function hangEnterChar()
 
   if (nC === 0)
   {
-    let n = idOrdCol.children.length
-    let hRet = hangCheckChar(idCharRect.text)
+    n = idOrdCol.children.length
+    var hRet = hangCheckChar(idCharRect.text)
     if (hRet)
       return
     if (n === 1)
@@ -188,7 +274,7 @@ function hangEnterChar()
     else
       idChar.createObject(idOrdCol3, {text: idCharRect.text})
 
-    let bRet = idDrawing.renderId(2)
+    var bRet = idDrawing.renderId(2)
 
     if (!bRet)
     {
@@ -201,17 +287,19 @@ function hangEnterChar()
 
 function hangShowAnswer(bAV)
 {
-  let n = idOrdRow.children.length
+  var n = idOrdRow.children.length
   if (bAV)
   {
-    for (let j = 0; j < n; ++j)
+    var j
+    for (j = 0; j < n; ++j)
     {
       idOrdRow.children[j].text = sHangWord[j]
     }
   }
   else
   {
-    for (let i = 0; i < n; ++i)
+    var i
+    for (i = 0; i < n; ++i)
     {
       if (sCurrentRow[i] !== " ")
         idOrdRow.children[i].text =  sCurrentRow[i]
@@ -308,9 +396,10 @@ function reqTranslation(oBtnIn, bIsSecond)
 
 function lookUppInWiki()
 {
-  var oInText
+  var oInText;
 
-  var sLang = bDoLookUppText1 ? sFromLang : sToLang
+  var sLang;
+  sLang = bDoLookUppText1 ? sFromLang : sToLang;
 
   if (bDoLookUppText1)
     oInText = getTextFromInput(idTextInput)

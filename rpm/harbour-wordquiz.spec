@@ -8,8 +8,8 @@ Name:       harbour-wordquiz
 # >> macros
 # << macros
 
-Summary:    WordQuiz Studio
-Version:    3.2
+Summary:    Word quiz studio
+Version:    4.0
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE

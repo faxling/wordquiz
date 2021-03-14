@@ -26,7 +26,7 @@ Item {
       radius:10
       width:idView.width
       height:idRectTakeQuiz.height - 200
-      color:Theme.darkSecondaryColor
+      color:Theme.overlayBackgroundColor
 
       ButtonQuizImg
       {

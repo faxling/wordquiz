@@ -41,3 +41,6 @@
 - New translation service mymemory.translated.net
 - Buggfixes
 
+* Sun Mar 14 2021 Fredrik Axling <faxling11@gmail.com> 4.0-1
+- Add Hangman game
+

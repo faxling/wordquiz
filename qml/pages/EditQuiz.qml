@@ -330,16 +330,15 @@ Item {
     id: idLowerButtonRow
     y: idTab2.height - (Theme.itemSizeExtraSmall * 1.6)
     spacing: 10
-    Button {
+    ButtonQuiz {
       id: idResetBtn
-
       text: "Reset"
       onClicked: {
         QuizLib.resetQuiz()
       }
     }
 
-    Button {
+    ButtonQuiz {
       id: idReverseBtn
       text: "Reverse"
       onClicked: {

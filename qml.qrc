@@ -1,12 +1,24 @@
 <RCC>
-<qresource prefix="/">
-<file>qml/pages/horn.png</file>
-<file>qml/pages/left.png</file>
-<file>qml/pages/r.png</file>
-<file>qml/pages/rm.png</file>
-<file>qml/pages/thumb.png</file>
-<file>qml/pages/harbour-wordquiz.png</file>
-<file>qml/pages/hornbig.png</file>
-<file>welcome_en.wav</file>
-</qresource>
+    <qresource prefix="/">
+        <file>qml/pages/horn.png</file>
+        <file>qml/pages/left.png</file>
+        <file>qml/pages/r.png</file>
+        <file>qml/pages/rm.png</file>
+        <file>qml/pages/thumb.png</file>
+        <file>qml/pages/harbour-wordquiz.png</file>
+        <file>qml/pages/hornbig.png</file>
+        <file>welcome_en.wav</file>
+        <file alias="ITCKRIST.TTF">../glosquiz/ITCKRIST.TTF</file>
+        <file alias="gubbe.svg">../glosquiz/gubbe.svg</file>
+        <file alias="france-flag-button-round-icon-128.png">../glosquiz/glosquiz/flags/france-flag-button-round-icon-128.png</file>
+        <file alias="germany-flag-button-round-icon-128.png">../glosquiz/glosquiz/flags/germany-flag-button-round-icon-128.png</file>
+        <file alias="hungary-flag-button-round-icon-128.png">../glosquiz/glosquiz/flags/hungary-flag-button-round-icon-128.png</file>
+        <file alias="italy-flag-button-round-icon-128.png">../glosquiz/glosquiz/flags/italy-flag-button-round-icon-128.png</file>
+        <file alias="norway-flag-button-round-icon-128.png">../glosquiz/glosquiz/flags/norway-flag-button-round-icon-128.png</file>
+        <file alias="poland-flag-button-round-icon-128.png">../glosquiz/glosquiz/flags/poland-flag-button-round-icon-128.png</file>
+        <file alias="russia-flag-button-round-icon-128.png">../glosquiz/glosquiz/flags/russia-flag-button-round-icon-128.png</file>
+        <file alias="spain-flag-button-round-icon-128.png">../glosquiz/glosquiz/flags/spain-flag-button-round-icon-128.png</file>
+        <file alias="sweden-flag-button-round-icon-128.png">../glosquiz/glosquiz/flags/sweden-flag-button-round-icon-128.png</file>
+        <file alias="united-kingdom-flag-button-round-icon-128.png">../glosquiz/glosquiz/flags/united-kingdom-flag-button-round-icon-128.png</file>
+    </qresource>
 </RCC>
