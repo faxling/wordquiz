@@ -139,10 +139,10 @@ Item {
         visible:!allok
         anchors.right: parent.right
         anchors.rightMargin: 20
-        width: idBtnAnswer.width / 3
-        height: idBtnAnswer.width / 3
-        y : idBtnAnswer.y + idQuizColumn.y - 4
-        source:"qrc:qml/pages/hornbig.png"
+        width: idBtnAnswer.height
+        height: idBtnAnswer.height
+				y : idBtnAnswer.y + idQuizColumn.y 
+        source:"image://theme/icon-m-speaker-on"
         onClicked: MyDownloader.playWord(idQuizModel.question,bIsReverse ? sToLang : sFromLang )
       }
       Column
@@ -179,6 +179,7 @@ Item {
         ButtonQuiz
         {
           id:idBtnAnswer
+
           anchors.horizontalCenter: parent.horizontalCenter
           text:"Show Answer"
           onClicked:
@@ -202,10 +203,10 @@ Item {
         ButtonQuizImg
         {
           anchors.horizontalCenter: parent.horizontalCenter
-          width: idBtnAnswer.width / 3
-          height: idBtnAnswer.width / 3
+          width: idBtnAnswer.height
+          height: idBtnAnswer.height
           visible: bAnswerVisible
-          source:"qrc:qml/pages/hornbig.png"
+          source:"image://theme/icon-m-speaker-on"
           onClicked: MyDownloader.playWord(idQuizModel.answer,sAnswerLang )
         }
       }
