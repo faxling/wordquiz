@@ -43,6 +43,7 @@ public:
   Q_INVOKABLE void stopTimer();
   Q_INVOKABLE QString ignoreAccent(QString s);
   QString ignoreAccentLC(QString s);
+  Q_INVOKABLE QString removeDiacritics(QString str);
   Q_INVOKABLE bool hasImage(QString sWord, QString sLang);
   Q_INVOKABLE QUrl imageSrc(QString sWord, QString sLang);
   Q_INVOKABLE void setImgWord(QString sWord, QString sLang);

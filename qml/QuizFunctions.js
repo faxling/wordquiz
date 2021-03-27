@@ -1,105 +1,79 @@
-function initLangList()
-{
-    // https://www.countryflags.com/
+function initLangList() {
 
-  idLangModel.append(
-        {
-          lang: "Swedish",
-          imgsource:"qrc:/sweden-flag-button-round-icon-128.png",
-          code:"sv"
-        }
-        )
+  // https://www.countryflags.com/
+  idLangModel.append({
+                       "lang": "Swedish",
+                       "imgsource": "qrc:/sweden-flag-button-round-icon-128.png",
+                       "code": "sv"
+                     })
 
-  idLangModel.append(
-        {
-          lang: "Russian",
-          imgsource:"qrc:/russia-flag-button-round-icon-128.png",
-          code:"ru"
-        }
-        )
+  idLangModel.append({
+                       "lang": "Russian",
+                       "imgsource": "qrc:/russia-flag-button-round-icon-128.png",
+                       "code": "ru"
+                     })
 
+  idLangModel.append({
+                       "lang": "French",
+                       "imgsource": "qrc:/france-flag-button-round-icon-128.png",
+                       "code": "fr"
+                     })
+  idLangModel.append({
+                       "lang": "Italian",
+                       "imgsource": "qrc:/italy-flag-button-round-icon-128.png",
+                       "code": "it"
+                     })
 
-  idLangModel.append(
-        {
-          lang: "French",
-          imgsource:"qrc:/france-flag-button-round-icon-128.png",
-          code:"fr"
-        }
-        )
-  idLangModel.append(
-        {
-          lang: "Italian",
-          imgsource:"qrc:/italy-flag-button-round-icon-128.png",
-          code:"it"
-        }
-        )
+  idLangModel.append({
+                       "lang": "English",
+                       "imgsource": "qrc:/united-kingdom-flag-button-round-icon-128.png",
+                       "code": "en"
+                     })
 
-  idLangModel.append(
-        {
-          lang: "English",
-          imgsource:"qrc:/united-kingdom-flag-button-round-icon-128.png",
-          code:"en"
-        }
-        )
+  idLangModel.append({
+                       "lang": "German",
+                       "imgsource": "qrc:/germany-flag-button-round-icon-128.png",
+                       "code": "de"
+                     })
+  idLangModel.append({
+                       "lang": "Polish",
+                       "imgsource": "qrc:/poland-flag-button-round-icon-128.png",
+                       "code": "pl"
+                     })
 
-  idLangModel.append(
-        {
-          lang: "German",
-          imgsource:"qrc:/germany-flag-button-round-icon-128.png",
-          code:"de"
-        }
-        )
-  idLangModel.append(
-        {
-          lang: "Polish",
-          imgsource:"qrc:/poland-flag-button-round-icon-128.png",
-          code:"pl"
-        }
-        )
+  idLangModel.append({
+                       "lang": "Norvegian",
+                       "imgsource": "qrc:/norway-flag-button-round-icon-128.png",
+                       "code": "no"
+                     })
 
-  idLangModel.append(
-        {
-          lang: "Norvegian",
-          imgsource:"qrc:/norway-flag-button-round-icon-128.png",
-          code:"no"
-        }
-        )
+  idLangModel.append({
+                       "lang": "Spanish",
+                       "imgsource": "qrc:/spain-flag-button-round-icon-128.png",
+                       "code": "es"
+                     })
 
-
-  idLangModel.append(
-        {
-          lang: "Spanish",
-          imgsource:"qrc:/spain-flag-button-round-icon-128.png",
-          code:"es"
-        }
-        )
-
-  idLangModel.append(
-        {
-          lang: "Hungarian",
-          imgsource:"qrc:/hungary-flag-button-round-icon-128.png",
-          code:"hu"
-        }
-        )
+  idLangModel.append({
+                       "lang": "Hungarian",
+                       "imgsource": "qrc:/hungary-flag-button-round-icon-128.png",
+                       "code": "hu"
+                     })
 }
 
-function hangUpdateImage()
-{
+function hangUpdateImage() {
   var n = idLangModel.count
   var sL = bIsReverseHang ? sToLang : sFromLang
+  console.log("hangUpdateImage " + sToLang + "  " + n)
   var i = 0
-  for (i = 0 ; i < n ; ++i)
-  {
-    if (idLangModel.get(i).code === sL)
-    {
+  for (i = 0; i < n; ++i) {
+    if (idLangModel.get(i).code === sL) {
       idFlagImg.source = idLangModel.get(i).imgsource
-      break;
+      break
     }
   }
 }
 
-function hangClearThings()
-{
+function hangClearThings() {
   idHangBtn3.bAV = false
   idResultMsg.visible = false
   idResultMsgTimer.stop()
@@ -111,8 +85,7 @@ function hangClearThings()
   idCharRect.text = ""
 }
 
-function hangNewQ()
-{
+function hangNewQ() {
   bIsReverseHang = false
   hangClearThings()
   idDrawing.renderId(1)
@@ -120,75 +93,66 @@ function hangNewQ()
   idHangBtn.visible = true
 }
 
-function hangAddWord()
-{
+function hangAddWord() {
   hangClearThings()
   var n = 0
   var i = 0
   var nIndexOfNewWord = 0
-  for ( i = 0 ; i < 10; ++i)
-  {
+  for (i = 0; i < 10; ++i) {
     nIndexOfNewWord = Math.floor(MyDownloader.rand() * glosModel.count)
 
-    if (bIsReverseHang)
-    {
+    if (bIsReverseHang) {
       sHangWord = glosModel.get(nIndexOfNewWord).answer
       idTTrans.text = glosModel.get(nIndexOfNewWord).question
-    }
-    else
-    {
+    } else {
       sHangWord = glosModel.get(nIndexOfNewWord).question
       idTTrans.text = glosModel.get(nIndexOfNewWord).answer
     }
 
     sHangWord = sHangWord.toUpperCase()
+    sHangWord = MyDownloader.removeDiacritics(sHangWord)
     n = sHangWord.length
     if (n < 14)
       break
   }
 
-  if (i === 10)
-  {
+  if (i === 10) {
     idErrorDialogHangMan.text = "Create or Select a Word Quiz that contains short words!"
     idErrorDialogHangMan.visible = true
-    return;
+    return
   }
 
   sCurrentRow = []
 
-  for (i = 0; i < n; ++i)
-  {
+  for (i = 0; i < n; ++i) {
     var ch = sHangWord[i]
 
-    if (MyDownloader.isSpecial(ch))
-    {
+    if (MyDownloader.isSpecial(ch)) {
       sCurrentRow.push((ch))
-      idChar.createObject(idOrdRow, {text : ch , bIsSpecial:true })
-    }
-    else
-    {
+      idChar.createObject(idOrdRow, {
+                            "text": ch,
+                            "bIsSpecial": true
+                          })
+    } else {
       sCurrentRow.push(" ")
       idChar.createObject(idOrdRow)
     }
   }
-  idWindow.nGlosaTakeQuizIndex = nIndexOfNewWord;
-
+  idWindow.nGlosaTakeQuizIndex = nIndexOfNewWord
 }
 
-function hangCheckCharInColumn(sChar, oColumn)
-{
+function hangCheckCharInColumn(sChar, oColumn) {
   var n = oColumn.children.length
   var i
-  for ( i = 0; i < n; ++i)
-  {
-    if (MyDownloader.ignoreAccent(oColumn.children[i].text) === MyDownloader.ignoreAccent(sChar))
+  for (i = 0; i < n; ++i) {
+    if (MyDownloader.ignoreAccent(
+          oColumn.children[i].text) === MyDownloader.ignoreAccent(sChar))
       return true
   }
   return false
 }
 
-function hangCheckChar(sChar)
-{
+function hangCheckChar(sChar) {
   if (hangCheckCharInColumn(sChar, idOrdCol))
     return true
 
@@ -201,8 +165,7 @@ function hangCheckChar(sChar)
   return false
 }
 
-function hangEnterChar()
-{
+function hangEnterChar() {
   Qt.inputMethod.hide()
   if (idCharRect.text === " " || idCharRect.text === "")
     return
@@ -212,8 +175,7 @@ function hangEnterChar()
   var nOKCount = 0
   var nC = 0
   var i = 0
-  for (i = 0; i < n; ++i)
-  {
+  for (i = 0; i < n; ++i) {
     if (idOrdRow.children[i].bIsSpecial)
       continue
 
@@ -223,23 +185,21 @@ function hangEnterChar()
       nOKCount += 1
   }
 
-  if (nOKCount === nValidCount)
-  {
+  if (nOKCount === nValidCount) {
     return
   }
 
   nOKCount = 0
   nValidCount = 0
-  for (i = 0; i < n; ++i)
-  {
+  for (i = 0; i < n; ++i) {
     if (idOrdRow.children[i].bIsSpecial)
       continue
 
     ++nValidCount
 
-    if (MyDownloader.ignoreAccent(sHangWord[i]) === MyDownloader.ignoreAccent(idCharRect.text[0]))
-    {
-      nC+=1
+    if (MyDownloader.ignoreAccent(sHangWord[i]) === MyDownloader.ignoreAccent(
+          idCharRect.text[0])) {
+      nC += 1
       idOrdRow.children[i].text = sHangWord[i]
       sCurrentRow[i] = sHangWord[i]
     }
@@ -248,36 +208,38 @@ function hangEnterChar()
       nOKCount += 1
   }
 
-  if (nOKCount === nValidCount)
-  {
+  if (nOKCount === nValidCount) {
     idResultMsg.visible = true
     idResultMsg.text = idDrawing.getRating()
     idDrawing.renderId(0)
     return
   }
 
-  if (nC === 0)
-  {
+  if (nC === 0) {
     n = idOrdCol.children.length
     var hRet = hangCheckChar(idCharRect.text)
     if (hRet)
       return
-    if (n === 1)
-    {
+    if (n === 1) {
       nUsedCharColLen = idHangMan.height / (idOrdCol.children[0].width * 1.8)
     }
 
     if (n < nUsedCharColLen)
-      idChar.createObject(idOrdCol, {text: idCharRect.text})
-    else if (n < nUsedCharColLen*2)
-      idChar.createObject(idOrdCol2, {text: idCharRect.text})
+      idChar.createObject(idOrdCol, {
+                            "text": idCharRect.text
+                          })
+    else if (n < nUsedCharColLen * 2)
+      idChar.createObject(idOrdCol2, {
+                            "text": idCharRect.text
+                          })
     else
-      idChar.createObject(idOrdCol3, {text: idCharRect.text})
+      idChar.createObject(idOrdCol3, {
+                            "text": idCharRect.text
+                          })
 
     var bRet = idDrawing.renderId(2)
 
-    if (!bRet)
-    {
+    if (!bRet) {
       idResultMsg.visible = true
       idResultMsg.text = "Game Over!"
       idResultMsgTimer.start()
@@ -285,44 +247,34 @@ function hangEnterChar()
   }
 }
 
-function hangShowAnswer(bAV)
-{
+function hangShowAnswer(bAV) {
   var n = idOrdRow.children.length
-  if (bAV)
-  {
+  if (bAV) {
     var j
-    for (j = 0; j < n; ++j)
-    {
+    for (j = 0; j < n; ++j) {
       idOrdRow.children[j].text = sHangWord[j]
     }
-  }
-  else
-  {
+  } else {
     var i
-    for (i = 0; i < n; ++i)
-    {
+    for (i = 0; i < n; ++i) {
       if (sCurrentRow[i] !== " ")
-        idOrdRow.children[i].text =  sCurrentRow[i]
+        idOrdRow.children[i].text = sCurrentRow[i]
       else
         idOrdRow.children[i].text = ""
     }
-
   }
 }
 
-
-function connectMyDownloader()
-{
+function connectMyDownloader() {
   MyDownloader.exportedSignal.connect(QuizLib.quizExported)
   MyDownloader.quizDownloadedSignal.connect(QuizLib.loadFromList)
-  MyDownloader.quizListDownloadedSignal.connect(
-        QuizLib.loadFromServerList)
+  MyDownloader.quizListDownloadedSignal.connect(QuizLib.loadFromServerList)
   MyDownloader.deletedSignal.connect(QuizLib.quizDeleted)
   idWindow.quizListView = idQuizList
 }
 
-String.prototype.equalIgnoreCase = function(str) {
-  return this.toUpperCase() === str.toUpperCase();
+String.prototype.equalIgnoreCase = function (str) {
+  return this.toUpperCase() === str.toUpperCase()
 }
 
 Array.prototype.indexOfObject = function arrayObjectIndexOf(property, value) {
@@ -348,7 +300,7 @@ function resetTakeQuizTab() {
 }
 
 function getTextFromInput(oTextInput) {
-  var oInText =  capitalizeStr(oTextInput.displayText)
+  var oInText = capitalizeStr(oTextInput.displayText)
   if (oInText.length < 1) {
     idErrorText.visible = true
     idErrorText.text = "No input to lookup in dictionary"
@@ -357,22 +309,17 @@ function getTextFromInput(oTextInput) {
   return oInText
 }
 
-
-function reqTranslation(oBtnIn, bIsSecond)
-{
+function reqTranslation(oBtnIn, bIsSecond) {
   var oInText
   var sUrl
-  if (bIsSecond)
-  {
+  if (bIsSecond) {
     nLastSearch = 1
     oInText = getTextFromInput(idTextInput2)
-    sUrl =  sReqUrlRev + oInText
-  }
-  else
-  {
+    sUrl = sReqUrlRev + oInText
+  } else {
     nLastSearch = 0
     oInText = getTextFromInput(idTextInput)
-    sUrl =  sReqUrl + oInText
+    sUrl = sReqUrl + oInText
   }
 
   if (oInText === "")
@@ -380,26 +327,24 @@ function reqTranslation(oBtnIn, bIsSecond)
 
   oBtnIn.bProgVisible = true
 
-  if (bIsSecond)
-  {
-    MyDownloader.translateWord(oInText,idWindow.sToLang,idWindow.sFromLang, oBtnIn)
+  if (bIsSecond) {
+    MyDownloader.translateWord(oInText, idWindow.sToLang,
+                               idWindow.sFromLang, oBtnIn)
     if (bHasDictFrom)
       downloadDictOnWord(sReqDictUrlRev, oInText)
-  }
-  else
-  {
-    MyDownloader.translateWord(oInText,idWindow.sFromLang,idWindow.sToLang, oBtnIn)
+  } else {
+    MyDownloader.translateWord(oInText, idWindow.sFromLang,
+                               idWindow.sToLang, oBtnIn)
     if (bHasDictTo)
       downloadDictOnWord(sReqDictUrl, oInText)
   }
 }
 
-function lookUppInWiki()
-{
-  var oInText;
+function lookUppInWiki() {
+  var oInText
 
-  var sLang;
-  sLang = bDoLookUppText1 ? sFromLang : sToLang;
+  var sLang
+  sLang = bDoLookUppText1 ? sFromLang : sToLang
 
   if (bDoLookUppText1)
     oInText = getTextFromInput(idTextInput)
@@ -409,8 +354,9 @@ function lookUppInWiki()
   if (oInText === "")
     return
 
-  Qt.openUrlExternally("http://"+sLang+ ".wiktionary.org/w/index.php?title=" +oInText.toLowerCase() )
-
+  Qt.openUrlExternally(
+        "http://" + sLang + ".wiktionary.org/w/index.php?title=" + oInText.toLowerCase(
+          ))
 }
 
 function updateDesc1(sDesc) {
@@ -424,7 +370,7 @@ function updateDesc1(sDesc) {
   idWindow.sQuizDesc = sDesc
 
   var sDateStr = MyDownloader.dateStr()
-  var sDescAndDate = sDesc + "###" +sDateStr
+  var sDescAndDate = sDesc + "###" + sDateStr
   glosModelIndex.get(nCurIndexInQList).descdate = sDateStr
   idWindow.sQuizDate = glosModelIndex.get(nCurIndexInQList).descdate
 
@@ -474,8 +420,8 @@ function getTextInputAndAdd() {
     return
   var i
   for (i = 0; i < glosModel.count; i++) {
-    if (sNewWordFrom.equalIgnoreCase(glosModel.get(i).question) && sNewWordTo.equalIgnoreCase(glosModel.get(
-                                                                                                i).answer) ){
+    if (sNewWordFrom.equalIgnoreCase(glosModel.get(i).question)
+        && sNewWordTo.equalIgnoreCase(glosModel.get(i).answer)) {
       idErrorText2.visible = true
       idErrorText2.text = idTextInput.text + " Already in quiz!"
       return
@@ -505,7 +451,6 @@ function getAndInitDb() {
   db = Sql.LocalStorage.openDatabaseSync("GlosDB", "1.0",
                                          "Glos Databas!", 1000000)
 
-
   db.transaction(function (tx) {
 
     // tx.executeSql('DROP TABLE GlosaDbIndex');
@@ -525,7 +470,6 @@ function getAndInitDb() {
 
     rs = tx.executeSql('SELECT * FROM GlosaDbDesc')
 
-
     var oc = []
 
     for (var i = 0; i < rs.rows.length; i++) {
@@ -538,10 +482,8 @@ function getAndInitDb() {
 
     rs = tx.executeSql('SELECT * FROM GlosaDbIndex')
 
-
-
     var nRowLen = rs.rows.length
-    var ocRet = new Array(nRowLen);
+    var ocRet = new Array(nRowLen)
     MyDownloader.sortRowset(rs.rows.item, rs.rows, nRowLen, ocRet)
 
     for (var j = 0; j < nRowLen; j++) {
@@ -561,7 +503,7 @@ function getAndInitDb() {
                               "state1": rs.rows.item(i).state1,
                               "langpair": rs.rows.item(i).langpair,
                               "desc1": getDesc(vDescDate),
-                              "descdate":getDate(vDescDate)
+                              "descdate": getDate(vDescDate)
                             })
     }
 
@@ -582,7 +524,6 @@ ocL.append(oJJ["desc1"].toString());
 ocL.append(oJJ["slang"].toString());
 ocL.append(oJJ["qcount"].toString());
 */
-
 function assignTextInputField(text) {
   text = text.trim()
   if (nLastSearch !== 1)
@@ -595,7 +536,6 @@ function setAllok(bval) {
   idWindow.bAllok = bval
 }
 
-
 // Updates the description of the Quiz
 function insertGlosa(dbnumber, nC, question, answer) {
   var sQ = capitalizeStr(question)
@@ -606,7 +546,7 @@ function insertGlosa(dbnumber, nC, question, answer) {
                   [nC, sQ, sA, 0])
   })
 
-  glosModel.insert(0,{
+  glosModel.insert(0, {
                      "answer": sA,
                      "extra": "",
                      "number": nC,
@@ -635,7 +575,6 @@ function insertGlosa(dbnumber, nC, question, answer) {
   }
 
   updateDesc1(idWindow.sQuizDesc)
-
 }
 
 function assignQuizModel(nIndexOfNewWord) {
@@ -695,7 +634,7 @@ function capitalizeStr(inStr) {
   if (inStr.length === 0)
     return ""
   var sA = inStr.trim().toLowerCase()
-  sA =  sA.charAt(0).toUpperCase() + sA.slice(1)
+  sA = sA.charAt(0).toUpperCase() + sA.slice(1)
   return sA
 }
 
@@ -716,8 +655,8 @@ function loadFromDb(tx) {
   var hasNonInt = false
   for (var i = 0; i < rs.rows.length; i++) {
 
-    var sWordAndExtra  = rs.rows.item(i).answer
-    var sA  = capitalizeStr(getWord(sWordAndExtra))
+    var sWordAndExtra = rs.rows.item(i).answer
+    var sA = capitalizeStr(getWord(sWordAndExtra))
     var sE = getExtra(sWordAndExtra)
     var sQ = capitalizeStr(rs.rows.item(i).quizword)
     var nNr = rs.rows.item(i).number
@@ -757,32 +696,26 @@ function loadFromDb(tx) {
   }
 }
 
-
-function renameQuiz(sQuizName)
-{
+function renameQuiz(sQuizName) {
 
   sQuizName = capitalizeStr(sQuizName)
 
-  if (sQuizName.length < 4)
-  {
-    idErrorDialog.text = "'" +idTextInputQuizName.displayText + "'" + " To short Quiz name"
+  if (sQuizName.length < 4) {
+    idErrorDialog.text = "'" + idTextInputQuizName.displayText + "'" + " To short Quiz name"
     idErrorDialog.visible = true
-    return;
+    return
   }
 
   idWindow.sQuizName = sQuizName
 
-  glosModelIndex.setProperty(idQuizList.currentIndex,"quizname",sQuizName)
+  glosModelIndex.setProperty(idQuizList.currentIndex, "quizname", sQuizName)
 
-  db.transaction(
-        function(tx) {
-          var nId = glosModelIndex.get(idQuizList.currentIndex).number;
-          tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',[sQuizName, nId]);
-          idTextSelected.text = sQuizName
-        }
-        )
-
-
+  db.transaction(function (tx) {
+    var nId = glosModelIndex.get(idQuizList.currentIndex).number
+    tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',
+                  [sQuizName, nId])
+    idTextSelected.text = sQuizName
+  })
 }
 
 function loadFromQuizList() {
@@ -794,8 +727,7 @@ function loadFromQuizList() {
                   [idQuizList.currentIndex])
   })
 
-  if (glosModelIndex.count === 0)
-  {
+  if (glosModelIndex.count === 0) {
     return
   }
 
@@ -836,11 +768,11 @@ function loadFromQuizList() {
 
 function newQuiz() {
 
-  if (idLangModel.get(idLangList1.currentIndex).code === idLangModel.get(idLangList2.currentIndex).code)
-  {
+  if (idLangModel.get(idLangList1.currentIndex).code === idLangModel.get(
+        idLangList2.currentIndex).code) {
     idErrorDialog.text = "A WordQuiz should be of different languages e.g en-ru"
     idErrorDialog.visible = true
-    return;
+    return
   }
 
   db.transaction(function (tx) {
@@ -860,13 +792,13 @@ function newQuiz() {
                   [nNr, sQuizName, "0/0", sLangLangSelected])
     tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)', [nNr, "-"])
 
-    glosModelIndex.append( {
+    glosModelIndex.append({
                             "number": nNr,
                             "quizname": sQuizName,
                             "state1": "0/0",
                             "langpair": sLangLangSelected,
                             "desc1": "-",
-                            "descdate":MyDownloader.dateStr()
+                            "descdate": MyDownloader.dateStr()
                           })
 
     idQuizList.positionViewAtEnd()
@@ -876,8 +808,7 @@ function newQuiz() {
   })
 }
 
-function getExtra(sWordAndExtra)
-{
+function getExtra(sWordAndExtra) {
   if (sWordAndExtra === undefined)
     return ""
   if (sWordAndExtra === null)
@@ -891,9 +822,7 @@ function getExtra(sWordAndExtra)
     return ""
 }
 
-
-function getWord(sWordAndExtra)
-{
+function getWord(sWordAndExtra) {
   if (sWordAndExtra === undefined)
     return ""
   if (sWordAndExtra === null)
@@ -904,9 +833,7 @@ function getWord(sWordAndExtra)
   return ocWord[0]
 }
 
-
-function getDesc(sDescAndDate)
-{
+function getDesc(sDescAndDate) {
   if (sDescAndDate === undefined)
     return "-"
 
@@ -915,9 +842,7 @@ function getDesc(sDescAndDate)
   return ocDesc[0]
 }
 
-
-function getDate(sDescAndDate)
-{
+function getDate(sDescAndDate) {
   if (sDescAndDate === undefined)
     return "-"
 
@@ -931,7 +856,7 @@ function getDate(sDescAndDate)
 
 function loadFromServerList(nCount, oDD) {
   var nLastSelected = -1
-  var sLastSelectedQ =  idImport.sSelectedQ
+  var sLastSelectedQ = idImport.sSelectedQ
   idServerQModel.clear()
   idDownloadBtn.bProgVisible = false
   idImport.bIsDownloadingList = false
@@ -974,20 +899,15 @@ function loadFromServerList(nCount, oDD) {
                           })
   }
 
-  if (nLastSelected >= 0)
-  {
+  if (nLastSelected >= 0) {
     idImport.currentIndex = nLastSelected
     idImport.positionViewAtIndex(nLastSelected)
-  }
-  else
-  {
+  } else {
     idImport.currentIndex = -1
     idImport.sDescDate = "-"
     idImport.sDesc1 = "-"
     idImport.sSelectedQ = "-"
   }
-
-
 }
 
 function quizDeleted(nResponce) {
@@ -1003,8 +923,7 @@ function quizDeleted(nResponce) {
       idImport.sSelectedQ = idServerQModel.get(nResponce - 1).qname
       idImport.sImportMsg = ""
     }
-  } else
-  {
+  } else {
     if (nResponce === -1)
       idImport.sImportMsg = "Wrong password"
     else
@@ -1026,12 +945,10 @@ function quizExported(nResponce) {
     } else if (nResponce === 207) {
       idExportError.text = "Can not update '" + sQuizName + "'"
       idExportError.visible = true
-    }
-    else if (nResponce === 208) {
+    } else if (nResponce === 208) {
       idExportError.text = "Error in Quizdb"
       idExportError.visible = true
-    }
-    else if (nResponce === 200) {
+    } else if (nResponce === 200) {
       idExport.visible = false
     } else {
       idExportError.text = nResponce
@@ -1062,7 +979,7 @@ function loadFromList(nCount, oDD, sLangLoaded) {
 
     var sState1 = nCount / 3 + "/" + nCount / 3
     tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)',
-                  [nDbNumber, idImport.sDesc1 +"###" + idImport.sDescDate])
+                  [nDbNumber, idImport.sDesc1 + "###" + idImport.sDescDate])
 
     tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',
                   [nDbNumber, sQuizName, sState1, sLangLoaded])
@@ -1073,7 +990,7 @@ function loadFromList(nCount, oDD, sLangLoaded) {
                             "state1": sState1,
                             "langpair": sLangLoaded,
                             "desc1": idImport.sDesc1,
-                            "descdate":idImport.sDescDate
+                            "descdate": idImport.sDescDate
                           })
 
     // answer, question , state
@@ -1199,13 +1116,10 @@ function updateQuiz() {
     // Assign The updated values
     if (idQuizModel.number === nNumber) {
       idQuizModel.extra = sE
-      if ( bIsReverse )
-      {
+      if (bIsReverse) {
         idQuizModel.question = sA_Org
         idQuizModel.answer = sQ
-      }
-      else
-      {
+      } else {
         idQuizModel.question = sQ
         idQuizModel.answer = sA_Org
       }
@@ -1217,27 +1131,20 @@ function updateQuiz() {
   if (i >= 0) {
     if (nState !== 0) {
       glosModelWorking.remove(i)
-      if ( glosModelWorking.count === 0)
+      if (glosModelWorking.count === 0)
         setAllok(true)
-    }
-    else
-    {
-      if ( bIsReverse )
-      {
+    } else {
+      if (bIsReverse) {
         glosModelWorking.get(i).answer = sQ
         glosModelWorking.get(i).question = sA_Org
-      }
-      else
-      {
+      } else {
         glosModelWorking.get(i).answer = sA_Org
         glosModelWorking.get(i).question = sQ
       }
       glosModelWorking.get(i).number = nNumber
       glosModelWorking.get(i).extra = sE
     }
-  }
-  else
-  {
+  } else {
     if (nState === 0) {
       glosModelWorking.append({
                                 "number": nNumber,
@@ -1268,10 +1175,9 @@ function updateQuiz() {
   MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).question,
                           sFromLang)
 
-  if (glosModel.get(idGlosList.currentIndex).question !== sQ
-      || glosModel.get(idGlosList.currentIndex).answer !== sA_Org
-      || glosModel.get(idGlosList.currentIndex).extra !== sE)
-  {
+  if (glosModel.get(idGlosList.currentIndex).question !== sQ || glosModel.get(
+        idGlosList.currentIndex).answer !== sA_Org || glosModel.get(
+        idGlosList.currentIndex).extra !== sE) {
     glosModel.get(idGlosList.currentIndex).question = sQ
     glosModel.get(idGlosList.currentIndex).answer = sA_Org
     glosModel.get(idGlosList.currentIndex).extra = sE
@@ -1327,9 +1233,7 @@ function deleteWordInQuiz() {
 }
 
 // To smoth the pathview
-
-function getFunctionU(nLastNumber, oTimer)
-{
+function getFunctionU(nLastNumber, oTimer) {
 
   return function updateDbWithWordState() {
 
@@ -1338,9 +1242,8 @@ function getFunctionU(nLastNumber, oTimer)
                     nLastNumber)
     })
 
-    oTimer.stop();
-    oTimer.destroy();
-
+    oTimer.stop()
+    oTimer.destroy()
   }
 }
 

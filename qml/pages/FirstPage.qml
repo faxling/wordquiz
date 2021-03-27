@@ -23,7 +23,7 @@ Page {
   property string sFromLang
   property string sQuestionLang: bIsReverse ? sToLang : sFromLang
   property string sAnswerLang: bIsReverse ? sFromLang : sToLang
-  property bool bIsReverse
+  property bool bIsReverse: false
   property bool bHasDictTo: sToLang === "ru" || sToLang === "en"
   property bool bHasDictFrom: sFromLang === "ru" || sFromLang === "en"
   property string sLangLangEn
@@ -48,6 +48,7 @@ Page {
   property string sSearchQuery
   property int nGlosaTakeQuizIndex
   property int nMargin: Screen.height > 1000 ? 50 : 25
+  property bool bInitHangMan: true
   onSScoreTextChanged: {
     db.transaction(function (tx) {
       tx.executeSql('UPDATE GlosaDbIndex SET state1=? WHERE dbnumber=?',
@@ -197,8 +198,10 @@ Page {
           text: "Hang Man"
 
           onClicked: {
-            if (idWindow.state === "idTab1")
+            if (idWindow.state === "idTab1" || bInitHangMan) {
+              bInitHangMan = false
               idTab4.newQ()
+            }
             idWindow.state = "idTab4"
           }
         }

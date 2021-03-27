@@ -122,6 +122,17 @@ QString Speechdownloader::ignoreAccent(QString str)
 
 }
 
+QString Speechdownloader::removeDiacritics(QString str)
+{
+  QString filtered;
+  for (int i = 0; i < str.length(); i++) {
+      if (str.at(i).category() != QChar::Mark_NonSpacing) {
+          filtered.append(str.at(i));
+      }
+  }
+  return filtered;
+}
+
 QString Speechdownloader::dateStr()
 {
   const wchar_t* szFormat = L"%Y-%m-%d  %H:%M";
