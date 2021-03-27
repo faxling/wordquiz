@@ -1,5 +1,3 @@
-
-
 import QtQuick 2.2
 import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0 as Sql
@@ -23,47 +21,42 @@ Page {
   property string sLangLangRev
   property string sToLang
   property string sFromLang
-  property string sQuestionLang : bIsReverse ? sToLang : sFromLang
-  property string sAnswerLang : bIsReverse ? sFromLang : sToLang
+  property string sQuestionLang: bIsReverse ? sToLang : sFromLang
+  property string sAnswerLang: bIsReverse ? sFromLang : sToLang
   property bool bIsReverse
-  property bool bHasDictTo : sToLang ==="ru" || sToLang ==="en"
-  property bool bHasDictFrom : sFromLang ==="ru" || sFromLang ==="en"
+  property bool bHasDictTo: sToLang === "ru" || sToLang === "en"
+  property bool bHasDictFrom: sFromLang === "ru" || sFromLang === "en"
   property string sLangLangEn
-  property string sQuizName : "-"
-  property string sQuizDate : "-"
-  property string sQuizDesc : "-"
-  property string sScoreText : "-"
-  property int nDbNumber : 0;
+  property string sQuizName: "-"
+  property string sQuizDate: "-"
+  property string sQuizDesc: "-"
+  property string sScoreText: "-"
+  property int nDbNumber: 0
   property int nQuizIndex: 1
   property int n3BtnWidth: idTabMain.width / 3 - 8
   property int n4BtnWidth: idTabMain.width / 4 - 7
   property int n25BtnWidth: idTabMain.width / 2.4 - 7
   property int n2BtnWidth: idTabMain.width / 2
   property int nDlgHeight: idWindow.height / 5 + 45
-  property bool bQSort : true
-  property string sQSort : bQSort ? "UPPER(quizword)" : "UPPER(answer)"
+  property bool bQSort: true
+  property string sQSort: bQSort ? "UPPER(quizword)" : "UPPER(answer)"
   property variant glosListView
   property variant quizListView
   property variant oTakeQuiz
-  property bool bAllok : false
-  property int nGlosaDbLastIndex:  -1
+  property bool bAllok: false
+  property int nGlosaDbLastIndex: -1
   property string sSearchQuery
   property int nGlosaTakeQuizIndex
-  property int nMargin : Screen.height > 1000 ? 50 : 25
-  onSScoreTextChanged:
-  {
-    db.transaction(
-          function(tx) {
-            tx.executeSql('UPDATE GlosaDbIndex SET state1=? WHERE dbnumber=?',[sScoreText, nDbNumber]);
+  property int nMargin: Screen.height > 1000 ? 50 : 25
+  onSScoreTextChanged: {
+    db.transaction(function (tx) {
+      tx.executeSql('UPDATE GlosaDbIndex SET state1=? WHERE dbnumber=?',
+                    [sScoreText, nDbNumber])
 
-            var i = MyDownloader.indexFromGlosNr(glosModelIndex, nDbNumber)
-            glosModelIndex.setProperty(i,"state1", sScoreText)
-
-          }
-          )
+      var i = MyDownloader.indexFromGlosNr(glosModelIndex, nDbNumber)
+      glosModelIndex.setProperty(i, "state1", sScoreText)
+    })
   }
-
-
 
   ListModel {
     id: glosModel
@@ -75,64 +68,58 @@ Page {
     id: glosModelWorking
   }
 
-
   // Used by idQuizList
   ListModel {
     id: glosModelIndex
   }
 
   // Used by idView in TakeQuiz
-
-
   ListModel {
-    id:idQuizModel
+    id: idQuizModel
     property string question
     property string extra
     property string answer
     property int number
 
-    onQuestionChanged:
-    {
-      MyDownloader.setImgWord(question,sQuestionLang )
+    onQuestionChanged: {
+      MyDownloader.setImgWord(question, sQuestionLang)
     }
 
     ListElement {
-      number:0
+      number: 0
     }
     ListElement {
-      number:1
+      number: 1
     }
     ListElement {
-      number:2
+      number: 2
     }
   }
 
   ListModel {
-    id:idLangModel
+    id: idLangModel
   }
 
   objectName: "idFirstPage"
 
-  Component.onCompleted:
-  {
+  Component.onCompleted: {
     QuizLib.initLangList()
-    QuizLib.getAndInitDb();
+    QuizLib.getAndInitDb()
   }
 
   SilicaListView {
     anchors.fill: parent
 
-    Column  {
-      id:idTabMain
-      anchors.fill : parent
-      anchors.leftMargin : nMargin
-      anchors.rightMargin : nMargin
-      anchors.topMargin : nMargin
-      spacing :10
+    Column {
+      id: idTabMain
+      anchors.fill: parent
+      anchors.leftMargin: nMargin
+      anchors.rightMargin: nMargin
+      anchors.topMargin: nMargin
+      spacing: 10
 
-      Item
-      {
-        width:parent.width
+      Item {
+        width: parent.width
         height: idTitle.height
         Label {
           id: idTitle
@@ -142,109 +129,109 @@ Page {
             if (glosModelIndex.count === 0)
               return "No Quiz create one or download"
 
-            return sQuizName + " " + sFromLang + (bIsReverse ? "<-" : "->") +  sToLang + " " + sScoreText
-
+            return sQuizName + " " + sFromLang + (bIsReverse ? "<-" : "->")
+                + sToLang + " " + sScoreText
           }
 
           onTextChanged: sAppTitle = sQuizName
         }
 
-        ButtonQuizImg
-        {
+        ButtonQuizImg {
           id: idBtnHelp
           anchors.right: parent.right
-          anchors.topMargin : -nMargin
-          anchors.rightMargin :-nMargin
-          anchors.top : parent.top
-          source:"image://theme/icon-m-question"
-          onClicked: Qt.openUrlExternally("https://faxling.github.io/WordQuizWin/index.html");
+          anchors.topMargin: -nMargin
+          anchors.rightMargin: -nMargin
+          anchors.top: parent.top
+          source: "image://theme/icon-m-question"
+          onClicked: Qt.openUrlExternally(
+                       "https://faxling.github.io/WordQuizWin/index.html")
         }
 
-        ButtonQuizImg
-        {
+        ButtonQuizImg {
           id: idBtnSearch
           anchors.left: parent.left
-          anchors.topMargin : -nMargin
-          anchors.leftMargin : -nMargin
-          anchors.top : parent.top
-          source:"image://theme/icon-m-search"
-          onClicked: Qt.openUrlExternally("https://www.google.com/search?q="+sSearchQuery);
+          anchors.topMargin: -nMargin
+          anchors.leftMargin: -nMargin
+          anchors.top: parent.top
+          source: "image://theme/icon-m-search"
+          onClicked: Qt.openUrlExternally(
+                       "https://www.google.com/search?q=" + sSearchQuery)
         }
       }
 
       Row {
-        id:idTabRow
-        width:parent.width
-        spacing :10
-        Button
-        {
-          id:idTab1Btn
+        id: idTabRow
+        width: parent.width
+        spacing: 10
+
+        Button {
+          id: idTab1Btn
           width: n4BtnWidth
-          text:"Home"
+          text: "Home"
           onClicked: idWindow.state = "idTab1"
         }
 
-        Button
-        {
-          id:idTab2Btn
+        Button {
+          id: idTab2Btn
           width: n4BtnWidth
           enabled: glosModelIndex.count > 0
-          text:"Edit"
-          onClicked:  idWindow.state =  "idTab2"
+          text: "Edit"
+          onClicked: idWindow.state = "idTab2"
         }
-        Button
-        {
-          id:idTab3Btn
+
+        Button {
+          id: idTab3Btn
           width: n4BtnWidth
           enabled: glosModelIndex.count > 0
-          text:"Quiz"
-          onClicked:  idWindow.state ="idTab3"
+          text: "Quiz"
+          onClicked: idWindow.state = "idTab3"
         }
-        Button
-        {
-          id:idTab4Btn
+
+        Button {
+          id: idTab4Btn
+
           width: n4BtnWidth
+          preferredWidth: n4BtnWidth
           enabled: glosModelIndex.count > 0
-          text:"Hang\n Man"
-          onClicked:  {
-            idWindow.state ="idTab4"
-            idTab4.newQ()
+
+          text: "Hang Man"
+
+          onClicked: {
+            if (idWindow.state === "idTab1")
+              idTab4.newQ()
+            idWindow.state = "idTab4"
           }
         }
       }
 
-      CreateNewQuiz
-      {
-        id:idTab1
-        width:parent.width
+      CreateNewQuiz {
+        id: idTab1
+        width: parent.width
         height: idTabMain.height - idTabRow.height - idTitle.height - 20
-        visible:false
+        visible: false
       }
-      EditQuiz
-      {
-        id:idTab2
-        width:parent.width
+      EditQuiz {
+        id: idTab2
+        width: parent.width
         height: idTabMain.height - idTabRow.height - idTitle.height - 20
-        visible:false
+        visible: false
       }
-      TakeQuiz
-      {
-        id:idTab3
-        width:parent.width
+      TakeQuiz {
+        id: idTab3
+        width: parent.width
         height: idTabMain.height - idTabRow.height - idTitle.height - 20
-        visible:false
+        visible: false
       }
-
-      HangMan
-      {
-        id:idTab4
-        width:parent.width
+      HangMan {
+        id: idTab4
+        width: parent.width
         height: idTabMain.height - idTabRow.height - idTitle.height - 20
-        visible:false
+        visible: false
       }
-
     }
   }
+
+
   /*
   Image
   {
@@ -253,61 +240,55 @@ Page {
     source: "qrc:qml/pages/harbour-wordquiz.png"
   }
   */
-
-
   states: [
     State {
       name: "idTab1"
       PropertyChanges {
         target: idTab1
-        visible:true
+        visible: true
       }
 
       PropertyChanges {
         target: idTab1Btn
-        color:Theme.highlightColor
-
+        color: Theme.highlightColor
       }
     },
     State {
       name: "idTab2"
       PropertyChanges {
         target: idTab2
-        visible:true
-        bTabActive:true
+        visible: true
+        bTabActive: true
       }
 
       PropertyChanges {
         target: idTab2Btn
-        color:Theme.highlightColor
-
+        color: Theme.highlightColor
       }
     },
     State {
       name: "idTab3"
       PropertyChanges {
         target: idTab3
-        visible:true
+        visible: true
       }
 
       PropertyChanges {
         target: idTab3Btn
-        color:Theme.highlightColor
+        color: Theme.highlightColor
       }
     },
     State {
       name: "idTab4"
       PropertyChanges {
         target: idTab4
-        visible:true
+        visible: true
       }
 
       PropertyChanges {
         target: idTab4Btn
-        color:Theme.highlightColor
+        color: Theme.highlightColor
       }
     }
-
   ]
-
 }

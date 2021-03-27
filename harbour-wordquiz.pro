@@ -13,8 +13,7 @@
 TARGET = harbour-wordquiz
 
 QT += qml quick multimedia core svg xml
-INCLUDEPATH += $$(MER_SSH_SHARED_TARGET)/$$(MER_SSH_TARGET_NAME)/usr/include/c++/4.9.4
-INCLUDEPATH += $$(MER_SSH_SHARED_TARGET)/$$(MER_SSH_TARGET_NAME)/usr/include
+
 
 CONFIG += sailfishapp
 
