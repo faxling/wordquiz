@@ -44,3 +44,7 @@
 * Sun Mar 14 2021 Fredrik Axling <faxling11@gmail.com> 4.0-1
 - Add Hangman game
 
+* Sat Mar 27 2021 Fredrik Axling <faxling11@gmail.com> 4.1-1
+- Polish chars in Hangman
+- Handle Diacritics
+

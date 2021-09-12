@@ -507,11 +507,15 @@ function getAndInitDb() {
                             })
     }
 
-    var bDoChanged = (idWindow.quizListView.currentIndex === -1
-                      && nGlosaDbLastIndex === 0)
-    idWindow.quizListView.currentIndex = nGlosaDbLastIndex
-    if (bDoChanged) {
-      idWindow.quizListView.currentIndexChanged()
+    // Set to last assigned Quiz
+    if (idWindow.quizListView !== undefined)
+    {
+      var bDoChanged = (idWindow.quizListView.currentIndex === -1
+                        && nGlosaDbLastIndex === 0)
+      idWindow.quizListView.currentIndex = nGlosaDbLastIndex
+      if (bDoChanged) {
+        idWindow.quizListView.currentIndexChanged()
+      }
     }
   })
   return db

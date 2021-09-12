@@ -66,6 +66,10 @@ public:
     ValT& val() {
       return *m_iter;
     }
+
+    auto& key() {
+      return m_iter.key();
+    }
     int index() {
       return m_index;
     }
@@ -110,7 +114,7 @@ public:
     return B(m_iterEnd, m_iterLast);
   }
 
-  typename T::mapped_type& last() {
+  auto& last() {
     return *(m_iterEnd);
   }
 };
