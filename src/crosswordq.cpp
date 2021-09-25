@@ -3,6 +3,7 @@
 #include <QAbstractListModel>
 #include <QDebug>
 #include <QMap>
+#include <random>
 
 #include "filehelpers.h"
 
@@ -28,9 +29,16 @@ void CrossWordQ::createCrossWordFromList(QObject* p) {
     ocWordMap[sAnswer] = sQuestion;
   }
 
-  m_pCrossWord->SetSeedWordHorizontal(15, 10, ocWordList.first());
-
   m_pCrossWord->AssignWordList(ocWordList);
+
+  static std::mt19937 gen(time(0));
+  static std::uniform_int_distribution<> dis(0, ocWordList.length());
+  static std::uniform_int_distribution<> dis2(0, 1);
+  if (dis2(gen) == 0)
+    m_pCrossWord->SetSeedWordHorizontal(10, _nW / 2, ocWordList[dis(gen)]);
+  else
+    m_pCrossWord->SetSeedWordVertical(_nH / 2, 10, ocWordList[dis(gen)]);
+
   while (m_pCrossWord->IterateArea(10, 10, _nW - 10, _nH - 10) != 0)
     ;
   m_ocRet = m_pCrossWord->Get();
@@ -39,8 +47,7 @@ void CrossWordQ::createCrossWordFromList(QObject* p) {
 void CrossWordQ::assignQuestionSquares(QJSValue pPF) {
   for (auto oI : IterRange(m_ocRet.second)) {
     int nIndex = oI.key().first + oI.key().second * nW();
-    qDebug() << oI.key().first << " " << oI.key().second;
-    pPF.call(QJSValueList({nIndex, oI.val()}));
+    pPF.call(QJSValueList({nIndex, oI.val().HorizontalQ, oI.val().VerticalQ}));
   }
 }
 
@@ -61,14 +68,14 @@ int CrossWordQ::nH() {
 int CrossWordQ::nW() {
   return m_ocRet.first.first().length();
 }
-
+/*
 QString CrossWordQ::QAt(int x, int y) {
   auto i = m_ocRet.second.find({x, y});
   if (i == m_ocRet.second.end())
     return QString();
   return *i;
 }
-
+*/
 QString CrossWordQ::ChAt(int x, int y) {
   return m_ocRet.first[y][x];
 }

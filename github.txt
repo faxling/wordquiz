@@ -1,0 +1,6 @@
+eval `ssh-agent -s`
+ssh-add ~/.ssh/sshgit
+git remote set-url origin git@github.com:faxling/wordquiz.git
+
+
+Raggo100

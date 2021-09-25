@@ -11,7 +11,7 @@ class CrossWordQ : public QObject
 public:
   explicit CrossWordQ(QObject *parent = nullptr);
 
-  Q_INVOKABLE QString QAt(int x,int y);
+  // Q_INVOKABLE QString QAt(int x,int y);
   Q_INVOKABLE QString ChAt(int x,int y);
   Q_INVOKABLE void createCrossWordFromList(QObject* pList);
 
