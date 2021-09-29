@@ -23,23 +23,28 @@ void CrossWordQ::createCrossWordFromList(QObject* p) {
   QMap<QString, QString> ocWordMap;
 
   for (int i = 0; i < nC; i++) {
-    QString sAnswer = pp->data(pp->index(i), 0).toString();
+    QString sAnswer = pp->data(pp->index(i), 0).toString().toUpper();
     ocWordList.push_back(sAnswer);
-    QString sQuestion = pp->data(pp->index(i), 3).toString();
+    QString sQuestion = pp->data(pp->index(i), 3).toString().toUpper();
     ocWordMap[sAnswer] = sQuestion;
   }
 
   m_pCrossWord->AssignWordList(ocWordList);
 
   static std::mt19937 gen(time(0));
-  static std::uniform_int_distribution<> dis(0, ocWordList.length());
+  static std::uniform_int_distribution<> dis(0, ocWordList.length() -1 );
   static std::uniform_int_distribution<> dis2(0, 1);
   if (dis2(gen) == 0)
     m_pCrossWord->SetSeedWordHorizontal(10, _nW / 2, ocWordList[dis(gen)]);
   else
     m_pCrossWord->SetSeedWordVertical(_nH / 2, 10, ocWordList[dis(gen)]);
 
+
   while (m_pCrossWord->IterateArea(10, 10, _nW - 10, _nH - 10) != 0)
+  {
+   //  qDebug() << "Iter";
+  }
+
     ;
   m_ocRet = m_pCrossWord->Get();
 }
@@ -56,7 +61,7 @@ void CrossWordQ::assignCharSquares(QJSValue pPF) {
     for (auto& oJ : IterRange(oI.val())) {
       int nIndex = oI.index() * nW() + oJ.index();
       if (m_pCrossWord->IsChar(oJ.val()) == true)
-        pPF.call(QJSValueList({nIndex, QString(oJ.val().toUpper())}));
+        pPF.call(QJSValueList({nIndex, QString(oJ.val())}));
     }
   }
 }
