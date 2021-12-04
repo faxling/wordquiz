@@ -58,6 +58,12 @@ function initLangList() {
                        "imgsource": "qrc:/hungary-flag-button-round-icon-128.png",
                        "code": "hu"
                      })
+
+  idLangModel.append({
+                       "lang": "Korean",
+                       "imgsource": "qrc:/south-korea-flag-button-round-icon-128.png",
+                       "code": "ko"
+                     })
 }
 
 function hangUpdateImage() {

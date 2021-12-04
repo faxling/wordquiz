@@ -9,9 +9,21 @@
 
 constexpr int _nH = 30;
 constexpr int _nW = 30;
+constexpr int _nX = 10;
 
 CrossWordQ::CrossWordQ(QObject* parent) : QObject(parent) {
   m_pCrossWord = nullptr;
+}
+
+bool CrossWordQ::sluggOneWord() {
+  if (m_pCrossWord->IterateArea(_nX, _nX, _nW - _nX, _nH - _nX) == 0)
+  {
+    m_ocRet = m_pCrossWord->Get();
+    return false;
+  }
+
+  m_ocRet = m_pCrossWord->Get();
+  return true;
 }
 
 void CrossWordQ::createCrossWordFromList(QObject* p) {
@@ -24,6 +36,8 @@ void CrossWordQ::createCrossWordFromList(QObject* p) {
 
   for (int i = 0; i < nC; i++) {
     QString sAnswer = pp->data(pp->index(i), 0).toString().toUpper();
+    if (sAnswer.length() + _nX >= _nW)
+      continue;
     ocWordList.push_back(sAnswer);
     QString sQuestion = pp->data(pp->index(i), 3).toString().toUpper();
     ocWordMap[sAnswer] = sQuestion;
@@ -32,21 +46,10 @@ void CrossWordQ::createCrossWordFromList(QObject* p) {
   m_pCrossWord->AssignWordList(ocWordList);
 
   static std::mt19937 gen(time(0));
-  static std::uniform_int_distribution<> dis(0, ocWordList.length() -1 );
+  static std::uniform_int_distribution<> dis(0, ocWordList.length() - 1);
   static std::uniform_int_distribution<> dis2(0, 1);
-  if (dis2(gen) == 0)
-    m_pCrossWord->SetSeedWordHorizontal(10, _nW / 2, ocWordList[dis(gen)]);
-  else
-    m_pCrossWord->SetSeedWordVertical(_nH / 2, 10, ocWordList[dis(gen)]);
 
-
-  while (m_pCrossWord->IterateArea(10, 10, _nW - 10, _nH - 10) != 0)
-  {
-   //  qDebug() << "Iter";
-  }
-
-    ;
-  m_ocRet = m_pCrossWord->Get();
+  m_pCrossWord->SetSeedWordHorizontal(10, _nW / 2, "UNO");
 }
 
 void CrossWordQ::assignQuestionSquares(QJSValue pPF) {
@@ -67,20 +70,11 @@ void CrossWordQ::assignCharSquares(QJSValue pPF) {
 }
 
 int CrossWordQ::nH() {
-  return m_ocRet.first.size();
+  return m_ocRet.first.length();
 }
 
 int CrossWordQ::nW() {
+  if (m_ocRet.first.isEmpty())
+    return 0;
   return m_ocRet.first.first().length();
-}
-/*
-QString CrossWordQ::QAt(int x, int y) {
-  auto i = m_ocRet.second.find({x, y});
-  if (i == m_ocRet.second.end())
-    return QString();
-  return *i;
-}
-*/
-QString CrossWordQ::ChAt(int x, int y) {
-  return m_ocRet.first[y][x];
 }
