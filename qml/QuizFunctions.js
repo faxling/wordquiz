@@ -67,10 +67,10 @@ function initLangList() {
 }
 
 function hangUpdateImage() {
-  var n = idLangModel.count
-  var sL = bIsReverseHang ? sToLang : sFromLang
-  console.log("hangUpdateImage " + sToLang + "  " + n)
-  var i = 0
+  let n = idLangModel.count
+  let sL = bIsReverseHang ? sToLang : sFromLang
+
+  let i = 0
   for (i = 0; i < n; ++i) {
     if (idLangModel.get(i).code === sL) {
       idFlagImg.source = idLangModel.get(i).imgsource
@@ -79,14 +79,23 @@ function hangUpdateImage() {
   }
 }
 
+function destroyChildren(idOc) {
+  for (let childIndex in idOc.children) {
+    idOc.children[childIndex].destroy()
+  }
+  idOc.children = null
+}
+
 function hangClearThings() {
   idHangBtn3.bAV = false
   idResultMsg.visible = false
   idResultMsgTimer.stop()
-  idOrdRow.children = []
-  idOrdCol.children = []
-  idOrdCol2.children = []
-  idOrdCol3.children = []
+
+  destroyChildren(idOrdRow)
+  destroyChildren(idOrdCol)
+  destroyChildren(idOrdCol2)
+  destroyChildren(idOrdCol3)
+
   idTTrans.visible = false
   idCharRect.text = ""
 }
@@ -148,13 +157,13 @@ function hangAddWord() {
 }
 
 function hangCheckCharInColumn(sChar, oColumn) {
-  var n = oColumn.children.length
-  var i
-  for (i = 0; i < n; ++i) {
+
+  for (let i in oColumn.children) {
     if (MyDownloader.ignoreAccent(
           oColumn.children[i].text) === MyDownloader.ignoreAccent(sChar))
       return true
   }
+
   return false
 }
 
@@ -176,11 +185,11 @@ function hangEnterChar() {
   if (idCharRect.text === " " || idCharRect.text === "")
     return
 
-  var n = sHangWord.length
-  var nValidCount = 0
-  var nOKCount = 0
-  var nC = 0
-  var i = 0
+  let n = sHangWord.length
+  let nValidCount = 0
+  let nOKCount = 0
+  let nC = 0
+  let i = 0
   for (i = 0; i < n; ++i) {
     if (idOrdRow.children[i].bIsSpecial)
       continue
@@ -254,15 +263,12 @@ function hangEnterChar() {
 }
 
 function hangShowAnswer(bAV) {
-  var n = idOrdRow.children.length
   if (bAV) {
-    var j
-    for (j = 0; j < n; ++j) {
+    for (const j in idOrdRow.children) {
       idOrdRow.children[j].text = sHangWord[j]
     }
   } else {
-    var i
-    for (i = 0; i < n; ++i) {
+    for (const i in idOrdRow.children) {
       if (sCurrentRow[i] !== " ")
         idOrdRow.children[i].text = sCurrentRow[i]
       else
@@ -284,10 +290,13 @@ String.prototype.equalIgnoreCase = function (str) {
 }
 
 Array.prototype.indexOfObject = function arrayObjectIndexOf(property, value) {
-  for (var i = 0, len = this.length; i < len; i++) {
+
+
+  for (const i in this) {
     if (this[i][property] === value)
       return i
   }
+
   return -1
 }
 
@@ -460,7 +469,7 @@ function getAndInitDb() {
   db.transaction(function (tx) {
 
     // tx.executeSql('DROP TABLE GlosaDbIndex');
-    var nGlosaDbLastIndex = 0
+    let nGlosaDbLastIndex = 0
     tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbLastIndex( dbindex INT )')
     var rs = tx.executeSql('SELECT * FROM GlosaDbLastIndex')
     if (rs.rows.length === 0) {
@@ -476,10 +485,10 @@ function getAndInitDb() {
 
     rs = tx.executeSql('SELECT * FROM GlosaDbDesc')
 
-    var oc = []
+    let oc = []
 
     for (var i = 0; i < rs.rows.length; i++) {
-      var oDescription = {
+      let oDescription = {
         "dbnumber": rs.rows.item(i).dbnumber,
         "desc1": rs.rows.item(i).desc1
       }
@@ -488,15 +497,15 @@ function getAndInitDb() {
 
     rs = tx.executeSql('SELECT * FROM GlosaDbIndex')
 
-    var nRowLen = rs.rows.length
-    var ocRet = new Array(nRowLen)
+    let nRowLen = rs.rows.length
+    let ocRet = new Array(nRowLen)
     MyDownloader.sortRowset(rs.rows.item, rs.rows, nRowLen, ocRet)
 
     for (var j = 0; j < nRowLen; j++) {
       i = ocRet[j]
-      var nDbnumber = rs.rows.item(i).dbnumber
-      var nN = oc.indexOfObject("dbnumber", nDbnumber)
-      var vDescDate
+      let nDbnumber = rs.rows.item(i).dbnumber
+      let nN = oc.indexOfObject("dbnumber", nDbnumber)
+      let vDescDate
 
       if (nN >= 0) {
         vDescDate = oc[nN].desc1
@@ -514,9 +523,8 @@ function getAndInitDb() {
     }
 
     // Set to last assigned Quiz
-    if (idWindow.quizListView !== undefined)
-    {
-      var bDoChanged = (idWindow.quizListView.currentIndex === -1
+    if (idWindow.quizListView !== undefined) {
+      let bDoChanged = (idWindow.quizListView.currentIndex === -1
                         && nGlosaDbLastIndex === 0)
       idWindow.quizListView.currentIndex = nGlosaDbLastIndex
       if (bDoChanged) {
@@ -548,8 +556,8 @@ function setAllok(bval) {
 
 // Updates the description of the Quiz
 function insertGlosa(dbnumber, nC, question, answer) {
-  var sQ = capitalizeStr(question)
-  var sA = capitalizeStr(answer)
+  let sQ = capitalizeStr(question)
+  let sA = capitalizeStr(answer)
 
   db.transaction(function (tx) {
     tx.executeSql('INSERT INTO Glosa' + dbnumber + ' VALUES(?, ?, ?, ?)',
@@ -612,9 +620,9 @@ function loadQuiz() {
     return
   }
 
-  var nC = glosModel.count
+  let nC = glosModel.count
 
-  var i
+  let i
   for (i = 0; i < nC; ++i) {
     if (glosModel.get(i).state1 === 0) {
 
@@ -628,7 +636,7 @@ function loadQuiz() {
     }
   }
 
-  var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
+  let nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
 
   // sScoreText =  glosModelWorking.count + "/" + nC
   if (glosModelWorking.count === 0) {
@@ -651,25 +659,25 @@ function capitalizeStr(inStr) {
 function loadFromDb(tx) {
 
   // To select the right highlighted word at quiz load time
-  var nCurrentNumber = -1
-  var oGlosaItem = glosModel.get(idWindow.glosListView.currentIndex)
+  let nCurrentNumber = -1
+  let oGlosaItem = glosModel.get(idWindow.glosListView.currentIndex)
   if (oGlosaItem !== undefined) {
     nCurrentNumber = oGlosaItem.number
   }
 
   glosModel.clear()
 
-  var rs = tx.executeSql(
+  let rs = tx.executeSql(
         "SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + sQSort)
 
-  var hasNonInt = false
+  let hasNonInt = false
   for (var i = 0; i < rs.rows.length; i++) {
 
-    var sWordAndExtra = rs.rows.item(i).answer
-    var sA = capitalizeStr(getWord(sWordAndExtra))
-    var sE = getExtra(sWordAndExtra)
-    var sQ = capitalizeStr(rs.rows.item(i).quizword)
-    var nNr = rs.rows.item(i).number
+    let sWordAndExtra = rs.rows.item(i).answer
+    let sA = capitalizeStr(getWord(sWordAndExtra))
+    let sE = getExtra(sWordAndExtra)
+    let sQ = capitalizeStr(rs.rows.item(i).quizword)
+    let nNr = rs.rows.item(i).number
     if (nNr !== Math.floor(nNr)) {
       hasNonInt = true
     }
@@ -787,8 +795,8 @@ function newQuiz() {
 
   db.transaction(function (tx) {
     glosModel.clear()
-    var rs = tx.executeSql('SELECT MAX(dbnumber) as newnr FROM GlosaDbIndex')
-    var nNr = 1
+    let rs = tx.executeSql('SELECT MAX(dbnumber) as newnr FROM GlosaDbIndex')
+    let nNr = 1
     if (rs.rows.length > 0) {
       nNr = rs.rows.item(0).newnr + 1
     }
@@ -847,7 +855,7 @@ function getDesc(sDescAndDate) {
   if (sDescAndDate === undefined)
     return "-"
 
-  var ocDesc = sDescAndDate.split("###")
+  let ocDesc = sDescAndDate.split("###")
 
   return ocDesc[0]
 }

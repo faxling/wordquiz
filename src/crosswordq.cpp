@@ -3,6 +3,9 @@
 #include <QAbstractListModel>
 #include <QDebug>
 #include <QMap>
+#include <QEventLoop>
+
+
 #include <random>
 
 #include "filehelpers.h"
@@ -16,8 +19,7 @@ CrossWordQ::CrossWordQ(QObject* parent) : QObject(parent) {
 }
 
 bool CrossWordQ::sluggOneWord() {
-  if (m_pCrossWord->IterateArea(_nX, _nX, _nW - _nX, _nH - _nX) == 0)
-  {
+  if (m_pCrossWord->IterateArea(_nX, _nX, _nW - _nX, _nH - _nX) == 0) {
     m_ocRet = m_pCrossWord->Get();
     return false;
   }
@@ -27,29 +29,56 @@ bool CrossWordQ::sluggOneWord() {
 }
 
 void CrossWordQ::createCrossWordFromList(QObject* p) {
-  delete m_pCrossWord;
-  m_pCrossWord = new CrossWord(_nW, _nH);
   QAbstractListModel* pp = dynamic_cast<QAbstractListModel*>(p);
   int nC = pp->rowCount();
+
+  if (nC < 6)
+    return;
+
+  delete m_pCrossWord;
+  m_pCrossWord = new CrossWord(_nW, _nH);
+
+  QEventLoop loop;
+  loop.processEvents();
+
   CrossWord::Vec ocWordList;
-  QMap<QString, QString> ocWordMap;
+  QMap<int, QString> ocWordMap;
 
   for (int i = 0; i < nC; i++) {
     QString sAnswer = pp->data(pp->index(i), 0).toString().toUpper();
     if (sAnswer.length() + _nX >= _nW)
-      continue;
+      sAnswer = "#";
     ocWordList.push_back(sAnswer);
     QString sQuestion = pp->data(pp->index(i), 3).toString().toUpper();
-    ocWordMap[sAnswer] = sQuestion;
+    ocWordMap[i] = sQuestion;
   }
 
   m_pCrossWord->AssignWordList(ocWordList);
 
   static std::mt19937 gen(time(0));
   static std::uniform_int_distribution<> dis(0, ocWordList.length() - 1);
-  static std::uniform_int_distribution<> dis2(0, 1);
 
-  m_pCrossWord->SetSeedWordHorizontal(10, _nW / 2, "UNO");
+  int nII = dis(gen);
+
+  for (int i = 0; i < 10; ++i) {
+    if (ocWordList[nII] != "#")
+      break;
+
+    nII = dis(gen);
+  }
+
+  /*
+    for (int i = 0 ; i < ocWordList.length(); ++i)
+    {
+      if (ocWordList[i] == "UNO")
+      {
+        nII = i;
+        break;
+      }
+    }
+  */
+
+  m_pCrossWord->SetSeedWordHorizontal(10, _nW / 2, ocWordList[nII], nII);
 }
 
 void CrossWordQ::assignQuestionSquares(QJSValue pPF) {
