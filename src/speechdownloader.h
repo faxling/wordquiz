@@ -93,6 +93,7 @@ private:
   QNetworkAccessManager m_oDeleteQuizNetMgr;
   QNetworkAccessManager m_oTransNetMgr;
   QVector<int> m_ocIndexStack;
+  bool m_bSkipNextPush = false;
   QVector<QObject*> m_ocTextInputElem;
   QObject* m_sTranslatedText;
   QObject* m_pErrorTextField;

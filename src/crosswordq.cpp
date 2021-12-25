@@ -56,28 +56,21 @@ void CrossWordQ::createCrossWordFromList(QObject* p) {
   m_pCrossWord->AssignWordList(ocWordList);
 
   static std::mt19937 gen(time(0));
-  static std::uniform_int_distribution<> dis(0, ocWordList.length() - 1);
+  std::uniform_int_distribution<> dis(0, ocWordList.length() - 1);
 
   int nII = dis(gen);
-
+  nII = dis(gen);
   for (int i = 0; i < 10; ++i) {
-    if (ocWordList[nII] != "#")
-      break;
+    if (nII < ocWordList.length())
+    {
+      if (ocWordList[nII] != "#")
+        break;
+    }
+    else
+      qDebug() << "StrangeW << " << nII;
 
     nII = dis(gen);
   }
-
-  /*
-    for (int i = 0 ; i < ocWordList.length(); ++i)
-    {
-      if (ocWordList[i] == "UNO")
-      {
-        nII = i;
-        break;
-      }
-    }
-  */
-
   m_pCrossWord->SetSeedWordHorizontal(10, _nW / 2, ocWordList[nII], nII);
 }
 

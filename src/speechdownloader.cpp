@@ -856,8 +856,14 @@ double Speechdownloader::rand()
 
 void Speechdownloader::pushIndex(int nI)
 {
+  if (m_bSkipNextPush)
+  {
+    m_bSkipNextPush = false;
+    return;
+  }
   if (m_ocIndexStack.isEmpty() == false)
   {
+    // No use to push 2 equalas
     if (m_ocIndexStack.last() == nI)
       return;
   }
@@ -875,6 +881,8 @@ int Speechdownloader::popIndex()
 
   if (m_ocIndexStack.isEmpty())
     return -1;
+
+  m_bSkipNextPush = true;
 
   return m_ocIndexStack.takeLast();
 }
