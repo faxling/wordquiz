@@ -704,7 +704,7 @@ function loadFromDb(tx) {
     */
   }
 
-  // Select hilight after eg sort
+  // Select highlight after eg sort
   if (nCurrentNumber > 0) {
     idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(
           glosModel, nCurrentNumber)
@@ -1235,7 +1235,7 @@ function deleteWordInQuiz() {
   if (glosModel.count > 0) {
     if (idQuizModel.number === nNumber) {
       // The removed word is displayed in the Quiz tab
-      var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
+      let nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
       idQuizModel.question = glosModelWorking.get(nIndexOwNewWord).question
       idQuizModel.answer = glosModelWorking.get(nIndexOwNewWord).answer
       idQuizModel.number = glosModelWorking.get(nIndexOwNewWord).number

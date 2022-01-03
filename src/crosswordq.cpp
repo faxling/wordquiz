@@ -15,7 +15,7 @@ constexpr int _nW = 30;
 constexpr int _nX = 10;
 
 CrossWordQ::CrossWordQ(QObject* parent) : QObject(parent) {
-  m_pCrossWord = nullptr;
+
 }
 
 bool CrossWordQ::sluggOneWord() {
@@ -35,8 +35,7 @@ void CrossWordQ::createCrossWordFromList(QObject* p) {
   if (nC < 6)
     return;
 
-  delete m_pCrossWord;
-  m_pCrossWord = new CrossWord(_nW, _nH);
+  m_pCrossWord.reset(new CrossWord(_nW, _nH));
 
   QEventLoop loop;
   loop.processEvents();

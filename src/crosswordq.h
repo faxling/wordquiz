@@ -3,8 +3,9 @@
 
 #include <QObject>
 #include <QJSValue>
+#include <memory>
 #include "../../CrossMatch/crossword.h"
-class CrossWord;
+
 class CrossWordQ : public QObject
 {
   Q_OBJECT
@@ -22,7 +23,7 @@ private:
   int nW();
   int nH();
 
-  CrossWord* m_pCrossWord;
+  std::unique_ptr<CrossWord> m_pCrossWord;
   CrossWord::Vec2D m_ocRet;
 };
 
