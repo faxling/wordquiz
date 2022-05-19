@@ -14,6 +14,7 @@ public:
   // 0 Glad gubbe 1 Clear 2 Increment
   Q_INVOKABLE bool renderId(int nId);
   Q_INVOKABLE void answerShown();
+  Q_INVOKABLE void setColor(const QColor& sColor);
   // 1 = Fantastic 2 = Greate 3 You Made it , Well (if sheeted)
   Q_INVOKABLE QString getRating();
   void paint(QPainter *painter) override;
@@ -29,8 +30,11 @@ private:
   QString m_sOrd;
   QMutex m_Mutex;
   int m_nIndex = 0;
+
+  // Style tag:value
   using SMap_t = QMap<QString, QString>;
   using StyleP_t = std::pair<SMap_t, QDomNode>;
+  void setStyleAttrInNode(StyleP_t& t, const QString& sStyle, const QString& sVal);
   QMap<QString, StyleP_t> m_ocStyleMap;
   QDomDocument m_oDomSvg;
   bool m_bAnswerShown = false;

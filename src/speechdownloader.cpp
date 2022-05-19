@@ -370,7 +370,7 @@ void Speechdownloader::listDownloaded(QNetworkReply* pReply)
 
   // m_ocIndexMap.clear();
 
-  QList<QuizInfo> ocQuizInfo;
+  QVector<QuizInfo> ocQuizInfo;
 
   for (auto oI : ocJson)
   {
@@ -398,7 +398,7 @@ void Speechdownloader::listDownloaded(QNetworkReply* pReply)
 
 
   QStringList ocL;
-  for (auto oI : ocQuizInfo)
+  for (const auto& oI : ocQuizInfo)
   {
     ocL.append(oI.qname);
     ocL.append(oI.desc1);
@@ -798,7 +798,7 @@ void Speechdownloader::transDownloaded()
 
 void Speechdownloader::translateWord(QString sWord, QString sFromLang, QString sToLang, QObject *pBtn)
 {
-  QString sFmt = "https://api.mymemory.translated.net/get?q=%ls&mt=1&langpair=%ls|%ls";
+  QString sFmt = "https://api.mymemory.translated.net/get?q=%ls&mt=1&langpair=%ls|%ls&de=faxling11@gmail.com";
   QString sUrl = QString::asprintf(sFmt.toLatin1(), sWord.utf16(), sFromLang.utf16(), sToLang.utf16());
   QNetworkRequest request(sUrl);
   QNetworkReply* pNR = m_oTransNetMgr.get(request);

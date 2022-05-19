@@ -11,7 +11,6 @@ Rectangle {
   signal closeClicked()
 
   ButtonQuizImg {
-
     id:idBtnCancel
     anchors.top : parent.top
     anchors.right : parent.right

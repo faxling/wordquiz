@@ -1,4 +1,4 @@
-import QtQuick 2.3
+import QtQuick 2.6
 import QtQuick.Window 2.2
 import QtQuick.XmlListModel 2.0
 import Sailfish.Silica 1.0
@@ -10,7 +10,7 @@ Item {
   id: idEditQuiz
   property int nLastSearch: 0
   property bool bTabActive: false
-  property bool bDoLookUppText1 : true
+  property bool bDoLookUppText1: true
 
   onBTabActiveChanged: {
     if (bTabActive) {
@@ -49,10 +49,13 @@ Item {
       width: parent.width
       TextList {
         id: idTextTrans
-        Component.onCompleted: MyDownloader.storeTransText(idTextTrans, idErrorText, idTrTextModel, idTrSynModel,
+        Component.onCompleted: MyDownloader.storeTransText(idTextTrans,
+                                                           idErrorText,
+                                                           idTrTextModel,
+                                                           idTrSynModel,
                                                            idTrMeanModel)
         text: "-"
-        onTextChanged:  QuizLib.assignTextInputField(idTextTrans.text)
+        onTextChanged: QuizLib.assignTextInputField(idTextTrans.text)
         onClick: {
           QuizLib.assignTextInputField(idTextTrans.text)
         }
@@ -92,7 +95,6 @@ Item {
           MyDownloader.toClipBoard(idTextInput2.text)
         }
       }
-
     }
 
     Row {
@@ -102,12 +104,12 @@ Item {
       height: Theme.fontSizeLarge
       InputTextQuiz {
         id: idTextInput
-        onGotFocus:  bDoLookUppText1 = true
+        onGotFocus: bDoLookUppText1 = true
         width: parent.width / 2 - 10
       }
       InputTextQuiz {
         id: idTextInput2
-        onGotFocus:  bDoLookUppText1 = false
+        onGotFocus: bDoLookUppText1 = false
         width: parent.width / 2 - 10
       }
     }
@@ -138,14 +140,14 @@ Item {
       ButtonQuiz {
         id: idBtn3
         width: n4BtnWidth
-        text:   (bDoLookUppText1 ?  sFromLang : sToLang) + " Wiki"
+        text: (bDoLookUppText1 ? sFromLang : sToLang) + " Wiki"
         onClicked: {
           QuizLib.lookUppInWiki()
         }
       }
 
       ButtonQuiz {
-        id:idAddBtn
+        id: idAddBtn
         text: "Add"
         width: n4BtnWidth
         onClicked: QuizLib.getTextInputAndAdd()
@@ -170,7 +172,6 @@ Item {
       id: idDictRow
       height: n4BtnWidth - 20
       width: parent.width
-
 
       ListViewHi {
         id: idDicList
@@ -227,7 +228,7 @@ Item {
 
     Row {
       id: idTableHeaderRow
-      height : idHeader1Text.height - 20
+      height: idHeader1Text.height - 20
       spacing: 5
       TextList {
         id: idHeader1Text
@@ -271,8 +272,7 @@ Item {
           width: n3BtnWidth
           text: question
           color: state1 === 0 ? Theme.primaryColor : "green"
-          onClick:
-          {
+          onClick: {
             idTextInput.text = question
             bDoLookUppText1 = true
           }
@@ -284,8 +284,7 @@ Item {
           text: answer
           font.bold: extra.length > 0
           color: state1 === 0 ? Theme.primaryColor : "green"
-          onClick:
-          {
+          onClick: {
             idTextInput2.text = answer
             bDoLookUppText1 = false
           }

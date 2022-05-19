@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QJSValue>
 #include <memory>
-#include "../../CrossMatch/crossword.h"
+#include "../../Crossword/crossword.h"
 
 class CrossWordQ : public QObject
 {

@@ -3,6 +3,7 @@ import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0 as Sql
 import "../QuizFunctions.js" as QuizLib
 
+// @disable-check M301
 Page {
   id: idWindow
   // init in initUrls
@@ -35,6 +36,7 @@ Page {
   property int nQuizIndex: 1
   property int n3BtnWidth: idTabMain.width / 3 - 8
   property int n4BtnWidth: idTabMain.width / 4 - 7
+  property int n5BtnWidth: idTabMain.width / 8
   property int n25BtnWidth: idTabMain.width / 2.4 - 7
   property int n2BtnWidth: idTabMain.width / 2
   property int nDlgHeight: idWindow.height / 5 + 45
@@ -49,6 +51,9 @@ Page {
   property int nGlosaTakeQuizIndex
   property int nMargin: Screen.height > 1000 ? 50 : 25
   property bool bInitHangMan: true
+  property bool bCWBusy: false
+
+  state: "idTab1"
   onSScoreTextChanged: {
     db.transaction(function (tx) {
       tx.executeSql('UPDATE GlosaDbIndex SET state1=? WHERE dbnumber=?',
@@ -108,7 +113,18 @@ Page {
     QuizLib.getAndInitDb()
   }
 
+  Rectangle {
+    height: idTab2Btn.height
+    x: idTab2Btn.x + nMargin + idTab2Btn.width + idTabMain.spacing
+    y: idTabRow.y + idTabMain.y
+    width: Screen.width / 2
+    opacity: 0.4
+    radius: 4
+    color: "steelblue"
+  }
+
   SilicaListView {
+    id: idSilicaListView
     anchors.fill: parent
 
     Column {
@@ -122,6 +138,7 @@ Page {
       Item {
         width: parent.width
         height: idTitle.height
+        // @disable-check M301
         Label {
           id: idTitle
           font.italic: glosModelIndex.count === 0
@@ -165,44 +182,52 @@ Page {
         width: parent.width
         spacing: 10
 
-        Button {
+        ButtonQuizImg {
           id: idTab1Btn
-          width: n4BtnWidth
-          text: "Home"
+          source: "image://theme/icon-m-home?"
+                  + (idWindow.state === "idTab1" ? Theme.highlightColor : Theme.primaryColor)
           onClicked: idWindow.state = "idTab1"
         }
 
-        Button {
+        ButtonQuizImg {
           id: idTab2Btn
-          width: n4BtnWidth
-          enabled: glosModelIndex.count > 0
-          text: "Edit"
+          source: "image://theme/icon-m-edit?"
+                  + (idWindow.state === "idTab2" ? Theme.highlightColor : Theme.primaryColor)
           onClicked: idWindow.state = "idTab2"
         }
 
-        Button {
-          id: idTab3Btn
-          width: n4BtnWidth
-          enabled: glosModelIndex.count > 0
-          text: "Quiz"
-          onClicked: idWindow.state = "idTab3"
-        }
+        // @disable-check M301
+        ComboBox {
 
-        Button {
-          id: idTab4Btn
-
-          width: n4BtnWidth
-          preferredWidth: n4BtnWidth
-          enabled: glosModelIndex.count > 0
-
-          text: "Hang Man"
-
-          onClicked: {
-            if (idWindow.state === "idTab1" || bInitHangMan) {
-              bInitHangMan = false
-              idTab4.newQ()
+          id: idCombo
+          //  width: 200
+          label: "Games"
+          // @disable-check M301
+          menu: ContextMenu {
+            // @disable-check M301
+            MenuItem {
+              text: "Quiz"
+              onClicked: idWindow.state = "idTab3"
             }
-            idWindow.state = "idTab4"
+            // @disable-check M301
+            MenuItem {
+              text: "Hang Man"
+              onClicked: {
+                if (idWindow.state === "idTab1" || bInitHangMan) {
+                  bInitHangMan = false
+                  idTab4.newQ()
+                }
+                idWindow.state = "idTab4"
+              }
+            }
+            // @disable-check M301
+            MenuItem {
+              text: "Crossword"
+              onClicked: {
+                idTab5.loadCW()
+                idWindow.state = "idTab5"
+              }
+            }
           }
         }
       }
@@ -228,32 +253,25 @@ Page {
       HangMan {
         id: idTab4
         width: parent.width
-        height: idTabMain.height - idTabRow.height - idTitle.height - 20
+        height: Screen.height - idTabRow.height - 2 * idTitle.height
+        visible: false
+      }
+
+      CrossWord {
+        id: idTab5
+        width: Screen.width
+        height: Screen.height
         visible: false
       }
     }
   }
 
-
-  /*
-  Image
-  {
-    anchors.left: idTabMain.left
-    anchors.bottom: idTabMain.top
-    source: "qrc:qml/pages/harbour-wordquiz.png"
-  }
-  */
   states: [
     State {
       name: "idTab1"
       PropertyChanges {
         target: idTab1
         visible: true
-      }
-
-      PropertyChanges {
-        target: idTab1Btn
-        color: Theme.highlightColor
       }
     },
     State {
@@ -263,11 +281,6 @@ Page {
         visible: true
         bTabActive: true
       }
-
-      PropertyChanges {
-        target: idTab2Btn
-        color: Theme.highlightColor
-      }
     },
     State {
       name: "idTab3"
@@ -275,10 +288,9 @@ Page {
         target: idTab3
         visible: true
       }
-
       PropertyChanges {
-        target: idTab3Btn
-        color: Theme.highlightColor
+        target: idCombo
+        labelColor: Theme.secondaryHighlightColor
       }
     },
     State {
@@ -287,10 +299,20 @@ Page {
         target: idTab4
         visible: true
       }
-
       PropertyChanges {
-        target: idTab4Btn
-        color: Theme.highlightColor
+        target: idCombo
+        labelColor: Theme.secondaryHighlightColor
+      }
+    },
+    State {
+      name: "idTab5"
+      PropertyChanges {
+        target: idTab5
+        visible: true
+      }
+      PropertyChanges {
+        target: idCombo
+        labelColor: Theme.secondaryHighlightColor
       }
     }
   ]

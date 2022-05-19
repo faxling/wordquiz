@@ -1,24 +1,30 @@
 // Holds the type of the lastpopup
 var g_eLastSquareType
-
+var g_nLastSquareIndex
 
 // idInputBox
 // idCrossWordGrid
 function handleCharInput(text) {
 
   // 0 Horizontal 1 = Verical
-  let eDirection = 0
+  var eDirection = 0
 
-  if (g_eLastSquareType === CrossWord.SquareType.QuestionV)
+  if (g_eLastSquareType === idCrossWordItem.cQuestionV)
+    eDirection = 1
+  var nNI = idInputBox.nIndex
+
+  if (g_eLastSquareType === idCrossWordItem.cQuestion
+      && (nNI >= (g_nLastSquareIndex + CrossWordQ.nW)))
     eDirection = 1
 
   text = text.replace(/ /g, "").toUpperCase()
-  const nInTextLen = text.length
+  var nInTextLen = text.length
+  var oCursorSq
 
-  let nNI = idInputBox.parent.nIndex
   if (nInTextLen === 0) {
-    let oCursorSq = idCrossWordGrid.children[nNI]
+    oCursorSq = idCrossWordGrid.children[nNI]
     oCursorSq.text = ""
+    oCursorSq.eSquareType = idCrossWordItem.cChar
     idInputBox.visible = false
     return
   }
@@ -28,12 +34,12 @@ function handleCharInput(text) {
     if (i === 0) {
       // Last question was a vertical check that we can go this way
       if (eDirection === 1) {
-        let oDownSq = idCrossWordGrid.children[nNI + CrossWordQ.nW]
+        var oDownSq = idCrossWordGrid.children[nNI + CrossWordQ.nW]
         if (!isChar(oDownSq))
           eDirection = 0
       }
 
-      let oRightSq = idCrossWordGrid.children[nNI + 1]
+      var oRightSq = idCrossWordGrid.children[nNI + 1]
       // Check if on right bound
       if ((nNI % CrossWordQ.nW) === (CrossWordQ.nW - 1))
         eDirection = 1
@@ -41,16 +47,16 @@ function handleCharInput(text) {
         eDirection = 1
     }
 
-    let oCursorSq = idCrossWordGrid.children[nNI]
-    let chIn = text.charAt(i)
+    oCursorSq = idCrossWordGrid.children[nNI]
+    var chIn = text.charAt(i)
 
     if (MyDownloader.ignoreAccent(chIn) === MyDownloader.ignoreAccent(
           oCursorSq.textA)) {
       oCursorSq.text = oCursorSq.textA
-      oCursorSq.eSquareType = CrossWord.SquareType.Done
+      oCursorSq.eSquareType = idCrossWordItem.cDone
     } else {
       oCursorSq.text = chIn
-      oCursorSq.eSquareType = CrossWord.SquareType.Char
+      oCursorSq.eSquareType = idCrossWordItem.cChar
     }
 
     if (eDirection === 0) {
@@ -65,7 +71,7 @@ function handleCharInput(text) {
 
     oCursorSq = idCrossWordGrid.children[nNI]
 
-    if (oCursorSq.eSquareType === CrossWord.SquareType.Space) {
+    while (oCursorSq.eSquareType === idCrossWordItem.cSpace) {
       if (eDirection === 0)
         nNI++
       else
@@ -81,9 +87,9 @@ function handleCharInput(text) {
   idInputBox.visible = false
 
   // Check if the crossword is completed show success message if so
-  let bDone = true
-  for (const j in idCrossWordGrid.children) {
-    if (idCrossWordGrid.children[j].eSquareType === CrossWord.SquareType.Char) {
+  var bDone = true
+  for (var j in idCrossWordGrid.children) {
+    if (idCrossWordGrid.children[j].eSquareType === idCrossWordItem.cChar) {
       bDone = false
       break
     }
@@ -96,16 +102,59 @@ function isChar(oCh) {
   if (oCh === undefined)
     return false
 
-  if (oCh.eSquareType === CrossWord.SquareType.Char
-      || oCh.eSquareType === CrossWord.SquareType.Done)
+  if (oCh.eSquareType === idCrossWordItem.cChar
+      || oCh.eSquareType === idCrossWordItem.cDone)
     return true
   return false
 }
 
 function isQ(eSquareType) {
-  return (eSquareType === CrossWord.SquareType.Question
-          || eSquareType === CrossWord.SquareType.QuestionH
-          || eSquareType === CrossWord.SquareType.QuestionV)
+  return (eSquareType === idCrossWordItem.cQuestion
+          || eSquareType === idCrossWordItem.cQuestionH
+          || eSquareType === idCrossWordItem.cQuestionV)
+}
+
+// idInfoBox
+function popupOnPressJolla(charRect, textBox) {
+  if (isQ(charRect.eSquareType)) {
+    idInputBox.visible = false
+    var oP = idCrossWordGrid.mapToItem(idCrossWord, charRect.x, charRect.y)
+    idInfoBox.visible = true
+    idInfoBox.y = oP.y - charRect.height
+    idInfoBox.x = oP.x + charRect.width
+    var sLine
+    var ocQuestions = textBox.text.split("\n\n")
+    g_eLastSquareType = charRect.eSquareType
+    g_nLastSquareIndex = idInputBox.nIndex
+    var nLineCount = 1
+    if (ocQuestions.length > 1) {
+      nLineCount = 3
+      if (ocQuestions[0].length > ocQuestions[1].length)
+        sLine = ocQuestions[0]
+      else
+        sLine = ocQuestions[1]
+    } else
+      sLine = ocQuestions[0]
+
+    var oBR = fontMetrics.boundingRect(sLine + "X")
+    idInfoBox.height = oBR.height * nLineCount
+    idInfoBox.width = oBR.width
+    idInfoBox.t.text = textBox.text
+  } else if (CWLib.isChar(charRect)) {
+    idInfoBox.visible = false
+    idInputBox.t.text = charRect.text
+    oP = idCrossWordGrid.mapToItem(idCrossWord, charRect.x, charRect.y)
+    idInputBox.y = oP.y
+    idInputBox.x = oP.x
+    idInputBox.nIndex = charRect.nIndex
+    idInputBox.visible = true
+    idInputBox.t.forceActiveFocus()
+    Qt.inputMethod.show()
+  } else {
+    idInputBox.visible = false
+    idInfoBox.visible = false
+    Qt.inputMethod.hide()
+  }
 }
 
 // idInfoBox
@@ -119,10 +168,10 @@ function popupOnPress(charRect, textBox, fontMetrics) {
     idInfoBox.parent = charRect
     idInfoBox.show(textBox.text)
 
-    const ocQuestions = textBox.text.split("\n\n")
+    var ocQuestions = textBox.text.split("\n\n")
     g_eLastSquareType = charRect.eSquareType
+    g_nLastSquareIndex = idInputBox.nIndex
     if (ocQuestions.length > 1) {
-
       if (ocQuestions[0].length > ocQuestions[1].length)
         fontMetrics.text = ocQuestions[0]
       else
@@ -136,7 +185,7 @@ function popupOnPress(charRect, textBox, fontMetrics) {
   } else if (CWLib.isChar(charRect)) {
     idInfoBox.hide()
     idInputBox.t.text = charRect.text
-    idInputBox.parent = charRect
+    idInputBox.nIndex = charRect.nIndex
     idInputBox.visible = true
     idInputBox.t.forceActiveFocus()
   } else {
@@ -147,9 +196,9 @@ function popupOnPress(charRect, textBox, fontMetrics) {
 // Callback function used for passing the a result crossword question
 // idCrossWordGrid
 function addQ(nIndex, nHorizontal, nVertical) {
-  const o = idCrossWordGrid.children[nIndex]
+  var o = idCrossWordGrid.children[nIndex]
 
-  let nQTypeNum = 0
+  var nQTypeNum = 0
 
   if (nHorizontal !== -1)
     nQTypeNum += 1
@@ -159,17 +208,17 @@ function addQ(nIndex, nHorizontal, nVertical) {
   switch (nQTypeNum) {
   case 1:
     o.text = glosModel.get(nHorizontal).question
-    o.eSquareType = CrossWord.SquareType.QuestionH
+    o.eSquareType = idCrossWordItem.cQuestionH
     break
   case 2:
     o.text = glosModel.get(nVertical).question
-    o.eSquareType = CrossWord.SquareType.QuestionV
+    o.eSquareType = idCrossWordItem.cQuestionV
     break
   case 3:
     o.text = glosModel.get(nHorizontal).question + "\n\n"
     o.text += glosModel.get(nVertical).question
-    o.eSquareType = CrossWord.SquareType.Question
-    let oDoubleQuestion = idDline.createObject(o)
+    o.eSquareType = idCrossWordItem.cQuestion
+    var oDoubleQuestion = idDline.createObject(o)
     oDoubleQuestion.textV = glosModel.get(nVertical).question
     oDoubleQuestion.textH = glosModel.get(nHorizontal).question
   }
@@ -181,12 +230,12 @@ function isNotLetter(c) {
 
 // Callback function used for passing the a result crossword char
 function addCh(nIndex, vVal) {
-  const o = idCrossWordGrid.children[nIndex]
+  var o = idCrossWordGrid.children[nIndex]
   if (isNotLetter(vVal)) {
-    o.eSquareType = CrossWord.SquareType.Space
+    o.eSquareType = idCrossWordItem.cSpace
     o.text = vVal
   } else {
-    o.eSquareType = CrossWord.SquareType.Char
+    o.eSquareType = idCrossWordItem.cChar
     o.textA = vVal
   }
 }
@@ -199,10 +248,10 @@ function createGrid() {
   idCrossWordGrid.columns = CrossWordQ.nW
 
   // Last low must contain just *
-  let nCount = CrossWordQ.nW * (CrossWordQ.nH - 1)
+  var nCount = CrossWordQ.nW * (CrossWordQ.nH - 1)
 
   for (var i = 0; i < nCount; ++i) {
-    let o = idCWCharComponent.createObject(idCrossWordGrid)
+    var o = idCWCharComponent.createObject(idCrossWordGrid)
     o.nIndex = i
   }
 }

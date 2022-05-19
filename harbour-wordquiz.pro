@@ -20,12 +20,19 @@ CONFIG += sailfishapp
 SOURCES += src/harbour-wordquiz.cpp \
 src/filehelpers.cpp \
 src/speechdownloader.cpp \
-src/svgdrawing.cpp
+src/svgdrawing.cpp \
+src/crosswordq.cpp \
+../Crossword/crossword.cpp
+
 
 HEADERS += \
     src/speechdownloader.h \
     src/filehelpers.h \
-    src/svgdrawing.h
+    src/svgdrawing.h \
+    src/crosswordq.h
+    ../Crossword/crossword.h
+
+
 
 DISTFILES += qml/harbour-wordquiz.qml \
     qml/cover/CoverPage.qml \
@@ -40,7 +47,9 @@ DISTFILES += qml/harbour-wordquiz.qml \
     qml/pages/RectRounded.qml \
     qml/pages/TakeQuiz.qml \
     qml/pages/TextList.qml \
+    qml/pages/CrossWord.qml \
     qml/QuizFunctions.js \
+    qml/CrossWordFunctions.js \
     harbour-wordquiz.desktop \
     rpm/harbour-wordquiz.changes.in \
     rpm/harbour-wordquiz.changes.run.in \

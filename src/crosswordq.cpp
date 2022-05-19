@@ -58,7 +58,7 @@ void CrossWordQ::createCrossWordFromList(QObject* p) {
   std::uniform_int_distribution<> dis(0, ocWordList.length() - 1);
 
   int nII = dis(gen);
-  nII = dis(gen);
+
   for (int i = 0; i < 10; ++i) {
     if (nII < ocWordList.length())
     {

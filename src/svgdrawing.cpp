@@ -46,16 +46,10 @@ SvgDrawing::SvgDrawing()
   renderId(0);
 }
 
-
-
-void SvgDrawing::setOpacityOnId(const QString& id, const QString& op)
+void SvgDrawing::setStyleAttrInNode(StyleP_t& t, const QString& sStyleTag, const QString& sVal)
 {
-  auto tS = m_ocStyleMap.find(id);
-  if (tS == m_ocStyleMap.end())
-    return;
-
-  auto& tSS = tS->first;
-  tS->first["opacity"] = op;
+  auto& tSS = t.first;
+  tSS[sStyleTag] = sVal;
   QString sStyle;
   for (auto oI = tSS.begin(); oI != tSS.end(); ++oI)
   {
@@ -63,7 +57,25 @@ void SvgDrawing::setOpacityOnId(const QString& id, const QString& op)
       sStyle += ";";
     sStyle += (oI.key() + ":" + oI.value());
   }
-  tS->second.setNodeValue(sStyle);
+  t.second.setNodeValue(sStyle);
+}
+
+void SvgDrawing::setOpacityOnId(const QString& id, const QString& op)
+{
+  auto tS = m_ocStyleMap.find(id);
+  if (tS == m_ocStyleMap.end())
+    return;
+  setStyleAttrInNode(*tS,"opacity",op);
+}
+
+
+void SvgDrawing::setColor(const QColor& sColor)
+{
+  QString sC =  sColor.name();
+
+  for (auto& oJ : m_ocStyleMap)
+    setStyleAttrInNode(oJ,"stroke",sC);
+
 }
 
 QString SvgDrawing::getRating()

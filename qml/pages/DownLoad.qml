@@ -7,35 +7,29 @@ RectRounded {
   visible: false
   width: parent.width
   height: parent.width / 1.5
-  property bool bIsDownloading : false
+  property bool bIsDownloading: false
   property bool bIsDownloadingList
-  property bool bIsDeleting : false
+  property bool bIsDeleting: false
   property string sSelectedQ
   property string sImportMsg: ""
   property string sDesc1: ""
-  property string sDescDate : ""
+  property string sDescDate: ""
   property int nError
 
-  property alias currentIndex : idServerListView.currentIndex
+  property alias currentIndex: idServerListView.currentIndex
 
-  function positionViewAtIndex(nIndex)
-  {
-    idServerListView.positionViewAtIndex(nIndex,
-                                         ListView.Center)
+  function positionViewAtIndex(nIndex) {
+    idServerListView.positionViewAtIndex(nIndex, ListView.Center)
   }
 
-  onNErrorChanged:
-  {
-    if (nError === 0)
-    {
+  onNErrorChanged: {
+    if (nError === 0) {
       sImportMsg = ""
     }
-    if (nError === 1)
-    {
+    if (nError === 1) {
       sImportMsg = "Network Error!"
     }
-    if (nError === 2)
-    {
+    if (nError === 2) {
       sImportMsg = "No Quiz aviailable!"
     }
   }
@@ -121,11 +115,9 @@ RectRounded {
           height: parent.height
         }
       }
-      MouseArea
-      {
+      MouseArea {
         anchors.fill: idServerRow
-        onClicked:
-        {
+        onClicked: {
           idContainer.sImportMsg = ""
           idContainer.sDesc1 = desc1
           idContainer.sDescDate = date1
@@ -135,7 +127,6 @@ RectRounded {
       }
     }
   }
-
 
   RectRounded {
     id: idPwdDialog
@@ -169,7 +160,7 @@ RectRounded {
     id: idDeleteQuiz
     width: n4BtnWidth
     text: "Remove"
-    bProgVisible : bIsDeleting
+    bProgVisible: bIsDeleting
     anchors.bottom: parent.bottom
     anchors.bottomMargin: 20
     anchors.right: idLoadQuiz.left
@@ -202,28 +193,29 @@ RectRounded {
     onClicked: {
       bIsDownloading = true
       idTextInputQuizName.text = idImport.sSelectedQ
-      sQuizName  = idImport.sSelectedQ
+      sQuizName = idImport.sSelectedQ
       MyDownloader.importQuiz(idImport.sSelectedQ, idProgress)
     }
   }
 
-  Rectangle
-  {
-    id:idProgress
+  Rectangle {
+    id: idProgress
     anchors.bottom: idLoadQuiz.top
     anchors.bottomMargin: 10
-    x:20
+    x: 20
     property double progress
-    color : "orange"
+    color: "orange"
     height: Theme.paddingSmall
     width: (parent.width - 40) * progress
   }
 
-
   states: [
     State {
       name: "Back"
-      PropertyChanges { target: idContainer; visible: true }
-    } ]
-
+      PropertyChanges {
+        target: idContainer
+        visible: true
+      }
+    }
+  ]
 }
