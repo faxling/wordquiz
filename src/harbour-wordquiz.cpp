@@ -15,6 +15,13 @@
 #include <src/speechdownloader.h>
 #include <src/crosswordq.h>
 
+
+// ssh-keygen -t ed25519 -C faxling11@gmail.com
+
+
+//  eval "$(ssh-agent -s)"
+
+
 int main(int argc, char *argv[])
 {
 
