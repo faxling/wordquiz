@@ -8,7 +8,6 @@ ApplicationWindow {
   property string sAppTitle
   property int nPageBottomY
   initialPage: Component {
-    // @disable-check M301
     FirstPage {}
   }
   cover: Component {

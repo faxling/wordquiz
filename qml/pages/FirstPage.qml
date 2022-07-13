@@ -161,7 +161,7 @@ Page {
           anchors.rightMargin: -nMargin
           anchors.top: parent.top
           source: "image://theme/icon-m-question"
-          onClicked: Qt.openUrlExternally(
+          onClicked: MyDownloader.openUrl(
                        "https://faxling.github.io/WordQuizWin/index.html")
         }
 
@@ -172,7 +172,7 @@ Page {
           anchors.leftMargin: -nMargin
           anchors.top: parent.top
           source: "image://theme/icon-m-search"
-          onClicked: Qt.openUrlExternally(
+          onClicked: MyDownloader.openUrl(
                        "https://www.google.com/search?q=" + sSearchQuery)
         }
       }
@@ -191,25 +191,25 @@ Page {
 
         ButtonQuizImg {
           id: idTab2Btn
+          fillMode: Image.PreserveAspectFit
+          width: idTab1Btn.width * 2
           source: "image://theme/icon-m-edit?"
                   + (idWindow.state === "idTab2" ? Theme.highlightColor : Theme.primaryColor)
           onClicked: idWindow.state = "idTab2"
         }
 
-        // @disable-check M301
         ComboBox {
 
           id: idCombo
           //  width: 200
           label: "Games"
-          // @disable-check M301
+
           menu: ContextMenu {
-            // @disable-check M301
+
             MenuItem {
               text: "Quiz"
               onClicked: idWindow.state = "idTab3"
             }
-            // @disable-check M301
             MenuItem {
               text: "Hang Man"
               onClicked: {
@@ -220,7 +220,7 @@ Page {
                 idWindow.state = "idTab4"
               }
             }
-            // @disable-check M301
+
             MenuItem {
               text: "Crossword"
               onClicked: {

@@ -20,7 +20,7 @@
 
 
 //  eval "$(ssh-agent -s)"
-
+// git remote add origin git@github.com:faxling/tripometer.git
 
 int main(int argc, char *argv[])
 {

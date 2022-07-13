@@ -17,6 +17,7 @@ class Speechdownloader : public QObject
   Q_OBJECT
 public:
   explicit Speechdownloader(const QString& sStoragePath, QObject *pParent);
+  Q_INVOKABLE void openUrl(QString sUrl);
   Q_INVOKABLE void deleteWord(QString sWord, QString sLang);
   Q_INVOKABLE void downloadWord(QString sWord, QString sLang);
   Q_INVOKABLE void translateWord(QString sWord, QString sFromLang, QString sToLang, QObject* oButton);

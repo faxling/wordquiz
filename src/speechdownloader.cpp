@@ -17,6 +17,7 @@
 #include <QBuffer>
 #include <QUrl>
 #include <QTextDocument>
+#include <QProcess>
 #include <random>
 
 // https://cloud.ibm.com/resources
@@ -121,6 +122,14 @@ QString Speechdownloader::ignoreAccent(QString str)
   return str;
 
 }
+
+void Speechdownloader::openUrl(QString sUrl)
+{
+  QProcess::startDetached("/usr/bin/sailfish-browser " + sUrl);
+  // QDesktopServices::openUrl(QUrl("https://kristinafrank.se/mal/faxmal.html"));
+  qDebug() << "openPage()" ;
+}
+
 
 QString Speechdownloader::removeDiacritics(QString str)
 {

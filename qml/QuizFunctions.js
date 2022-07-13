@@ -368,7 +368,7 @@ function lookUppInWiki() {
   if (oInText === "")
     return
 
-  Qt.openUrlExternally(
+  MyDownloader.openUrl(
         "http://" + sLang + ".wiktionary.org/w/index.php?title=" + oInText.toLowerCase(
           ))
 }
