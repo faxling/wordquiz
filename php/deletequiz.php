@@ -9,7 +9,7 @@ $qname = $_GET['qname'];
 $qpwd = $_GET['qpwd'];
 $dbid = $_GET['dbid'];
 error_log($qname . "   " . $qpwd);
-$sql = "DELETE FROM QuizIndex WHERE qname=? AND pwd=?";
+$sql = "DELETE FROM quizindex WHERE qname=? AND pwd=?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ss", $qname, $qpwd);
 $ret = $stmt->execute();

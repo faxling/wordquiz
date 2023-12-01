@@ -12,7 +12,7 @@ $desc1 = $_GET['desc1'];
 
 $desc1 = $desc1 . "###" . date("Y-m-d  H:i") . " UTC";
 $pwd = $_GET['pwd'];
-$sql = "SELECT ID FROM QuizIndex WHERE qname=? and pwd=?";
+$sql = "SELECT ID FROM quizindex WHERE qname=? and pwd=?";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ss", $qname, $pwd);

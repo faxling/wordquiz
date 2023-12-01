@@ -10,7 +10,7 @@ Name:       harbour-wordquiz
 
 Summary:    Word quiz studio
 Version:    4.0
-Release:    1
+Release:    2
 Group:      Qt/Qt
 License:    LICENSE
 URL:        https://github.com/faxling

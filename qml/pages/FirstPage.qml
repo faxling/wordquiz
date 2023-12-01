@@ -1,9 +1,9 @@
 import QtQuick 2.2
+// import Nemo.DBus 2.0
 import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0 as Sql
 import "../QuizFunctions.js" as QuizLib
 
-// @disable-check M301
 Page {
   id: idWindow
   // init in initUrls
@@ -138,7 +138,7 @@ Page {
       Item {
         width: parent.width
         height: idTitle.height
-        // @disable-check M301
+
         Label {
           id: idTitle
           font.italic: glosModelIndex.count === 0
@@ -154,6 +154,35 @@ Page {
           onTextChanged: sAppTitle = sQuizName
         }
 
+
+        /* Some tryes with DBus did not work
+        DBusInterface {
+          id: browseControl
+          service: "org.sailfishos.browser"
+          iface: "org.freedesktop.DBus.Introspectable"
+          path: "/"
+          function listNamesRes(o) {
+            console.log(o)
+          }
+          function listNames() {
+            console.log("oo")
+            call('Introspect', undefined, listNamesRes)
+          }
+        }
+        DBusInterface {
+          id: browseControl
+          service: "org.sailfishos.browser"
+          iface: "org.sailfishos.browser"
+          path: "/"
+          function listNamesRes(o) {
+            console.log(o)
+          }
+          function listNames() {
+            console.log("oo")
+            call('activateNewTabView', undefined, listNamesRes)
+          }
+        }
+        */
         ButtonQuizImg {
           id: idBtnHelp
           anchors.right: parent.right
@@ -161,6 +190,7 @@ Page {
           anchors.rightMargin: -nMargin
           anchors.top: parent.top
           source: "image://theme/icon-m-question"
+
           onClicked: MyDownloader.openUrl(
                        "https://faxling.github.io/WordQuizWin/index.html")
         }

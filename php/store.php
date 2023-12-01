@@ -12,7 +12,7 @@ $qcount = (int) $_GET['qcount'];
 $desc1 = $_GET['desc1'];
 $desc1 = $desc1 . "###" . date("Y-m-d  H:i");
 $pwd = $_GET['pwd'];
-$sql = "SELECT count(*) FROM QuizIndex WHERE qname=?";
+$sql = "SELECT count(*) FROM quizindex WHERE qname=?";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $qname);

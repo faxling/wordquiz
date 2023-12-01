@@ -8,7 +8,7 @@ StopWatch::StopWatch(const QString& sMsg)
 {
   m_oTimer = new QElapsedTimer;
   m_sMsg = sMsg;
-  m_oTimer->start();
+  m_oTimer->start(); 
   return;
 }
 

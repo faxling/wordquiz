@@ -7,7 +7,7 @@ include 'dbconn.php';
 
 $conn = new mysqli($servername, $username, $password, "glosquiz");
 $qlang = $_GET['qlang'];
-$sql = "SELECT id, desc1, slang, qcount,qname  FROM QuizIndex WHERE slang LIKE '%" . $qlang.  "%' ORDER BY slang";
+$sql = "SELECT id, desc1, slang, qcount,qname  FROM quizindex WHERE slang LIKE '%" . $qlang.  "%' ORDER BY slang";
 $result = $conn->query($sql);
 $rows = array();
 while ($row = $result->fetch_row()) {
@@ -15,5 +15,4 @@ while ($row = $result->fetch_row()) {
 }
 
 print json_encode($rows);
-
 ?>

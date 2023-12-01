@@ -80,6 +80,8 @@ private:
   void wordDownloaded(QNetworkReply* pReply);
   void imgDownloaded(QNetworkReply* pReply);
   void transDownloaded();
+    void errorSlot(QNetworkReply::NetworkError);
+        void readyRead();
 private:
   void currentQuizCmd(QVariant p,QString sName, QString sLang,  QString sPwd,QString sDesc, QString sCmd, QObject* pProgressIndicator);
   // QVector<int> m_ocIndexMap;
