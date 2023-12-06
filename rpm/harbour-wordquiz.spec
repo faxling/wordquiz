@@ -23,9 +23,10 @@ BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  desktop-file-utils
+BuildRequires:  pkgconfig(qt5embedwidget)
 
 %description
-An language study application for creating and taking word quizs in different languages.
+An language study application for creating and taking word translatioquizs in different languages.
 
 
 %prep

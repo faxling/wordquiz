@@ -191,8 +191,9 @@ Page {
           anchors.top: parent.top
           source: "image://theme/icon-m-question"
 
-          onClicked: MyDownloader.openUrl(
-                       "https://faxling.github.io/WordQuizWin/index.html")
+          onClicked: {
+            QuizLib.openManPage()
+          }
         }
 
         ButtonQuizImg {
@@ -202,7 +203,7 @@ Page {
           anchors.leftMargin: -nMargin
           anchors.top: parent.top
           source: "image://theme/icon-m-search"
-          onClicked: MyDownloader.openUrl(
+          onClicked: QuizLib.openWwwPage(
                        "https://www.google.com/search?q=" + sSearchQuery)
         }
       }

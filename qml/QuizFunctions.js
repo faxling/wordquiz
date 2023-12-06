@@ -354,6 +354,16 @@ function reqTranslation(oBtnIn, bIsSecond) {
   }
 }
 
+function openWwwPage(sUrl) {
+  pageStack.push("pages/WikiView.qml", {
+                   "url": sUrl
+                 })
+}
+
+function openManPage() {
+  pageStack.push("pages/HelpView.qml")
+}
+
 function lookUppInWiki() {
   var oInText
 
@@ -368,9 +378,11 @@ function lookUppInWiki() {
   if (oInText === "")
     return
 
-  MyDownloader.openUrl(
-        "http://" + sLang + ".wiktionary.org/w/index.php?title=" + oInText.toLowerCase(
-          ))
+  var sUrl = "http://" + sLang + ".wiktionary.org/w/index.php?title=" + oInText.toLowerCase()
+
+  pageStack.push("pages/WikiView.qml", {
+                   "url": sUrl
+                 })
 }
 
 function updateDesc1(sDesc) {
@@ -787,9 +799,9 @@ function newQuiz() {
 
   if (idLangModel.get(idLangList1.currentIndex).code === idLangModel.get(
         idLangList2.currentIndex).code) {
-    idErrorDialog.text = "A WordQuiz should be of different languages e.g en-ru"
+    idErrorDialog.text = "WordQuiz with same language " + idLangModel.get(
+          idLangList2.currentIndex).lang + "!"
     idErrorDialog.visible = true
-    return
   }
 
   db.transaction(function (tx) {

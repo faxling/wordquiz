@@ -7,6 +7,6 @@ Name=WordQuiz Studio
 MimeType=application/gpx+xml
 
 [X-Sailjail]
-Permissions=UserDirs;Audio;Internet
+Permissions=UserDirs;Audio;Internet;MediaIndexing
 OrganizationName=harbour-wordquiz
 ApplicationName=harbour-wordquiz

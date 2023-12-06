@@ -14,6 +14,7 @@ TARGET = harbour-wordquiz
 
 QT += qml quick multimedia core svg xml
 
+PKGCONFIG += qt5embedwidget
 
 CONFIG += sailfishapp
 
@@ -36,6 +37,8 @@ HEADERS += \
 
 DISTFILES += qml/harbour-wordquiz.qml \
     qml/cover/CoverPage.qml \
+    qml/pages/HelpView.qml \
+    qml/pages/WikiView.qml \
     qml/pages/DownLoad.qml \
     qml/pages/FirstPage.qml \
     qml/pages/ButtonQuiz.qml \
