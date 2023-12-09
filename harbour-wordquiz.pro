@@ -38,6 +38,8 @@ HEADERS += \
 DISTFILES += qml/harbour-wordquiz.qml \
     qml/cover/CoverPage.qml \
     qml/pages/HelpView.qml \
+    qml/pages/QuestionPanel.qml \
+    qml/pages/QuestionPanelRect.qml \
     qml/pages/WikiView.qml \
     qml/pages/DownLoad.qml \
     qml/pages/FirstPage.qml \

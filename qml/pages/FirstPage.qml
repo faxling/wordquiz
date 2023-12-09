@@ -79,12 +79,13 @@ Page {
     id: glosModelIndex
   }
 
-  // Used by idView in TakeQuiz
+  // Used by idTakeQuizView in TakeQuiz
   ListModel {
     id: idQuizModel
     property string question
     property string extra
     property string answer
+    property string answerDisp
     property int number
 
     onQuestionChanged: {
@@ -93,12 +94,15 @@ Page {
 
     ListElement {
       number: 0
+      answerVisible: false
     }
     ListElement {
       number: 1
+      answerVisible: false
     }
     ListElement {
       number: 2
+      answerVisible: false
     }
   }
 
@@ -154,35 +158,6 @@ Page {
           onTextChanged: sAppTitle = sQuizName
         }
 
-
-        /* Some tryes with DBus did not work
-        DBusInterface {
-          id: browseControl
-          service: "org.sailfishos.browser"
-          iface: "org.freedesktop.DBus.Introspectable"
-          path: "/"
-          function listNamesRes(o) {
-            console.log(o)
-          }
-          function listNames() {
-            console.log("oo")
-            call('Introspect', undefined, listNamesRes)
-          }
-        }
-        DBusInterface {
-          id: browseControl
-          service: "org.sailfishos.browser"
-          iface: "org.sailfishos.browser"
-          path: "/"
-          function listNamesRes(o) {
-            console.log(o)
-          }
-          function listNames() {
-            console.log("oo")
-            call('activateNewTabView', undefined, listNamesRes)
-          }
-        }
-        */
         ButtonQuizImg {
           id: idBtnHelp
           anchors.right: parent.right
@@ -278,7 +253,7 @@ Page {
       TakeQuiz {
         id: idTab3
         width: parent.width
-        height: idTabMain.height - idTabRow.height - idTitle.height - 20
+        height: Screen.height - idTabRow.height - idTitle.height - 20
         visible: false
       }
       HangMan {

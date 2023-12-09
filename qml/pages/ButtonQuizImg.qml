@@ -8,7 +8,7 @@ Image {
   Rectangle {
     id: idRect
     opacity: 0.4
-    radius: 4
+    radius: 8
     color: "steelblue"
     anchors.fill: parent
   }

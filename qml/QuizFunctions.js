@@ -305,11 +305,23 @@ function sortModel() {
   })
 }
 
+function setAnswerVisible() {
+  var i = nQuizIndex
+  idQuizModel.get(i).answerVisible = true
+}
+
+function toggleAnswerVisible() {
+  var i = nQuizIndex
+  idQuizModel.get(i).answerVisible = !idQuizModel.get(i).answerVisible
+}
+
 function resetTakeQuizTab() {
   if (idWindow.oTakeQuiz !== undefined) {
     idWindow.oTakeQuiz.bExtraInfoVisible = false
-    idWindow.oTakeQuiz.bAnswerVisible = false
-    idWindow.oTakeQuiz.bTextAnswerOk = false
+    var nC = idQuizModel.count
+    for (var i = 0; i < nC; ++i) {
+      idQuizModel.get(i).answerVisible = false
+    }
   }
 }
 
@@ -1282,7 +1294,8 @@ function Timer() {
 
 function calcAndAssigNextQuizWord(currentIndex) {
   var nI = (currentIndex + 1) % 3
-  var nLastIndex = idView.nLastIndex
+  var nLastIndex = idTakeQuizView.nLastIndex
+  idQuizModel.get(nI).answerVisible = false
 
   //nQuizIndex the index of the view with 3 items that swipes left or right
   nQuizIndex = nI
@@ -1308,7 +1321,7 @@ function calcAndAssigNextQuizWord(currentIndex) {
 
   var nLastNumber = idQuizModel.number
 
-  idView.nLastIndex = nI
+  idTakeQuizView.nLastIndex = nI
 
   if (bDir === -1) {
     var i = MyDownloader.indexFromGlosNr(glosModelWorking, nLastNumber)
