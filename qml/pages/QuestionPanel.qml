@@ -7,6 +7,7 @@ Flipable {
   property bool bTextAnswerOk: false
   width: idTakeQuizView.width
   height: idRectTakeQuiz.height - 200
+
   front: QuestionPanelRect {
 
     ButtonQuizImg {
@@ -16,7 +17,7 @@ Flipable {
       anchors.top: parent.top
       anchors.topMargin: 20
       source: "image://theme/icon-m-about"
-      visible: idQuizModel.extra.length > 0
+      visible: extra.length > 0
       onClicked: bExtraInfoVisible = !bExtraInfoVisible
     }
 
@@ -46,13 +47,12 @@ Flipable {
 
     ButtonQuizImg {
       id: idImgBtn
-      visible: !allok
+      visible: !allok && imgUrl !== "image://theme/icon-m-file-image"
       anchors.right: parent.right
       anchors.rightMargin: 20
       anchors.top: idTextBtn.bottom
       anchors.topMargin: 20
       source: "image://theme/icon-m-image?"
-              + (bImageMode ? Theme.highlightColor : Theme.primaryColor)
       onClicked: bImageMode = !bImageMode
     }
 
@@ -77,7 +77,7 @@ Flipable {
       color: Theme.primaryColor
       font.pixelSize: Theme.fontSizeExtraSmall
       visible: bExtraInfoVisible
-      text: idQuizModel.extra
+      text: extra
     }
 
 
@@ -103,7 +103,7 @@ Flipable {
       labelVisible: false
       placeholderText: "your answer"
       onTextChanged: {
-        var bAnswerVisible = QuizLib.isAnswerOk(text, idQuizModel.answer)
+        var bAnswerVisible = QuizLib.isAnswerOk(text, answer)
         if (bAnswerVisible)
           QuizLib.setAnswerVisible()
       }
@@ -116,7 +116,7 @@ Flipable {
       height: Theme.itemSizeExtraSmall
       y: idBtnAnswer.y + idQuizColumn.y
       source: "image://theme/icon-m-speaker-on"
-      onClicked: MyDownloader.playWord(idQuizModel.question,
+      onClicked: MyDownloader.playWord(question,
                                        bIsReverse ? sToLang : sFromLang)
     }
     Column {
@@ -133,8 +133,9 @@ Flipable {
         width: 500
         fillMode: Image.PreserveAspectFit
         anchors.horizontalCenter: parent.horizontalCenter
-        visible: bImageMode && MyDownloader.hasImg
-        source: MyDownloader.urlImg
+        visible: bImageMode
+        // && MyDownloader.hasImg
+        source: imgUrl
       }
 
       Text {
@@ -145,7 +146,7 @@ Flipable {
         font.pixelSize: Theme.fontSizeExtraLarge
         font.bold: true
         anchors.horizontalCenter: parent.horizontalCenter
-        text: idQuizModel.question
+        text: question
       }
 
       ButtonQuizImg {
@@ -156,7 +157,6 @@ Flipable {
         height: Theme.itemSizeExtraSmall * 2
         source: "image://theme/icon-m-flip"
         onClicked: {
-          idQuizModel.answerDisp = idQuizModel.answer
           QuizLib.toggleAnswerVisible()
         }
       }
@@ -195,7 +195,7 @@ Flipable {
         font.pixelSize: Theme.fontSizeExtraLarge
         font.bold: true
         horizontalAlignment: Text.AlignHCenter
-        text: idQuizModel.answerDisp
+        text: answer
       }
 
       ButtonQuizImg {
@@ -223,7 +223,7 @@ Flipable {
         width: Theme.itemSizeExtraSmall
         height: Theme.itemSizeExtraSmall
         source: "image://theme/icon-m-speaker-on"
-        onClicked: MyDownloader.playWord(idQuizModel.answer, sAnswerLang)
+        onClicked: MyDownloader.playWord(answer, sAnswerLang)
       }
     }
   }

@@ -183,7 +183,14 @@ void Speechdownloader::setImgWord(QString sWord, QString sLang)
 
 QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
 {
-  return QUrl::fromLocalFile(ImgPath(sWord, sLang));
+  QString s = ImgPath(sWord, sLang);
+  bool bEx = QFile::exists(s);
+
+  if (bEx == true)
+    return QUrl::fromLocalFile(s);
+  else
+    return QUrl("image://theme/icon-m-file-image");
+
 }
 
 void Speechdownloader::checkAndEmit(QString sPath1, QString sPath2)

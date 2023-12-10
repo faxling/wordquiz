@@ -301,23 +301,27 @@ Array.prototype.indexOfObject = function arrayObjectIndexOf(property, value) {
 
 function sortModel() {
   db.readTransaction(function (tx) {
-    QuizLib.loadFromDb(tx)
+    QuizLib.loadFromDb(tx, 1)
   })
 }
 
 function setAnswerVisible() {
-  var i = nQuizIndex
+  var i = nQuizIndex1_3
   idQuizModel.get(i).answerVisible = true
+  idWindow.oTakeQuiz.bAnswerVisible = true
 }
 
 function toggleAnswerVisible() {
-  var i = nQuizIndex
+  var i = nQuizIndex1_3
   idQuizModel.get(i).answerVisible = !idQuizModel.get(i).answerVisible
+  idWindow.oTakeQuiz.bAnswerVisible = idQuizModel.get(i).answerVisible
 }
 
 function resetTakeQuizTab() {
   if (idWindow.oTakeQuiz !== undefined) {
     idWindow.oTakeQuiz.bExtraInfoVisible = false
+    idWindow.oTakeQuiz.bAnswerVisible = false
+    idWindow.oTakeQuiz.bImageMode = false
     var nC = idQuizModel.count
     for (var i = 0; i < nC; ++i) {
       idQuizModel.get(i).answerVisible = false
@@ -618,21 +622,35 @@ function insertGlosa(dbnumber, nC, question, answer) {
   updateDesc1(idWindow.sQuizDesc)
 }
 
-function assignQuizModel(nIndexOfNewWord) {
-  var sNumberNewWord = glosModelWorking.get(nIndexOfNewWord).number
-  idQuizModel.question = glosModelWorking.get(nIndexOfNewWord).question
-  idQuizModel.answer = glosModelWorking.get(nIndexOfNewWord).answer
-  idQuizModel.number = sNumberNewWord
-  idQuizModel.extra = glosModelWorking.get(nIndexOfNewWord).extra
-  idWindow.nGlosaTakeQuizIndex = MyDownloader.indexFromGlosNr(glosModel,
-                                                              sNumberNewWord)
-
+function assignQuizModel(nIndexNewWordInModelWorking, nNumberInQuizModel) {
+  var i = nNumberInQuizModel
+  var j = nIndexNewWordInModelWorking
+  var sQ = glosModelWorking.get(j).question
+  idQuizModel.get(i).question = sQ
+  idQuizModel.get(i).answer = glosModelWorking.get(j).answer
+  idQuizModel.get(i).extra = glosModelWorking.get(j).extra
+  var nNumberDbNewWord = glosModelWorking.get(j).number
+  idQuizModel.get(i).numberDb = nNumberDbNewWord
+  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ, sQuestionLang))
+  // MyDownloader.setImgWord(idQuizModel.get(i).question, sQuestionLang)
   // idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(glosModel, sNumberNewWord)
+}
+
+function assignQuizModelAll() {
+  if (glosModelWorking.count === 0) {
+    setAllok(true)
+    return
+  }
+  setAllok(false)
+  for (var i = 0; i < 3; ++i) {
+    var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
+    assignQuizModel(nIndexOwNewWord, i)
+  }
 }
 
 function loadQuiz() {
   glosModelWorking.clear()
-  setAllok(false)
+
   bIsReverse = false
 
   if (glosModel.count < 1) {
@@ -658,15 +676,7 @@ function loadQuiz() {
                               })
     }
   }
-
-  var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
-
-  // sScoreText =  glosModelWorking.count + "/" + nC
-  if (glosModelWorking.count === 0) {
-    setAllok(true)
-  } else {
-    assignQuizModel(nIndexOwNewWord)
-  }
+  assignQuizModelAll()
 }
 
 function capitalizeStr(inStr) {
@@ -679,14 +689,18 @@ function capitalizeStr(inStr) {
   return sA
 }
 
-function loadFromDb(tx) {
+function loadFromDb(tx, nSelectFromCurrentIndex) {
 
   // To select the right highlighted word at quiz load time
   var nCurrentNumber = -1
-  var oGlosaItem = glosModel.get(idWindow.glosListView.currentIndex)
-  if (oGlosaItem !== undefined) {
-    nCurrentNumber = oGlosaItem.number
+  if (nSelectFromCurrentIndex > 0) {
+    var oGlosaItem = glosModel.get(idWindow.glosListView.currentIndex)
+    if (oGlosaItem !== undefined) {
+      nCurrentNumber = oGlosaItem.number
+    }
   }
+
+  console.log("LOAD " + nCurrentNumber)
 
   glosModel.clear()
 
@@ -727,13 +741,16 @@ function loadFromDb(tx) {
     */
   }
 
-  // Select highlight after eg sort
+  // Select highlight after  sort
   if (nCurrentNumber > 0) {
     idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(
           glosModel, nCurrentNumber)
     idWindow.nGlosaTakeQuizIndex = idWindow.glosListView.currentIndex
     idWindow.glosListView.positionViewAtIndex(idWindow.nGlosaTakeQuizIndex,
                                               ListView.Center)
+  } else {
+    idWindow.nGlosaTakeQuizIndex = -1
+    idWindow.glosListView.currentIndex = -1
   }
 }
 
@@ -798,7 +815,7 @@ function loadFromQuizList() {
     tx.executeSql('CREATE TABLE IF NOT EXISTS Glosa' + nDbNumber
                   + '( number INT , quizword TEXT, answer TEXT, state INT)')
 
-    loadFromDb(tx)
+    loadFromDb(tx, 0)
     loadQuiz()
   })
 
@@ -1101,8 +1118,7 @@ function reverseQuiz() {
                               })
   }
 
-  var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
-  assignQuizModel(nIndexOwNewWord)
+  assignQuizModelAll()
 }
 
 function resetQuiz() {
@@ -1129,10 +1145,7 @@ function resetQuiz() {
                             })
   }
 
-  var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
-
-  assignQuizModel(nIndexOwNewWord)
-  setAllok(glosModelWorking.count === 0)
+  assignQuizModelAll()
 }
 
 function updateQuiz() {
@@ -1170,6 +1183,7 @@ function updateQuiz() {
   var i = MyDownloader.indexFromGlosNr(glosModelWorking, nNumber)
 
   if (i >= 0) {
+
     if (nState !== 0) {
       glosModelWorking.remove(i)
       if (glosModelWorking.count === 0)
@@ -1184,6 +1198,7 @@ function updateQuiz() {
       }
       glosModelWorking.get(i).number = nNumber
       glosModelWorking.get(i).extra = sE
+      checkAndReplace(nNumber, i)
     }
   } else {
     if (nState === 0) {
@@ -1200,13 +1215,6 @@ function updateQuiz() {
         setAllok(false)
       }
     }
-  }
-
-  if (glosModelWorking.count === 1) {
-    idQuizModel.question = sQ
-    idQuizModel.answer = sA_Org
-    idQuizModel.number = nNumber
-    idQuizModel.extra = sE
   }
 
   sScoreText = glosModelWorking.count + "/" + glosModel.count
@@ -1251,6 +1259,10 @@ function deleteWordInQuiz() {
     }
   }
 
+  assignQuizModelAll()
+
+
+  /*
   if (idQuizModel.number === nNumber) {
     resetTakeQuizTab()
   }
@@ -1270,99 +1282,120 @@ function deleteWordInQuiz() {
     idQuizModel.number = 0
     idQuizModel.extra = "-"
   }
+  */
   sScoreText = glosModelWorking.count + "/" + glosModel.count
 }
 
-// To smoth the pathview
-function getFunctionU(nLastNumber, oTimer) {
+function updateDbWithWordState(nLastNumber) {
 
-  return function updateDbWithWordState() {
-
-    db.transaction(function (tx) {
-      tx.executeSql("UPDATE Glosa" + nDbNumber + " SET state=1 WHERE number=?",
-                    nLastNumber)
-    })
-
-    oTimer.stop()
-    oTimer.destroy()
-  }
+  db.transaction(function (tx) {
+    tx.executeSql("UPDATE Glosa" + nDbNumber + " SET state=1 WHERE number=?",
+                  nLastNumber)
+  })
 }
 
 function Timer() {
   return Qt.createQmlObject("import QtQuick 2.0; Timer {}", idWindow)
 }
 
-function calcAndAssigNextQuizWord(currentIndex) {
-  var nI = (currentIndex + 1) % 3
-  var nLastIndex = idTakeQuizView.nLastIndex
-  idQuizModel.get(nI).answerVisible = false
+function checkAndReplace(nNumberDb, nReplaceWidthIndexInWorking) {
+  for (var i = 0; i < 3; ++i) {
+    if (idQuizModel.get(i).numberDb === nNumberDb) {
+      assignQuizModel(nReplaceWidthIndexInWorking, i)
+    }
+  }
+}
+
+function assigNextQuizWord() {
+
+  //var nLastIndex = idTakeQuizView.nLastIndex
+  // idQuizModel.get(nQuizIndex1_3).answerVisible = false
 
   //nQuizIndex the index of the view with 3 items that swipes left or right
-  nQuizIndex = nI
+  //  nQuizIndex = nI
+  // idTakeQuizView.nLastIndex = nI
+  var nLastNumber = idQuizModel.get(nLastQuizIndex1_3).numberDb
+  if (idQuizModel.bDir === -1) {
+    var i = nLastQuizIndex1_3
+
+    var ii = MyDownloader.indexFromGlosNr(glosModelWorking, nLastNumber)
+    if (ii >= 0)
+      glosModelWorking.remove(ii)
+    else {
+      console.log("not found in working model " + nLastNumber + " "
+                  + glosModelWorking.count + " " + idQuizModel.get(i).question)
+    }
+
+    if (glosModelWorking.count === 0) {
+      setAllok(true)
+
+      idQuizModel.get(i).answerVisible = false
+      idQuizModel.get(i).answer = ""
+      idQuizModel.get(i).question = ""
+      idQuizModel.get(i).extra = ""
+      idQuizModel.get(i).numberDb = 0
+    }
+
+    sScoreText = glosModelWorking.count + "/" + glosModel.count
+    i = MyDownloader.indexFromGlosNr(glosModel, nLastNumber)
+    if (i !== -1) {
+      glosModel.get(i).state1 = 1
+      updateDbWithWordState(nLastNumber)
+    }
+  }
+
+  // MyDownloader.storeCurrentIndex(nQuizIndex1_3)
+  if (glosModelWorking.count > 0) {
+
+    var nIndexNewWordInModelWorking = 0
+    while (glosModelWorking.count > 1) {
+      nIndexNewWordInModelWorking = Math.floor(Math.random(
+                                                 ) * glosModelWorking.count)
+      // var nNumberNewWord = glosModelWorking.get(nIndexNewWord).number
+      if (glosModelWorking.get(
+            nIndexNewWordInModelWorking).number !== nLastNumber)
+        break
+    }
+
+    if (glosModelWorking.count === 1) {
+      assignQuizModel(0, nLastQuizIndex1_3)
+    } else {
+      assignQuizModel(nIndexNewWordInModelWorking, nLastQuizIndex1_3)
+    }
+
+    if (idQuizModel.bDir === -1)
+      checkAndReplace(nLastNumber, nIndexNewWordInModelWorking)
+
+    idWindow.nGlosaTakeQuizIndex = MyDownloader.indexFromGlosNr(
+          glosModel, idQuizModel.get(nQuizIndex1_3).numberDb)
+  }
+
+  resetTakeQuizTab()
+}
+
+function calcSwipeDirection(currentIndex) {
+  var nI = (currentIndex + 1) % 3
+
+  idQuizModel.get(nI).answerVisible = false
+  //nQuizIndex the index of the view with 3 items that swipes left or right
+  nLastQuizIndex1_3 = nQuizIndex1_3
+  nQuizIndex1_3 = nI
 
   if (glosModelWorking.count === 0) {
     return
   }
 
-  var bDir = 0
-
+  var nLastIndex = nLastQuizIndex1_3
   if (nLastIndex === 0 && nI === 1)
-    bDir = 1
+    idQuizModel.bDir = 1
   if (nLastIndex === 0 && nI === 2)
-    bDir = -1
+    idQuizModel.bDir = -1
   if (nLastIndex === 1 && nI === 0)
-    bDir = -1
+    idQuizModel.bDir = -1
   if (nLastIndex === 1 && nI === 2)
-    bDir = 1
+    idQuizModel.bDir = 1
   if (nLastIndex === 2 && nI === 0)
-    bDir = 1
+    idQuizModel.bDir = 1
   if (nLastIndex === 2 && nI === 1)
-    bDir = -1
-
-  var nLastNumber = idQuizModel.number
-
-  idTakeQuizView.nLastIndex = nI
-
-  if (bDir === -1) {
-    var i = MyDownloader.indexFromGlosNr(glosModelWorking, nLastNumber)
-
-    glosModelWorking.remove(i)
-
-    if (glosModelWorking.count === 0) {
-      setAllok(true)
-      idQuizModel.answer = ""
-      idQuizModel.extra = ""
-    }
-
-    sScoreText = glosModelWorking.count + "/" + glosModel.count
-
-    i = MyDownloader.indexFromGlosNr(glosModel, nLastNumber)
-
-    if (i !== -1) {
-      glosModel.get(i).state1 = 1
-      var oTimer = new Timer()
-      oTimer.interval = 1000
-      oTimer.repeat = false
-      oTimer.triggered.connect(getFunctionU(nLastNumber, oTimer))
-      oTimer.start()
-    }
-  }
-
-  MyDownloader.storeCurrentIndex(nI)
-
-  if (glosModelWorking.count > 0) {
-
-    while (glosModelWorking.count > 1) {
-      var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
-      if (glosModelWorking.get(nIndexOwNewWord).number !== nLastNumber)
-        break
-    }
-
-    if (glosModelWorking.count === 1) {
-      assignQuizModel(0, nQuizIndex)
-    } else
-      assignQuizModel(nIndexOwNewWord, nQuizIndex)
-  }
-
-  resetTakeQuizTab()
+    idQuizModel.bDir = -1
 }

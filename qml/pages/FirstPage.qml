@@ -33,7 +33,8 @@ Page {
   property string sQuizDesc: "-"
   property string sScoreText: "-"
   property int nDbNumber: 0
-  property int nQuizIndex: 1
+  property int nQuizIndex1_3: 1
+  property int nLastQuizIndex1_3: 1
   property int n3BtnWidth: idTabMain.width / 3 - 8
   property int n4BtnWidth: idTabMain.width / 4 - 7
   property int n5BtnWidth: idTabMain.width / 8
@@ -82,26 +83,33 @@ Page {
   // Used by idTakeQuizView in TakeQuiz
   ListModel {
     id: idQuizModel
-    property string question
-    property string extra
-    property string answer
-    property string answerDisp
-    property int number
-
-    onQuestionChanged: {
-      MyDownloader.setImgWord(question, sQuestionLang)
-    }
+    property int bDir
 
     ListElement {
       number: 0
+      numberDb: 0
+      question: ""
+      extra: ""
+      imgUrl: ""
+      answer: ""
       answerVisible: false
     }
     ListElement {
       number: 1
+      numberDb: 0
+      question: ""
+      extra: ""
+      answer: ""
+      imgUrl: ""
       answerVisible: false
     }
     ListElement {
       number: 2
+      numberDb: 0
+      question: ""
+      extra: ""
+      answer: ""
+      imgUrl: ""
       answerVisible: false
     }
   }

@@ -8,7 +8,7 @@ Item {
   property bool bTextMode: false
   property bool bImageMode: false
   property bool bVoiceMode: false
-
+  property bool bAnswerVisible: false
   property bool allok: idWindow.bAllok
   Component.onCompleted: {
     idWindow.oTakeQuiz = idRectTakeQuiz
@@ -17,18 +17,16 @@ Item {
   // May be the filler is calculated (PathLen - NoElem*sizeElem) /  (NoElem )
   PathView {
     id: idTakeQuizView
-    property int nLastIndex: 1
     clip: true
 
-    highlightMoveDuration: 800
-
     // Making it lock if bTextMode and not correct answer
-    interactive: (!bTextMode || moving)
+    interactive: (!bTextMode || moving || bAnswerVisible)
     width: idRectTakeQuiz.width
     height: idRectTakeQuiz.height
 
     onCurrentIndexChanged: {
-      QuizLib.calcAndAssigNextQuizWord(currentIndex)
+      QuizLib.calcSwipeDirection(currentIndex)
+      QuizLib.assigNextQuizWord()
     }
 
     model: idQuizModel
