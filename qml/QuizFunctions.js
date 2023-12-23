@@ -613,10 +613,16 @@ function insertGlosa(dbnumber, nC, question, answer) {
   setAllok(false)
 
   if (glosModelWorking.count === 1) {
-    idQuizModel.question = sQ
-    idQuizModel.answer = sA
-    idQuizModel.number = nC
-    idQuizModel.extra = ""
+    nC = idQuizModel.count
+    for (var i = 0; i < nC; ++i) {
+      idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ,
+                                                               sQuestionLang))
+      idQuizModel.get(i).answerVisible = false
+      idQuizModel.get(i).question = sQ
+      idQuizModel.get(i).answer = sA
+      idQuizModel.get(i).number = nC
+      idQuizModel.get(i).extra = ""
+    }
   }
 
   updateDesc1(idWindow.sQuizDesc)
@@ -654,16 +660,20 @@ function loadQuiz() {
   bIsReverse = false
 
   if (glosModel.count < 1) {
-    idQuizModel.question = "-"
-    idQuizModel.answer = "-"
-    idQuizModel.number = 0
-    idQuizModel.extra = "-"
+    var nC = idQuizModel.count
+    for (var i = 0; i < nC; ++i) {
+      idQuizModel.get(i).imgUrl = "image://theme/icon-m-file-image"
+      idQuizModel.get(i).answerVisible = false
+      idQuizModel.get(i).question = "-"
+      idQuizModel.get(i).answer = "-"
+      idQuizModel.get(i).number = 0
+      idQuizModel.get(i).extra = ""
+    }
     return
   }
 
-  var nC = glosModel.count
+  nC = glosModel.count
 
-  var i
   for (i = 0; i < nC; ++i) {
     if (glosModel.get(i).state1 === 0) {
 
@@ -691,7 +701,7 @@ function capitalizeStr(inStr) {
 
 function loadFromDb(tx, nSelectFromCurrentIndex) {
 
-  // To select the right highlighted word at quiz load time
+  // To select the right highlighted word at quiz load time when sorting nSelectFromCurrentIndex == 1 in that case
   var nCurrentNumber = -1
   if (nSelectFromCurrentIndex > 0) {
     var oGlosaItem = glosModel.get(idWindow.glosListView.currentIndex)
@@ -835,7 +845,7 @@ function newQuiz() {
 
   db.transaction(function (tx) {
     glosModel.clear()
-    var rs = tx.executeSql('SELECT MAX(dbnumber) as newnr FROM GlosaDbIndex')
+    var rs = tx.executeSql('SELECT MAX(dbnumber) AS newnr FROM GlosaDbIndex')
     var nNr = 1
     if (rs.rows.length > 0) {
       nNr = rs.rows.item(0).newnr + 1
@@ -861,6 +871,7 @@ function newQuiz() {
 
     idQuizList.positionViewAtEnd()
     idQuizList.currentIndex = glosModelIndex.count - 1
+    // kick changed at initialization
     if (idQuizList.currentIndex === 0)
       idWindow.quizListView.currentIndexChanged()
   })
@@ -1168,14 +1179,17 @@ function updateQuiz() {
           [sQ, sA, nState, nNumber])
 
     // Assign The updated values
-    if (idQuizModel.number === nNumber) {
-      idQuizModel.extra = sE
-      if (bIsReverse) {
-        idQuizModel.question = sA_Org
-        idQuizModel.answer = sQ
-      } else {
-        idQuizModel.question = sQ
-        idQuizModel.answer = sA_Org
+    var nC = idQuizModel.count
+    for (var i = 0; i < nC; ++i) {
+      if (idQuizModel.get(i).number === nNumber) {
+        idQuizModel.get(i).extra = sE
+        if (bIsReverse) {
+          idQuizModel.get(i).question = sA_Org
+          idQuizModel.get(i).answer = sQ
+        } else {
+          idQuizModel.get(i).question = sQ
+          idQuizModel.get(i).answer = sA_Org
+        }
       }
     }
   })
@@ -1198,6 +1212,9 @@ function updateQuiz() {
       }
       glosModelWorking.get(i).number = nNumber
       glosModelWorking.get(i).extra = sE
+
+      String(MyDownloader.imageSrc(sQ, sQuestionLang))
+
       checkAndReplace(nNumber, i)
     }
   } else {
@@ -1261,28 +1278,6 @@ function deleteWordInQuiz() {
 
   assignQuizModelAll()
 
-
-  /*
-  if (idQuizModel.number === nNumber) {
-    resetTakeQuizTab()
-  }
-
-  if (glosModel.count > 0) {
-    if (idQuizModel.number === nNumber) {
-      // The removed word is displayed in the Quiz tab
-      var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
-      idQuizModel.question = glosModelWorking.get(nIndexOwNewWord).question
-      idQuizModel.answer = glosModelWorking.get(nIndexOwNewWord).answer
-      idQuizModel.number = glosModelWorking.get(nIndexOwNewWord).number
-      idQuizModel.extra = glosModelWorking.get(nIndexOwNewWord).extra
-    }
-  } else {
-    idQuizModel.question = "-"
-    idQuizModel.answer = "-"
-    idQuizModel.number = 0
-    idQuizModel.extra = "-"
-  }
-  */
   sScoreText = glosModelWorking.count + "/" + glosModel.count
 }
 
@@ -1328,7 +1323,7 @@ function assigNextQuizWord() {
 
     if (glosModelWorking.count === 0) {
       setAllok(true)
-
+      idQuizModel.get(i).imgUrl = "image://theme/icon-m-file-image"
       idQuizModel.get(i).answerVisible = false
       idQuizModel.get(i).answer = ""
       idQuizModel.get(i).question = ""

@@ -7,11 +7,15 @@
 #include <QMap>
 #include <QObject>
 #include <QVector>
+#include <QSortFilterProxyModel>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 class QAbstractListModel;
 class StopWatch;
+
+class QuizFilterModel;
+
 class Speechdownloader : public QObject
 {
   Q_OBJECT
@@ -28,6 +32,7 @@ public:
   Q_INVOKABLE void updateCurrentQuiz(QVariant p, QString sName, QString sLang, QString sPwd,
                                      QString sDesc, QObject* pProgressIndicator);
   Q_INVOKABLE void importQuiz(QString sName, QObject* pProgressIndicator);
+  Q_INVOKABLE QObject* setFilterProxy(QObject* pModel);
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void listQuizLang(QString sLang);
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, QString sId);
@@ -40,8 +45,11 @@ public:
   Q_INVOKABLE void pushIndex(int);
   Q_INVOKABLE int popIndex();
   bool isStackEmpty();
+
+  Q_INVOKABLE void setFilterQList(const QString regExp);
   Q_INVOKABLE void sortRowset(QJSValue p, QJSValue p1, int nCount, QJSValue jsArray);
-  Q_INVOKABLE void downLoadAllSpeech(QVariant p, QString sLang);
+
+  Q_INVOKABLE void downLoadAllSpeech(QVariant pModel, QString sLang);
   Q_INVOKABLE void initUrls(QVariant p);
   Q_INVOKABLE int indexFromGlosNr(QVariant p, int nNr);
   Q_INVOKABLE void startTimer();
@@ -112,7 +120,7 @@ private:
   QObject* m_pTrTextModel;
   QObject* m_pTrSynModel;
   QObject* m_pTrMeanModel;
-
+  QuizFilterModel*  m_pSortFilterProxyModel = nullptr;
   QByteArray m_oDownloadedData;
 
   bool m_bPlayAfterDownload = false;

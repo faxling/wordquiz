@@ -5,7 +5,7 @@ import "../QuizFunctions.js" as QuizLib
 
 Item {
 
-
+  property var oFilteredQListModel
 
   Column {
     id: idTopColumn
@@ -14,15 +14,14 @@ Item {
     anchors.bottomMargin: 50
     anchors.fill: parent
 
-    TextList
-    {
-      x:idDescText.x
-      id:idDateDesc1
+    TextList {
+      x: idDescText.x
+      id: idDateDesc1
       text: idWindow.sQuizDate
     }
 
     Row {
-      id:idDescText
+      id: idDescText
       TextList {
         id: idTextSelected
         width: idTopColumn.width / 2
@@ -46,6 +45,7 @@ Item {
       spacing: 10
       width: parent.width
       ButtonQuiz {
+        id: btnCreate1
         text: ""
         width: n3BtnWidth
 
@@ -54,7 +54,8 @@ Item {
         }
         Image {
           anchors.centerIn: parent
-          source: "image://theme/icon-m-add?" + (idLangListRow.visible ? Theme.highlightColor : Theme.primaryColor)
+          source: "image://theme/icon-m-add?"
+                  + (idLangListRow.visible ? Theme.highlightColor : Theme.primaryColor)
         }
       }
 
@@ -77,6 +78,7 @@ Item {
         text: ""
         onClicked: {
           bProgVisible = true
+          // signals with quizListDownloadedSignal
           MyDownloader.listQuiz()
         }
         Image {
@@ -91,7 +93,7 @@ Item {
       width: parent.width
       height: n3BtnWidth
       spacing: 10
-      visible:false
+      visible: false
 
       function doCurrentIndexChanged() {
         if (idLangList1.currentIndex < 0 || idLangList1.currentIndex < 0)
@@ -102,8 +104,9 @@ Item {
 
         var sPreFix = "New Quiz "
         var nL = sPreFix.length
-        if ((idTextInputQuizName.displayText.substring(0,nL) === sPreFix) || idTextInputQuizName.displayText.length < 3)
-          idTextInputQuizName.text =  sPreFix + sLangLangSelected
+        if ((idTextInputQuizName.displayText.substring(0, nL) === sPreFix)
+            || idTextInputQuizName.displayText.length < 3)
+          idTextInputQuizName.text = sPreFix + sLangLangSelected
       }
 
       ListViewHi {
@@ -121,22 +124,21 @@ Item {
         }
       }
 
-      Column
-      {
+      Column {
         Text {
           id: idLangPair
-          horizontalAlignment : Text.AlignHCenter
+          horizontalAlignment: Text.AlignHCenter
           font.pixelSize: Theme.fontSizeLarge
           width: n3BtnWidth
           text: sLangLangSelected
-          color:Theme.primaryColor
+          color: Theme.primaryColor
         }
 
-        ButtonQuiz
-        {
+        ButtonQuiz {
+          id: btnCreate2
           width: n3BtnWidth
           text: "Create"
-          onClicked:  QuizLib.newQuiz()
+          onClicked: QuizLib.newQuiz()
         }
       }
 
@@ -167,7 +169,8 @@ Item {
     ListViewHi {
       id: idQuizList
       width: parent.width
-      height: parent.height - idTextAvailable.x - idTextAvailable.height - idDownloadBtn.height*3 - (idLangListRow.visible ? n2BtnWidth : 0)
+      height: parent.height - idTextAvailable.x - idTextAvailable.height
+              - idDownloadBtn.height * 3 - (idLangListRow.visible ? n2BtnWidth : 0)
       model: glosModelIndex
       spacing: 5
 
@@ -183,9 +186,9 @@ Item {
         }
       }
 
-      delegate:Item {
-        height : idQuizListRow.height
-        width : idQuizListRow.width
+      delegate: Item {
+        height: idQuizListRow.height
+        width: idQuizListRow.width
         Row {
           id: idQuizListRow
 
@@ -220,9 +223,8 @@ Item {
             }
           }
         }
-        MouseArea
-        {
-          anchors.fill:idQuizListRow
+        MouseArea {
+          anchors.fill: idQuizListRow
           anchors.rightMargin: idEdtBtn.width
           onClicked: {
             idQuizList.currentIndex = index
@@ -330,21 +332,19 @@ Item {
       }
     }
 
-    Rectangle
-    {
-      id:idProgressUpload
-      x:10
+    Rectangle {
+      id: idProgressUpload
+      x: 10
       anchors.bottom: idExportBtn.top
       anchors.bottomMargin: 5
       property double progress
-      color : "orange"
+      color: "orange"
       height: Theme.paddingSmall
       width: (parent.width - 20) * progress
     }
   }
 
-  DownLoad
-  {
+  DownLoad {
     id: idImport
     y: 20
     visible: false
@@ -352,25 +352,23 @@ Item {
     height: parent.width / 1.5
   }
 
-  RectRounded
-  {
-    id:idErrorDialog
-    property alias text : idWhiteText.text
-    visible:false
+  RectRounded {
+    id: idErrorDialog
+    property alias text: idWhiteText.text
+    visible: false
     anchors.horizontalCenter: parent.horizontalCenter
-    y:20
-    height : nDlgHeight
+    y: 20
+    height: nDlgHeight
     width: parent.width
 
     Label {
-      id:idWhiteText
-      x:20
-      anchors.top : idErrorDialog.bottomClose
-      text:"'" +idQuizNameInput.displayText + "'" + " To short Quiz name"
+      id: idWhiteText
+      x: 20
+      anchors.top: idErrorDialog.bottomClose
+      text: "'" + idQuizNameInput.displayText + "'" + " To short Quiz name"
     }
 
-    onCloseClicked:
-    {
+    onCloseClicked: {
       idErrorDialog.visible = false
     }
   }
@@ -447,7 +445,6 @@ Item {
     }
   } // Rectangle
 
-
   ListModel {
     id: idServerQModel
     ListElement {
@@ -456,6 +453,9 @@ Item {
       state1: ""
       desc1: ""
       date1: ""
+    }
+    Component.onCompleted: {
+      oFilteredQListModel = MyDownloader.setFilterProxy(idServerQModel)
     }
   }
 

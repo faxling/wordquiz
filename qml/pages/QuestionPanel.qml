@@ -56,19 +56,6 @@ Flipable {
       onClicked: bImageMode = !bImageMode
     }
 
-
-    /*
-    ButtonQuizImg {
-      id: idSoundBtn
-      visible: bTextAnswerOk && bTextMode && !allok
-      anchors.right: parent.right
-      anchors.rightMargin: 20
-      anchors.top: idTextBtn.bottom
-      anchors.topMargin: 20
-      source: "image://theme/icon-m-speaker"
-      onClicked: MyDownloader.playWord(idQuizModel.answer, sAnswerLang)
-    }
-*/
     Text {
       id: idTextExtra
       anchors.left: idInfoBtn.right
@@ -80,17 +67,6 @@ Flipable {
       text: extra
     }
 
-
-    /*
-    Image {
-      id: idTextAnswerOkImage
-      anchors.left: idVoiceModeBtn.left
-      anchors.top: idVoiceModeBtn.bottom
-      anchors.topMargin: 20
-      visible: bTextAnswerOk && bTextMode && !allok
-      source: "image://theme/icon-m-like"
-    }
-*/
     TextField {
       id: idTextEditYourAnswer
       Component.onCompleted: {

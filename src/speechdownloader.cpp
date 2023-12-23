@@ -190,7 +190,6 @@ QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
     return QUrl::fromLocalFile(s);
   else
     return QUrl("image://theme/icon-m-file-image");
-
 }
 
 void Speechdownloader::checkAndEmit(QString sPath1, QString sPath2)
@@ -532,6 +531,62 @@ void Speechdownloader::listQuizLang(QString sLang)
   QString sUrl = (GLOS_SERVER2 ^ "quizlist_lang.php?qlang=") + sLang;
   QNetworkRequest request(sUrl);
   m_oListQuizNetMgr.get(request);
+}
+
+/*
+ListElement {
+  qname: "-"
+  code: ""
+  state1: ""
+  desc1: ""
+  date1: ""
+}
+code, date1,desc1, code, qname
+*/
+class QuizFilterModel : public QSortFilterProxyModel
+{
+public:
+  QStringList FilterStr;
+  bool filterAcceptsRow(int sourceRow,
+          const QModelIndex &sourceParent) const override
+  {
+    auto HasColumStr = [&] (int n, const QString& sF){
+      QModelIndex index0 = sourceModel()->index(sourceRow, 0, sourceParent);
+      QString s = sourceModel()->data(index0,n).toString();
+      return s.contains(sF,Qt::CaseSensitivity::CaseInsensitive);
+    };
+
+    for (auto& oI : FilterStr)
+      if ((HasColumStr(1,oI) || HasColumStr(3,oI) || HasColumStr(4,oI)) == false)
+        return false;
+
+    return  true;
+
+  }
+
+};
+
+void Speechdownloader::setFilterQList(const QString regExp)
+{
+  m_pSortFilterProxyModel->FilterStr = regExp.split(" ");
+  m_pSortFilterProxyModel->invalidate();
+}
+
+QObject* Speechdownloader::setFilterProxy(QObject* pModel)
+{
+  QAbstractListModel* pp = dynamic_cast<QAbstractListModel*>(pModel);
+  if (m_pSortFilterProxyModel == nullptr)
+    m_pSortFilterProxyModel = new QuizFilterModel;
+
+
+  m_pSortFilterProxyModel->setSourceModel(pp);
+/*
+  auto oOC = pp->roleNames();
+
+  for (auto oJ : IterRange(oOC))
+    qDebug() << oJ.key() << " " << oJ.val() << " " << oJ.index();
+*/
+  return m_pSortFilterProxyModel;
 }
 
 void Speechdownloader::listQuiz()

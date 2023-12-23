@@ -61,6 +61,27 @@ RectRounded {
     text: sDescDate
   }
 
+  Row {
+    id: idFilterRow
+    width: parent.width
+    height: Theme.fontSizeLarge
+    anchors.top: idImport.bottomClose
+    InputTextQuizSilica {
+      id: idTextEdit1
+      placeholderText: "Filter name or lang key"
+      onActiveFocusChanged: {
+        if (activeFocus)
+          MyDownloader.setFilterQList(displayText)
+      }
+      onDisplayTextChanged: {
+        MyDownloader.setFilterQList(displayText)
+      }
+      height: Theme.fontSizeLarge * 1.5
+      labelVisible: false
+      width: parent.width
+    }
+  }
+
   TextList {
     id: idImportMsg
     x: parent.width / 2
@@ -69,28 +90,14 @@ RectRounded {
     text: sImportMsg
   }
 
-  TextList {
-    id: idImportTitle
-    x: 10
-    color: "steelblue"
-    anchors.top: idImport.bottomClose
-    text: "Downloadable Quiz's"
-  }
-  TextList {
-    anchors.right: idImport.right
-    anchors.top: idImport.bottomClose
-    anchors.rightMargin: 20
-    color: "steelblue"
-    text: "Questions"
-  }
-
   ListViewHi {
     id: idServerListView
-    anchors.top: idImportTitle.bottom
+    anchors.top: idFilterRow.bottom
+    anchors.topMargin: 5
     width: idImport.width - 20
     x: 10
     height: parent.height - idDeleteQuiz.height * 3 + 10
-    model: idServerQModel
+    model: oFilteredQListModel
     delegate: Item {
       property int nW: idServerListView.width / 6
       width: idServerListView.width
