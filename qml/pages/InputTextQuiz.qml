@@ -9,6 +9,7 @@ Rectangle {
   width: parent.width
   height: Theme.fontSizeLarge
   TextInput {
+
     onActiveFocusChanged: {
       if (activeFocus)
         gotFocus()

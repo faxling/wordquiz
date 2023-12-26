@@ -138,7 +138,10 @@ Item {
           id: btnCreate2
           width: n3BtnWidth
           text: "Create"
-          onClicked: QuizLib.newQuiz()
+          onClicked: {
+            QuizLib.newQuiz()
+            idLangListRow.visible = false
+          }
         }
       }
 
@@ -160,14 +163,41 @@ Item {
       }
     }
 
+
+    /*
     TextList {
       id: idTextAvailable
       color: "steelblue"
       text: "Available Quiz's:"
     }
+    */
+    Row {
+      id: idTextAvailable
+      height: idHeader1Text.height - 10
+      property int nSortRole: 4
+
+      TextList {
+        id: idHeader1Text
+        color: "steelblue"
+        font.bold: parent.nSortRole === 4
+        width: n4BtnWidth * 2
+        text: "Name"
+        property bool bSortAsc
+        onClick: QuizLib.sortOn(4, this)
+      }
+
+      TextList {
+        color: "steelblue"
+        font.bold: parent.nSortRole === 2
+        property bool bSortAsc
+        text: "Lang keys"
+        onClick: QuizLib.sortOn(2, this)
+      }
+    }
 
     ListViewHi {
       id: idQuizList
+      enabled: !idExport.visible && !idEditQuizEntryDlg.visible
       width: parent.width
       height: parent.height - idTextAvailable.x - idTextAvailable.height
               - idDownloadBtn.height * 3 - (idLangListRow.visible ? n2BtnWidth : 0)
@@ -187,6 +217,7 @@ Item {
       }
 
       delegate: Item {
+        property int nNumber: number
         height: idQuizListRow.height
         width: idQuizListRow.width
         Row {
@@ -216,9 +247,10 @@ Item {
               height: idCol1.height
               source: "image://theme/icon-s-edit"
               onClicked: {
-                idQuizNameInput.text = quizname
-                idEditQuizEntryDlg.visible = true
                 idQuizList.currentIndex = index
+                idQuizNameInput.text = quizname
+                idQuizDescInput.text = desc1
+                idEditQuizEntryDlg.visible = true
               }
             }
           }
@@ -306,6 +338,7 @@ Item {
       anchors.rightMargin: 20
       onClicked: {
         bProgVisible = true
+
         QuizLib.updateDesc1(idTextInputQuizDesc.displayText)
         MyDownloader.updateCurrentQuiz(glosModel, sQuizName, sLangLang,
                                        idTextInputQuizPwd.displayText,
@@ -378,9 +411,11 @@ Item {
     visible: false
     y: 50
     width: parent.width
-    height: Theme.itemSizeExtraSmall * 3.7
+    height: Theme.itemSizeExtraSmall * 5
     Column {
       x: 20
+      id: idQnameInput
+
       width: parent.width - 40
       anchors.top: parent.bottomClose
       spacing: 5
@@ -394,6 +429,20 @@ Item {
         width: parent.width
       }
     } // Col
+    Column {
+      x: 20
+      width: parent.width - 40
+      anchors.top: idQnameInput.bottom
+      spacing: 5
+      Label {
+        text: "Quiz Description:"
+      }
+
+      InputTextQuiz {
+        id: idQuizDescInput
+        width: parent.width
+      }
+    } // Col
 
     ButtonQuiz {
       id: idBtnRename
@@ -402,9 +451,10 @@ Item {
       anchors.bottomMargin: 20
       anchors.right: idBtnQuizDelete.left
       anchors.rightMargin: 20
-      text: "Rename"
+      text: "Update"
       onClicked: {
         QuizLib.renameQuiz(idQuizNameInput.displayText)
+        QuizLib.updateDesc1(idQuizDescInput.displayText)
         idEditQuizEntryDlg.visible = false
       }
     }
@@ -417,27 +467,27 @@ Item {
       anchors.right: parent.right
       anchors.rightMargin: 20
       text: "Delete"
-      onClicked: Remorse.popupAction(idTopColumn,
-                                     "Delete Quiz " + idTextSelected.text,
-                                     function () {
+      onClicked: {
+        Remorse.popupAction(idTopColumn, "Delete Quiz " + idTextSelected.text,
+                            function () {
 
-                                       db.transaction(function (tx) {
+                              db.transaction(function (tx) {
 
-                                         tx.executeSql(
-                                               'DELETE FROM GlosaDbIndex WHERE dbnumber = ?',
-                                               [nDbNumber])
-                                         tx.executeSql(
-                                               'DROP TABLE Glosa' + nDbNumber)
-                                         tx.executeSql(
-                                               'DELETE FROM GlosaDbDesc WHERE dbnumber = ?',
-                                               [nDbNumber])
-                                       })
+                                tx.executeSql(
+                                      'DELETE FROM GlosaDbIndex WHERE dbnumber = ?',
+                                      [nDbNumber])
+                                tx.executeSql('DROP TABLE Glosa' + nDbNumber)
+                                tx.executeSql(
+                                      'DELETE FROM GlosaDbDesc WHERE dbnumber = ?',
+                                      [nDbNumber])
+                              })
 
-                                       glosModelIndex.remove(
-                                             idQuizList.currentIndex)
-
-                                       idEditQuizEntryDlg.visible = false
-                                     })
+                              idGlosModelIndex.remove(
+                                    QuizLib.indexQuizFromCurrentItem())
+                              quizListView.currentIndex = -1
+                            })
+        idEditQuizEntryDlg.visible = false
+      }
     }
 
     onCloseClicked: {
@@ -454,6 +504,7 @@ Item {
       desc1: ""
       date1: ""
     }
+
     Component.onCompleted: {
       oFilteredQListModel = MyDownloader.setFilterProxy(idServerQModel)
     }

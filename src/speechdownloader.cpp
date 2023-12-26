@@ -137,7 +137,6 @@ void Speechdownloader::openUrl(QString sUrl)
 {
   //  QProcess::startDetached("/usr/bin/sailfish-browser " + sUrl);
   QDesktopServices::openUrl(QUrl(sUrl));
-  qDebug() << "openPage()";
 }
 
 QString Speechdownloader::removeDiacritics(QString str)
@@ -541,30 +540,88 @@ ListElement {
   desc1: ""
   date1: ""
 }
+
+
+
+
 code, date1,desc1, code, qname
 */
+
 class QuizFilterModel : public QSortFilterProxyModel
 {
 public:
   QStringList FilterStr;
-  bool filterAcceptsRow(int sourceRow,
-          const QModelIndex &sourceParent) const override
+  bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override
   {
-    auto HasColumStr = [&] (int n, const QString& sF){
+    auto HasColumStr = [&](int n, const QString& sF) {
       QModelIndex index0 = sourceModel()->index(sourceRow, 0, sourceParent);
-      QString s = sourceModel()->data(index0,n).toString();
-      return s.contains(sF,Qt::CaseSensitivity::CaseInsensitive);
+      QString s = sourceModel()->data(index0, n).toString();
+      return s.contains(sF, Qt::CaseSensitivity::CaseInsensitive);
     };
 
     for (auto& oI : FilterStr)
-      if ((HasColumStr(1,oI) || HasColumStr(3,oI) || HasColumStr(4,oI)) == false)
+      if ((HasColumStr(1, oI) || HasColumStr(3, oI) || HasColumStr(4, oI)) == false)
         return false;
 
-    return  true;
-
+    return true;
   }
-
 };
+
+void Speechdownloader::sortOn(int n, int nRole)
+{
+  m_pOLSortFilterProxyModel->setSortRole(nRole);
+  m_pOLSortFilterProxyModel->sort(0, (Qt::SortOrder)n);
+  // m_pOLSortFilterProxyModel->invalidate();
+}
+
+/*
+ 5   "state1"   0
+ 4   "quizname"   1
+ 3   "number"   2
+ 2   "langpair"   3
+ 1   "descdate"   4
+ 0   "desc1"   5
+*/
+
+
+
+class QuizSortModel : public QSortFilterProxyModel
+{
+public:
+  const int QUIZNAME = 4;
+  const int LANGPAIR = 2;
+
+  bool lessThan(const QModelIndex& source_left, const QModelIndex& source_right) const override
+  {
+    if (sortRole() == QUIZNAME)
+      return source_left.data(QUIZNAME).toString() < source_right.data(QUIZNAME).toString();
+
+    QString s1 = source_left.data(LANGPAIR).toString();
+    QString s2 = source_right.data(LANGPAIR).toString();
+    std::sort(s1.begin(), s1.end());
+    std::sort(s2.begin(), s2.end());
+    return s1 < s2;
+  }
+};
+
+
+
+QObject* Speechdownloader::setOLFilterProxy(QObject* pModel)
+{
+  QAbstractListModel* pp = dynamic_cast<QAbstractListModel*>(pModel);
+  if (m_pOLSortFilterProxyModel == nullptr)
+    m_pOLSortFilterProxyModel = new QuizSortModel;
+
+  m_pOLSortFilterProxyModel->setSourceModel(pp);
+
+  auto oOC = pp->roleNames();
+
+  if (oOC.isEmpty() == false)
+    for (auto oJ : IterRange(oOC))
+      qDebug() << oJ.key() << " " << oJ.val() << " " << oJ.index();
+
+  return m_pOLSortFilterProxyModel;
+}
 
 void Speechdownloader::setFilterQList(const QString regExp)
 {
@@ -578,14 +635,13 @@ QObject* Speechdownloader::setFilterProxy(QObject* pModel)
   if (m_pSortFilterProxyModel == nullptr)
     m_pSortFilterProxyModel = new QuizFilterModel;
 
-
   m_pSortFilterProxyModel->setSourceModel(pp);
-/*
-  auto oOC = pp->roleNames();
+  /*
+    auto oOC = pp->roleNames();
 
-  for (auto oJ : IterRange(oOC))
-    qDebug() << oJ.key() << " " << oJ.val() << " " << oJ.index();
-*/
+    for (auto oJ : IterRange(oOC))
+      qDebug() << oJ.key() << " " << oJ.val() << " " << oJ.index();
+  */
   return m_pSortFilterProxyModel;
 }
 
@@ -898,7 +954,7 @@ void Speechdownloader::translateWord(QString sWord, QString sFromLang, QString s
   QObject::connect(pNR, &QNetworkReply::finished, this, &Speechdownloader::transDownloaded);
 }
 
-int Speechdownloader::NumberRole(QAbstractListModel* pp)
+int Speechdownloader::NumberRole(QAbstractItemModel* pp)
 {
   auto oc = pp->roleNames();
   QByteArray sNumber("number");
@@ -914,12 +970,13 @@ int Speechdownloader::NumberRole(QAbstractListModel* pp)
 
 int Speechdownloader::indexFromGlosNr(QVariant p, int nNr)
 {
-  QAbstractListModel* pp = qvariant_cast<QAbstractListModel*>(p);
+  QAbstractItemModel* pp = qvariant_cast<QAbstractItemModel*>(p);
+
   int nC = pp->rowCount();
   int nR = NumberRole(pp);
   for (int i = 0; i < nC; i++)
   {
-    int nVal = pp->data(pp->index(i), nR).toInt();
+    int nVal = pp->data(pp->index(i, 0), nR).toInt();
     if (nVal == nNr)
       return i;
   }

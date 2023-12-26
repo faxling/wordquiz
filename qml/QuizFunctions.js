@@ -403,22 +403,23 @@ function lookUppInWiki() {
 
 function updateDesc1(sDesc) {
 
-  var nCurIndexInQList = idWindow.quizListView.currentIndex
-
-  var nDbId = glosModelIndex.get(nCurIndexInQList).number
-
-  glosModelIndex.get(nCurIndexInQList).desc1 = sDesc
+  // var nCurIndexInQList = idWindow.quizListView.currentIndex
+  var o = quizFromCurrentItem()
+  var nDbId = o.number
 
   idWindow.sQuizDesc = sDesc
 
   var sDateStr = MyDownloader.dateStr()
   var sDescAndDate = sDesc + "###" + sDateStr
-  glosModelIndex.get(nCurIndexInQList).descdate = sDateStr
-  idWindow.sQuizDate = glosModelIndex.get(nCurIndexInQList).descdate
+
+  o.desc1 = sDesc
+  o.descdate = sDateStr
+  idWindow.sQuizDate = sDateStr
 
   db.transaction(function (tx) {
     var rs = tx.executeSql("SELECT dbnumber FROM GlosaDbDesc WHERE dbnumber=?",
                            [nDbId])
+
     if (rs.rows.length > 0) {
       tx.executeSql("UPDATE GlosaDbDesc SET desc1=? WHERE dbnumber=?",
                     [sDescAndDate, nDbId])
@@ -519,18 +520,19 @@ function getAndInitDb() {
         "dbnumber": rs.rows.item(i).dbnumber,
         "desc1": rs.rows.item(i).desc1
       }
+
       oc.push(oDescription)
     }
 
     rs = tx.executeSql('SELECT * FROM GlosaDbIndex')
 
     var nRowLen = rs.rows.length
-    var ocRet = new Array(nRowLen)
-    MyDownloader.sortRowset(rs.rows.item, rs.rows, nRowLen, ocRet)
 
+    // var ocRet = new Array(nRowLen)
+
+    // MyDownloader.sortRowset(rs.rows.item, rs.rows, nRowLen, ocRet)
     for (var j = 0; j < nRowLen; j++) {
-      i = ocRet[j]
-      var nDbnumber = rs.rows.item(i).dbnumber
+      var nDbnumber = rs.rows.item(j).dbnumber
       var nN = oc.indexOfObject("dbnumber", nDbnumber)
       var vDescDate
 
@@ -538,22 +540,31 @@ function getAndInitDb() {
         vDescDate = oc[nN].desc1
       }
 
-      glosModelIndex.append({
-                              "number": nDbnumber,
-                              "quizname": capitalizeStr(rs.rows.item(
-                                                          i).quizname),
-                              "state1": rs.rows.item(i).state1,
-                              "langpair": rs.rows.item(i).langpair,
-                              "desc1": getDesc(vDescDate),
-                              "descdate": getDate(vDescDate)
-                            })
+      console.log(vDescDate + " " + rs.rows.item(
+                    j).quizname + " number=" + nDbnumber)
+
+      idGlosModelIndex.append({
+                                "number": nDbnumber,
+                                "quizname": capitalizeStr(rs.rows.item(
+                                                            j).quizname),
+                                "state1": rs.rows.item(j).state1,
+                                "langpair": rs.rows.item(j).langpair,
+                                "desc1": getDesc(vDescDate),
+                                "descdate": getDate(vDescDate)
+                              })
     }
+
+    glosModelIndex = MyDownloader.setOLFilterProxy(idGlosModelIndex)
+
+    MyDownloader.sortOn(0, 4)
 
     // Set to last assigned Quiz
     if (idWindow.quizListView !== undefined) {
       var bDoChanged = (idWindow.quizListView.currentIndex === -1
                         && nGlosaDbLastIndex === 0)
-      idWindow.quizListView.currentIndex = nGlosaDbLastIndex
+      idWindow.quizListView.currentIndex = MyDownloader.indexFromGlosNr(
+            glosModelIndex, nGlosaDbLastIndex)
+
       if (bDoChanged) {
         idWindow.quizListView.currentIndexChanged()
       }
@@ -710,8 +721,6 @@ function loadFromDb(tx, nSelectFromCurrentIndex) {
     }
   }
 
-  console.log("LOAD " + nCurrentNumber)
-
   glosModel.clear()
 
   var rs = tx.executeSql(
@@ -764,6 +773,14 @@ function loadFromDb(tx, nSelectFromCurrentIndex) {
   }
 }
 
+function sortOn(nSortRoleIn, o) {
+  idTextAvailable.nSortRole = nSortRoleIn
+  o.bSortAsc = !o.bSortAsc
+  var j = idQuizList.currentItem.nNumber
+  MyDownloader.sortOn(o.bSortAsc, idTextAvailable.nSortRole)
+  idQuizList.currentIndex = MyDownloader.indexFromGlosNr(glosModelIndex, j)
+}
+
 function renameQuiz(sQuizName) {
 
   sQuizName = capitalizeStr(sQuizName)
@@ -776,35 +793,64 @@ function renameQuiz(sQuizName) {
 
   idWindow.sQuizName = sQuizName
 
-  glosModelIndex.setProperty(idQuizList.currentIndex, "quizname", sQuizName)
+  var j = indexQuizFromCurrentItem()
+  idGlosModelIndex.setProperty(j, "quizname", sQuizName)
 
   db.transaction(function (tx) {
-    var nId = glosModelIndex.get(idQuizList.currentIndex).number
+    var o = quizFromCurrentItem()
+    var nId = o.number
     tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',
                   [sQuizName, nId])
     idTextSelected.text = sQuizName
   })
 }
 
+function indexQuizFromCurrentItem() {
+  return MyDownloader.indexFromGlosNr(idGlosModelIndex,
+                                      idQuizList.currentItem.nNumber)
+}
+
+function quizFromCurrentItem() {
+
+  if (idWindow.quizListView.currentItem === null)
+    return
+  var j = MyDownloader.indexFromGlosNr(
+        idGlosModelIndex, idWindow.quizListView.currentItem.nNumber)
+  return idGlosModelIndex.get(j)
+
+
+  /*
+  var i = idQuizList.currentItem.nNumber
+
+  var c = idGlosModelIndex.count
+  for (var j = 0; j < c; ++j) {
+    var o =
+    if (o.number === i)
+      return o
+  }*/
+}
+
 function loadFromQuizList() {
 
   db = getAndInitDb()
-
-  db.transaction(function (tx) {
-    tx.executeSql('UPDATE GlosaDbLastIndex SET dbindex=?',
-                  [idQuizList.currentIndex])
-  })
+  var o = quizFromCurrentItem()
+  if (o === undefined)
+    return
 
   if (glosModelIndex.count === 0) {
     return
   }
 
-  sQuizName = glosModelIndex.get(idQuizList.currentIndex).quizname
-  sLangLang = glosModelIndex.get(idQuizList.currentIndex).langpair
-  nDbNumber = glosModelIndex.get(idQuizList.currentIndex).number
-  sScoreText = glosModelIndex.get(idQuizList.currentIndex).state1
-  idWindow.sQuizDesc = glosModelIndex.get(idQuizList.currentIndex).desc1
-  idWindow.sQuizDate = glosModelIndex.get(idQuizList.currentIndex).descdate
+  db.transaction(function (tx) {
+    tx.executeSql('UPDATE GlosaDbLastIndex SET dbindex=?', [o.number])
+  })
+
+  sQuizName = o.quizname
+  sLangLang = o.langpair
+  nDbNumber = o.number
+  sScoreText = o.state1
+  sQuizDesc = o.desc1
+  sQuizDate = o.descdate
   idTextInputQuizDesc.text = idWindow.sQuizDesc
   var res = sLangLang.split("-")
   sLangLangRev = res[1] + "-" + res[0]
@@ -860,17 +906,21 @@ function newQuiz() {
                   [nNr, sQuizName, "0/0", sLangLangSelected])
     tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)', [nNr, "-"])
 
-    glosModelIndex.append({
-                            "number": nNr,
-                            "quizname": sQuizName,
-                            "state1": "0/0",
-                            "langpair": sLangLangSelected,
-                            "desc1": "-",
-                            "descdate": MyDownloader.dateStr()
-                          })
+    idGlosModelIndex.append({
+                              "number": nNr,
+                              "quizname": sQuizName,
+                              "state1": "0/0",
+                              "langpair": sLangLangSelected,
+                              "desc1": "-",
+                              "descdate": MyDownloader.dateStr()
+                            })
 
     idQuizList.positionViewAtEnd()
-    idQuizList.currentIndex = glosModelIndex.count - 1
+    console.log("idQuizList.currentIndex " + idGlosModelIndex.count)
+
+    idQuizList.currentIndex = MyDownloader.indexFromGlosNr(
+          idWindow.glosModelIndex, nNr)
+
     // kick changed at initialization
     if (idQuizList.currentIndex === 0)
       idWindow.quizListView.currentIndexChanged()

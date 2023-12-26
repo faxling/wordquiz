@@ -60,8 +60,8 @@ Page {
       tx.executeSql('UPDATE GlosaDbIndex SET state1=? WHERE dbnumber=?',
                     [sScoreText, nDbNumber])
 
-      var i = MyDownloader.indexFromGlosNr(glosModelIndex, nDbNumber)
-      glosModelIndex.setProperty(i, "state1", sScoreText)
+      var i = MyDownloader.indexFromGlosNr(idGlosModelIndex, nDbNumber)
+      idGlosModelIndex.setProperty(i, "state1", sScoreText)
     })
   }
 
@@ -76,8 +76,9 @@ Page {
   }
 
   // Used by idQuizList
+  property variant glosModelIndex
   ListModel {
-    id: glosModelIndex
+    id: idGlosModelIndex
   }
 
   // Used by idTakeQuizView in TakeQuiz

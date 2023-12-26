@@ -33,6 +33,8 @@ public:
                                      QString sDesc, QObject* pProgressIndicator);
   Q_INVOKABLE void importQuiz(QString sName, QObject* pProgressIndicator);
   Q_INVOKABLE QObject* setFilterProxy(QObject* pModel);
+  Q_INVOKABLE QObject* setOLFilterProxy(QObject* pModel);
+  Q_INVOKABLE void sortOn(int n,int nRole);
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void listQuizLang(QString sLang);
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, QString sId);
@@ -121,10 +123,11 @@ private:
   QObject* m_pTrSynModel;
   QObject* m_pTrMeanModel;
   QuizFilterModel*  m_pSortFilterProxyModel = nullptr;
+  QSortFilterProxyModel*  m_pOLSortFilterProxyModel = nullptr;
   QByteArray m_oDownloadedData;
 
   bool m_bPlayAfterDownload = false;
-  int NumberRole(QAbstractListModel* pp);
+  int NumberRole(QAbstractItemModel* pp);
   StopWatch* m_pStopWatch;
   QUrl m_oImgUrl;
   QString m_sImgPath;

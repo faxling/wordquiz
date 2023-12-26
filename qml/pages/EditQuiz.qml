@@ -333,6 +333,7 @@ Item {
       id: idResetBtn
       text: "Reset"
       onClicked: {
+        idGlosState.checked = false
         QuizLib.resetQuiz()
       }
     }

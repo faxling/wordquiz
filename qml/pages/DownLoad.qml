@@ -66,7 +66,7 @@ RectRounded {
     width: parent.width
     height: Theme.fontSizeLarge
     anchors.top: idImport.bottomClose
-    InputTextQuizSilica {
+    InputTextQuizSilicaEx {
       id: idTextEdit1
       placeholderText: "Filter name or lang key"
       onActiveFocusChanged: {
