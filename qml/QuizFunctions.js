@@ -402,7 +402,7 @@ function lookUppInWiki() {
 }
 
 function updateDesc1(sDesc) {
-
+  sDesc = sDesc.trim()
   // var nCurIndexInQList = idWindow.quizListView.currentIndex
   var o = quizFromCurrentItem()
   var nDbId = o.number
@@ -539,9 +539,6 @@ function getAndInitDb() {
       if (nN >= 0) {
         vDescDate = oc[nN].desc1
       }
-
-      console.log(vDescDate + " " + rs.rows.item(
-                    j).quizname + " number=" + nDbnumber)
 
       idGlosModelIndex.append({
                                 "number": nDbnumber,
@@ -776,9 +773,13 @@ function loadFromDb(tx, nSelectFromCurrentIndex) {
 function sortOn(nSortRoleIn, o) {
   idTextAvailable.nSortRole = nSortRoleIn
   o.bSortAsc = !o.bSortAsc
-  var j = idQuizList.currentItem.nNumber
+  if (idQuizList.currentItem !== null)
+    var j = idQuizList.currentItem.nNumber
+
   MyDownloader.sortOn(o.bSortAsc, idTextAvailable.nSortRole)
-  idQuizList.currentIndex = MyDownloader.indexFromGlosNr(glosModelIndex, j)
+
+  if (j !== undefined)
+    idQuizList.currentIndex = MyDownloader.indexFromGlosNr(glosModelIndex, j)
 }
 
 function renameQuiz(sQuizName) {
@@ -793,15 +794,14 @@ function renameQuiz(sQuizName) {
 
   idWindow.sQuizName = sQuizName
 
-  var j = indexQuizFromCurrentItem()
-  idGlosModelIndex.setProperty(j, "quizname", sQuizName)
-
   db.transaction(function (tx) {
     var o = quizFromCurrentItem()
+    o.quizname = sQuizName
     var nId = o.number
     tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',
                   [sQuizName, nId])
     idTextSelected.text = sQuizName
+    idQuizList.currentIndex = MyDownloader.indexFromGlosNr(glosModelIndex, nId)
   })
 }
 
@@ -916,7 +916,6 @@ function newQuiz() {
                             })
 
     idQuizList.positionViewAtEnd()
-    console.log("idQuizList.currentIndex " + idGlosModelIndex.count)
 
     idQuizList.currentIndex = MyDownloader.indexFromGlosNr(
           idWindow.glosModelIndex, nNr)
@@ -974,8 +973,8 @@ function getDate(sDescAndDate) {
 }
 
 function loadFromServerList(nCount, oDD) {
-  var nLastSelected = -1
-  var sLastSelectedQ = idImport.sSelectedQ
+  var nLastSelected = idImport.nSelectedQ
+  // var sLastSelectedQ = idImport.sSelectedQ
   idServerQModel.clear()
   idDownloadBtn.bProgVisible = false
   idImport.bIsDownloadingList = false
@@ -997,14 +996,13 @@ function loadFromServerList(nCount, oDD) {
   idImport.nError = 0
   var nIndex = 0
 
-  for (var i = 0; i < nCount; i += 4) {
+  for (var i = 0; i < nCount; i += 5) {
     var sDescAndDate = oDD[i + 1]
 
-    if (sLastSelectedQ === oDD[i]) {
+    if (nLastSelected === oDD[i + 4]) {
       idImport.sDescDate = getDate(sDescAndDate)
       idImport.sDesc1 = getDesc(sDescAndDate)
       idImport.sSelectedQ = oDD[i]
-      nLastSelected = nIndex
     }
 
     nIndex++
@@ -1014,13 +1012,15 @@ function loadFromServerList(nCount, oDD) {
                             "desc1": getDesc(sDescAndDate),
                             "code": oDD[i + 2],
                             "state1": oDD[i + 3],
-                            "date1": getDate(sDescAndDate)
+                            "date1": getDate(sDescAndDate),
+                            "number": parseInt(oDD[i + 4])
                           })
   }
 
   if (nLastSelected >= 0) {
-    idImport.currentIndex = nLastSelected
-    idImport.positionViewAtIndex(nLastSelected)
+    idImport.currentIndex = MyDownloader.indexFromGlosNr(oFilteredQListModel,
+                                                         nLastSelected)
+    idImport.positionViewAtIndex(idImport.currentIndex)
   } else {
     idImport.currentIndex = -1
     idImport.sDescDate = "-"
@@ -1033,15 +1033,14 @@ function quizDeleted(nResponce) {
   idImport.bIsDeleting = false
 
   if (nResponce >= 0) {
+    var nCI = MyDownloader.indexFromGlosNr(idServerQModel, nResponce)
+    idServerQModel.remove(nCI)
+    idImport.nSelectedQ = -1
     idImport.sDesc1 = ""
     idImport.sDescDate = ""
-    idServerQModel.remove(nResponce)
-    if (nResponce > 0) {
-      idImport.currentIndex = nResponce - 1
-      idImport.sDesc1 = idServerQModel.get(nResponce - 1).desc1
-      idImport.sSelectedQ = idServerQModel.get(nResponce - 1).qname
-      idImport.sImportMsg = ""
-    }
+    idImport.sSelectedQ = ""
+    idImport.sImportMsg = ""
+    idImport.currentIndex = -1
   } else {
     if (nResponce === -1)
       idImport.sImportMsg = "Wrong password"
@@ -1103,14 +1102,14 @@ function loadFromList(nCount, oDD, sLangLoaded) {
     tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',
                   [nDbNumber, sQuizName, sState1, sLangLoaded])
 
-    glosModelIndex.append({
-                            "number": nNr,
-                            "quizname": sQuizName,
-                            "state1": sState1,
-                            "langpair": sLangLoaded,
-                            "desc1": idImport.sDesc1,
-                            "descdate": idImport.sDescDate
-                          })
+    idGlosModelIndex.append({
+                              "number": nNr,
+                              "quizname": sQuizName,
+                              "state1": sState1,
+                              "langpair": sLangLoaded,
+                              "desc1": idImport.sDesc1,
+                              "descdate": idImport.sDescDate
+                            })
 
     // answer, question , state
 
@@ -1131,7 +1130,8 @@ function loadFromList(nCount, oDD, sLangLoaded) {
     idImport.bIsDownloading = false
     idImport.state = ""
 
-    idQuizList.currentIndex = glosModelIndex.count - 1
+    idQuizList.currentIndex = MyDownloader.indexFromGlosNr(glosModelIndex, nNr)
+
     if (idQuizList.currentIndex === 0)
       idWindow.quizListView.currentIndexChanged()
   })

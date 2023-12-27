@@ -37,8 +37,21 @@
 
 // https://dictionary.yandex.net/api/v1/dicservice/getLangs?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739
 
-static const QString GLOS_SERVER2("http://212.112.183.157/glosquiz");
+#define GLOS_SERVER2 "http://212.112.183.157/glosquiz"
+
 static const QString GLOS_SERVER1("http://192.168.2.1");
+
+// Känns som det går att hitta någon bättre
+class Enc
+{
+public:
+  const char* operator()(const QString& s)
+  {
+    oR = QUrl::toPercentEncoding(s);
+    return oR.constData();
+  }
+  QByteArray oR;
+};
 
 Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject* pParent) : QObject(pParent)
 {
@@ -370,6 +383,7 @@ struct QuizInfo
   QString desc1;
   QString slang;
   QString qcount;
+  QString number;
 };
 
 void Speechdownloader::listDownloaded(QNetworkReply* pReply)
@@ -396,6 +410,7 @@ void Speechdownloader::listDownloaded(QNetworkReply* pReply)
     //   id, desc1, slang, qcount,qname
     QJsonArray oJJ = oI.toArray();
     QuizInfo t;
+    t.number = oJJ[0].toString();
     t.desc1 = oJJ[1].toString();
     t.slang = oJJ[2].toString();
     t.qcount = oJJ[3].toString();
@@ -420,11 +435,13 @@ void Speechdownloader::listDownloaded(QNetworkReply* pReply)
     ocL.append(oI.desc1);
     ocL.append(oI.slang);
     ocL.append(oI.qcount);
+    ocL.append(oI.number);
     /*
                         "qname"
                         "desc1"
                         "slang"
                         "qcount
+                        "number"
                         */
   }
   pReply->deleteLater();
@@ -527,24 +544,18 @@ void Speechdownloader::downloadWord(QString sWord, QString sLang)
 
 void Speechdownloader::listQuizLang(QString sLang)
 {
-  QString sUrl = (GLOS_SERVER2 ^ "quizlist_lang.php?qlang=") + sLang;
+  QString sUrl = QString::asprintf(GLOS_SERVER2 "/quizlist_lang.php?qlang=%s", Enc()(sLang));
   QNetworkRequest request(sUrl);
   m_oListQuizNetMgr.get(request);
 }
 
 /*
-ListElement {
-  qname: "-"
-  code: ""
-  state1: ""
-  desc1: ""
-  date1: ""
-}
-
-
-
-
-code, date1,desc1, code, qname
+5   "qname"   0
+4   "code"   1
+3   "state1"   2
+2   "desc1"   3
+1   "date1"   4
+0   "number"   5
 */
 
 class QuizFilterModel : public QSortFilterProxyModel
@@ -559,9 +570,20 @@ public:
       return s.contains(sF, Qt::CaseSensitivity::CaseInsensitive);
     };
 
-    for (auto& oI : FilterStr)
-      if ((HasColumStr(1, oI) || HasColumStr(3, oI) || HasColumStr(4, oI)) == false)
+    for (auto oI : IterRange(FilterStr))
+    {
+      if (oI.val().endsWith("-"))
+      {
+        QString s = oI.val();
+        QString sExtraCheck("-" + s.remove("-"));
+        if (HasColumStr(4, oI.val()) || HasColumStr(4, sExtraCheck))
+          continue;
+      }
+
+      if ((HasColumStr(5, oI.val()) || HasColumStr(4, oI.val()) || HasColumStr(2, oI.val())) ==
+          false)
         return false;
+    }
 
     return true;
   }
@@ -573,17 +595,6 @@ void Speechdownloader::sortOn(int n, int nRole)
   m_pOLSortFilterProxyModel->sort(0, (Qt::SortOrder)n);
   // m_pOLSortFilterProxyModel->invalidate();
 }
-
-/*
- 5   "state1"   0
- 4   "quizname"   1
- 3   "number"   2
- 2   "langpair"   3
- 1   "descdate"   4
- 0   "desc1"   5
-*/
-
-
 
 class QuizSortModel : public QSortFilterProxyModel
 {
@@ -604,8 +615,6 @@ public:
   }
 };
 
-
-
 QObject* Speechdownloader::setOLFilterProxy(QObject* pModel)
 {
   QAbstractListModel* pp = dynamic_cast<QAbstractListModel*>(pModel);
@@ -615,17 +624,26 @@ QObject* Speechdownloader::setOLFilterProxy(QObject* pModel)
   m_pOLSortFilterProxyModel->setSourceModel(pp);
 
   auto oOC = pp->roleNames();
-
-  if (oOC.isEmpty() == false)
-    for (auto oJ : IterRange(oOC))
-      qDebug() << oJ.key() << " " << oJ.val() << " " << oJ.index();
-
+  /*
+    if (oOC.isEmpty() == false)
+      for (auto oJ : IterRange(oOC))
+        qDebug() << oJ.key() << " " << oJ.val() << " " << oJ.index();
+  */
   return m_pOLSortFilterProxyModel;
 }
 
-void Speechdownloader::setFilterQList(const QString regExp)
+void Speechdownloader::setFilterQList(QString regExp)
 {
+  regExp = regExp.trimmed();
   m_pSortFilterProxyModel->FilterStr = regExp.split(" ");
+  auto& rFilterStr = m_pSortFilterProxyModel->FilterStr;
+
+  // auto pE = std::remove_if(rFilterStr.begin(), rFilterStr.end(), [](const QString& s) {return
+  // s.isEmpty();});
+  // rFilterStr.erase(pE, rFilterStr.end());
+  for (auto oJ : IterRange(rFilterStr))
+    qDebug() << oJ.val() << " " << oJ.index();
+
   m_pSortFilterProxyModel->invalidate();
 }
 
@@ -636,18 +654,18 @@ QObject* Speechdownloader::setFilterProxy(QObject* pModel)
     m_pSortFilterProxyModel = new QuizFilterModel;
 
   m_pSortFilterProxyModel->setSourceModel(pp);
-  /*
-    auto oOC = pp->roleNames();
 
-    for (auto oJ : IterRange(oOC))
-      qDebug() << oJ.key() << " " << oJ.val() << " " << oJ.index();
-  */
+  auto oOC = pp->roleNames();
+
+  for (auto oJ : IterRange(oOC))
+    qDebug() << oJ.key() << " " << oJ.val() << " " << oJ.index();
+
   return m_pSortFilterProxyModel;
 }
 
 void Speechdownloader::listQuiz()
 {
-  QNetworkRequest request(QUrl(GLOS_SERVER2 ^ "quizlist.php"));
+  QNetworkRequest request(QUrl(GLOS_SERVER2 "/quizlist.php"));
   m_oListQuizNetMgr.get(request);
 }
 
@@ -712,10 +730,10 @@ void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
   emit quizDownloadedSignal(oDataDownloaded.size(), oDataDownloaded, sLang);
 }
 
-void Speechdownloader::deleteQuiz(QString sName, QString sPwd, QString nDbId)
+void Speechdownloader::deleteQuiz(QString sName, QString sPwd, int nDbId)
 {
-  QString sUrl =
-      GLOS_SERVER2 ^ ("deletequiz.php?qname=" + sName + "&qpwd=" + sPwd + "&dbid=" + nDbId);
+  QString sUrl = QString::asprintf(GLOS_SERVER2 "/deletequiz.php?qname=%s&qpwd=%s&dbid=%d",
+                                   Enc()(sName), Enc()(sPwd), nDbId);
   QNetworkRequest request(sUrl);
   m_oDeleteQuizNetMgr.get(request);
 }
@@ -730,7 +748,7 @@ void Speechdownloader::loadProgressSlot(qint64 bytes, qint64 bytesTotal)
 
 void Speechdownloader::importQuiz(QString sName, QObject* pProgressIndicator)
 {
-  QString sUrl = GLOS_SERVER2 ^ ("quizload.php?qname=" + sName + ".txt");
+  QString sUrl = QString::asprintf(GLOS_SERVER2 "/quizload.php?qname=%s", Enc()(sName + ".txt"));
   QNetworkRequest request(sUrl);
   QNetworkReply* pNR = m_oQuizNetMgr.get(request);
   pNR->setProperty("progressIndicator", QVariant::fromValue(pProgressIndicator));
@@ -876,11 +894,10 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
     oF.open(QIODevice::ReadOnly);
     ss << oF.readAll();
     oF.close();
-  }
-
-  QString sFmt = GLOS_SERVER2 ^ "%ls.php?qname=%ls&slang=%ls&qcount=%d&desc1=%ls&pwd=%ls";
-  QString sUrl = QString::asprintf(sFmt.toLatin1(), sCmd.utf16(), sName.utf16(), sLang.utf16(), nC,
-                                   sDesc.utf16(), sPwd.utf16());
+  };
+  QString sUrl =
+      QString::asprintf(GLOS_SERVER2 "/%s.php?qname=%s&slang=%s&qcount=%d&desc1=%s&pwd=%s",
+                        Enc()(sCmd), Enc()(sName), Enc()(sLang), nC, Enc()(sDesc), Enc()(sPwd));
   // qDebug() << "Cmd to glosserver " << sCmd << " size " << ocArray.size();
   ss.setVersion(2);
   QNetworkRequest request(sUrl);

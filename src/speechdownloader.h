@@ -37,7 +37,7 @@ public:
   Q_INVOKABLE void sortOn(int n,int nRole);
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void listQuizLang(QString sLang);
-  Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, QString sId);
+  Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, int nDbId);
   Q_INVOKABLE void storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTrTextModel,
                                   QObject* pTrSynModel, QObject* pTrMeanModel);
   Q_INVOKABLE void storeTextInputField(QObject* p);
@@ -48,7 +48,7 @@ public:
   Q_INVOKABLE int popIndex();
   bool isStackEmpty();
 
-  Q_INVOKABLE void setFilterQList(const QString regExp);
+  Q_INVOKABLE void setFilterQList(QString regExp);
   Q_INVOKABLE void sortRowset(QJSValue p, QJSValue p1, int nCount, QJSValue jsArray);
 
   Q_INVOKABLE void downLoadAllSpeech(QVariant pModel, QString sLang);

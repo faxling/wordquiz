@@ -15,7 +15,7 @@
 #include <src/speechdownloader.h>
 #include <src/crosswordq.h>
 
-// c:\Users\fraxl\Documents\qt\sfosicons\
+// c:\Users\fraxl\Documents\qt\sfosicons
 // ssh-keygen -t ed25519 -C faxling11@gmail.com
 
 

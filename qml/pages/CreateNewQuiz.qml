@@ -415,16 +415,17 @@ Item {
     Column {
       x: 20
       id: idQnameInput
-
+      spacing: 10
       width: parent.width - 40
       anchors.top: parent.bottomClose
-      spacing: 5
+      anchors.topMargin: -10
+      // spacing: 5
       Label {
         id: idAddInfo
         text: "Quiz Name:"
       }
 
-      InputTextQuiz {
+      InputTextQuizSilicaEx {
         id: idQuizNameInput
         width: parent.width
       }
@@ -433,12 +434,12 @@ Item {
       x: 20
       width: parent.width - 40
       anchors.top: idQnameInput.bottom
-      spacing: 5
+      //spacing: 5
       Label {
         text: "Quiz Description:"
       }
 
-      InputTextQuiz {
+      InputTextQuizSilicaEx {
         id: idQuizDescInput
         width: parent.width
       }
@@ -503,6 +504,7 @@ Item {
       state1: ""
       desc1: ""
       date1: ""
+      number: 0
     }
 
     Component.onCompleted: {

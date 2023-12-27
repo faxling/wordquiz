@@ -11,13 +11,14 @@ RectRounded {
   property bool bIsDownloadingList
   property bool bIsDeleting: false
   property string sSelectedQ
+  property int nSelectedQ
   property string sImportMsg: ""
   property string sDesc1: ""
   property string sDescDate: ""
   property int nError
 
   property alias currentIndex: idServerListView.currentIndex
-
+  property alias currentItem: idServerListView.currentItem
   function positionViewAtIndex(nIndex) {
     idServerListView.positionViewAtIndex(nIndex, ListView.Center)
   }
@@ -92,6 +93,7 @@ RectRounded {
 
   ListViewHi {
     id: idServerListView
+
     anchors.top: idFilterRow.bottom
     anchors.topMargin: 5
     width: idImport.width - 20
@@ -100,10 +102,12 @@ RectRounded {
     model: oFilteredQListModel
     delegate: Item {
       property int nW: idServerListView.width / 6
+      property int nNumber: number
       width: idServerListView.width
       height: idServerRow.height
       Row {
         id: idServerRow
+
         TextList {
           width: nW * 4
           id: idTextQname
@@ -125,6 +129,7 @@ RectRounded {
       MouseArea {
         anchors.fill: idServerRow
         onClicked: {
+          nSelectedQ = number
           idContainer.sImportMsg = ""
           idContainer.sDesc1 = desc1
           idContainer.sDescDate = date1
@@ -153,7 +158,7 @@ RectRounded {
         id: idPwdLabelText
         font.pixelSize: Theme.fontSizeExtraSmall
         anchors.verticalCenter: parent.verticalCenter
-        text: "Password to remove '" + idImport.sSelectedQ + "'"
+        text: "Password to remove '" + idImport.sSelectedQ.substring(0, 7) + "'"
       }
 
       InputTextQuiz {
@@ -173,15 +178,13 @@ RectRounded {
     anchors.right: idLoadQuiz.left
     anchors.rightMargin: 20
     onClicked: {
-
       idTextInputQuizName.text = idImport.sSelectedQ
       idPwdTextInput.text = idPwdTextInput.displayText
       if (idPwdTextInput.text.length > 0) {
         bIsDeleting = true
         idPwdDialog.visible = false
         MyDownloader.deleteQuiz(idImport.sSelectedQ,
-                                idPwdTextInput.displayText,
-                                idServerListView.currentIndex)
+                                idPwdTextInput.displayText, idImport.nSelectedQ)
         idPwdTextInput.text = ""
       } else
         idPwdDialog.visible = true

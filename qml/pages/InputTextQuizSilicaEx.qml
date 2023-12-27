@@ -6,6 +6,8 @@ Item {
   property alias placeholderText: idTextField.placeholderText
   property alias displayText: idTextField.text
   property alias text: idTextField.text
+  height: Theme.fontSizeLarge
+
   TextField {
     id: idTextField
     width: parent.width - idClearBtn.width
@@ -17,8 +19,6 @@ Item {
     anchors.rightMargin: 10
     source: "image://theme/icon-s-clear-opaque-cross"
     onClicked: {
-      console.log("click")
-      // parent.text = parent.displayText
       idTextField.text = ""
     }
   }
