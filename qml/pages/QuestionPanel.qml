@@ -70,7 +70,8 @@ Flipable {
     TextField {
       id: idTextEditYourAnswer
       Component.onCompleted: {
-        MyDownloader.storeTextInputField(idTextEditYourAnswer)
+
+        // MyDownloader.storeTextInputField(idTextEditYourAnswer)
       }
       y: 50
       anchors.horizontalCenter: parent.horizontalCenter

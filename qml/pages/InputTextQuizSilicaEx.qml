@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
+// InputTextQuizSilicaEx
 Item {
   property alias labelVisible: idTextField.labelVisible
   property alias placeholderText: idTextField.placeholderText
@@ -16,10 +17,19 @@ Item {
     id: idClearBtn
     anchors.verticalCenter: parent.verticalCenter
     anchors.right: parent.right
-    anchors.rightMargin: 10
-    source: "image://theme/icon-s-clear-opaque-cross"
+
+    source: "image://theme/icon-m-backspace"
+
+    Timer {
+      id: idTimer
+      interval: 50
+      repeat: false
+      onTriggered: idTextField.forceActiveFocus()
+    }
     onClicked: {
+
       idTextField.text = ""
+      idTimer.start()
     }
   }
 }

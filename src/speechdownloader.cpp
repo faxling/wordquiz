@@ -1,5 +1,5 @@
 ﻿#include "speechdownloader.h"
-#include "filehelpers.h"
+
 #include <QAbstractListModel>
 #include <QBuffer>
 #include <QClipboard>
@@ -19,6 +19,8 @@
 #include <QUrl>
 #include <QUrlQuery>
 #include <random>
+
+#include "filehelpers.h"
 
 // https://cloud.ibm.com/resources
 // https://api.eu-gb.language-translator.watson.cloud.ibm.com
@@ -456,33 +458,33 @@ QString sVoicetechEn(QStringLiteral("http://tts.voicetech.yandex.net/"
                                     "generate?lang=en_EN&format=wav&speaker=oksana&key=6372dda5-"
                                     "9674-4413-85ff-e9d0eb2f99a7&text="));
 
-QString sVoicetechFr(QStringLiteral(
-    "http://"
-    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&r=2&hl=fr-fr&src="));
-QString sVoicetechSe(QStringLiteral(
-    "http://"
-    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=sv-se&src="));
-QString sVoicetechNo(QStringLiteral(
-    "http://"
-    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=nb-no&src="));
-QString sVoicetechIt(QStringLiteral(
-    "http://"
-    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=it-it&src="));
-QString sVoicetechDe(QStringLiteral(
-    "http://"
-    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=de-de&src="));
-QString sVoicetechPl(QStringLiteral(
-    "http://"
-    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=pl-pl&src="));
-QString sVoicetechEs(QStringLiteral(
-    "http://"
-    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=es-es&src="));
-QString sVoicetechHu(QStringLiteral(
-    "http://"
-    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=hu-hu&src="));
-QString sVoicetechKo(QStringLiteral(
-    "http://"
-    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f=44khz_16bit_mono&hl=ko-kr&src="));
+QString sVoicetechFr(QStringLiteral("http://"
+                                    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
+                                    "44khz_16bit_mono&r=2&hl=fr-fr&src="));
+QString sVoicetechSe(QStringLiteral("http://"
+                                    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
+                                    "44khz_16bit_mono&hl=sv-se&src="));
+QString sVoicetechNo(QStringLiteral("http://"
+                                    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
+                                    "44khz_16bit_mono&hl=nb-no&src="));
+QString sVoicetechIt(QStringLiteral("http://"
+                                    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
+                                    "44khz_16bit_mono&hl=it-it&src="));
+QString sVoicetechDe(QStringLiteral("http://"
+                                    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
+                                    "44khz_16bit_mono&hl=de-de&src="));
+QString sVoicetechPl(QStringLiteral("http://"
+                                    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
+                                    "44khz_16bit_mono&hl=pl-pl&src="));
+QString sVoicetechEs(QStringLiteral("http://"
+                                    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
+                                    "44khz_16bit_mono&hl=es-es&src="));
+QString sVoicetechHu(QStringLiteral("http://"
+                                    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
+                                    "44khz_16bit_mono&hl=hu-hu&src="));
+QString sVoicetechKo(QStringLiteral("http://"
+                                    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
+                                    "44khz_16bit_mono&hl=ko-kr&src="));
 
 void Speechdownloader::playWord(QString sWord, QString sLang)
 {
@@ -502,7 +504,6 @@ void Speechdownloader::playWord(QString sWord, QString sLang)
 
 void Speechdownloader::deleteWord(QString sWord, QString sLang)
 {
-
   if (QFile::exists(AudioPath(sWord, sLang)))
     QFile::remove(AudioPath(sWord, sLang));
 }
@@ -588,22 +589,27 @@ public:
     return true;
   }
 };
+static int QUIZNUMBER = -1;
+static int QUIZNAME = -1;
+static int LANGPAIR = -1;
 
-void Speechdownloader::sortOn(int n, int nRole)
+void Speechdownloader::sortOn(int nRole, int sortOrder)
 {
-  m_pOLSortFilterProxyModel->setSortRole(nRole);
-  m_pOLSortFilterProxyModel->sort(0, (Qt::SortOrder)n);
-  // m_pOLSortFilterProxyModel->invalidate();
+  if (nRole == 0)
+    m_pOLSortFilterProxyModel->setSortRole(QUIZNAME);
+  else if (nRole == 0)
+    m_pOLSortFilterProxyModel->setSortRole(LANGPAIR);
+  m_pOLSortFilterProxyModel->sort(0, (Qt::SortOrder)sortOrder);
+  //  m_pOLSortFilterProxyModel->invalidate();
 }
 
+// Sort for local quizlist
 class QuizSortModel : public QSortFilterProxyModel
 {
 public:
-  const int QUIZNAME = 4;
-  const int LANGPAIR = 2;
-
   bool lessThan(const QModelIndex& source_left, const QModelIndex& source_right) const override
   {
+
     if (sortRole() == QUIZNAME)
       return source_left.data(QUIZNAME).toString() < source_right.data(QUIZNAME).toString();
 
@@ -615,6 +621,28 @@ public:
   }
 };
 
+void Speechdownloader::AssignRoles()
+{
+  if (QUIZNUMBER != -1)
+    return;
+  auto* pp = m_pOLSortFilterProxyModel->sourceModel();
+
+  auto oOC = pp->roleNames();
+
+  if (oOC.isEmpty() == false)
+    for (auto oJ : IterRange(oOC))
+    {
+      if (oJ.val() == "langpair")
+        LANGPAIR = oJ.key();
+      else if (oJ.val() == "quizname")
+        QUIZNAME = oJ.key();
+      else if (oJ.val() == "number")
+        QUIZNUMBER = oJ.key();
+
+      qDebug() << oJ.key() << " " << oJ.val() << " " << oJ.index();
+    }
+}
+
 QObject* Speechdownloader::setOLFilterProxy(QObject* pModel)
 {
   QAbstractListModel* pp = dynamic_cast<QAbstractListModel*>(pModel);
@@ -622,13 +650,7 @@ QObject* Speechdownloader::setOLFilterProxy(QObject* pModel)
     m_pOLSortFilterProxyModel = new QuizSortModel;
 
   m_pOLSortFilterProxyModel->setSourceModel(pp);
-
-  auto oOC = pp->roleNames();
-  /*
-    if (oOC.isEmpty() == false)
-      for (auto oJ : IterRange(oOC))
-        qDebug() << oJ.key() << " " << oJ.val() << " " << oJ.index();
-  */
+  AssignRoles();
   return m_pOLSortFilterProxyModel;
 }
 
@@ -636,13 +658,12 @@ void Speechdownloader::setFilterQList(QString regExp)
 {
   regExp = regExp.trimmed();
   m_pSortFilterProxyModel->FilterStr = regExp.split(" ");
-  auto& rFilterStr = m_pSortFilterProxyModel->FilterStr;
+  //  auto& rFilterStr = m_pSortFilterProxyModel->FilterStr;
 
-  // auto pE = std::remove_if(rFilterStr.begin(), rFilterStr.end(), [](const QString& s) {return
-  // s.isEmpty();});
-  // rFilterStr.erase(pE, rFilterStr.end());
-  for (auto oJ : IterRange(rFilterStr))
-    qDebug() << oJ.val() << " " << oJ.index();
+  // auto pE = std::remove_if(rFilterStr.begin(), rFilterStr.end(), [](const
+  // QString& s) {return s.isEmpty();}); rFilterStr.erase(pE, rFilterStr.end());
+  // for (auto oJ : IterRange(rFilterStr))
+  //   qDebug() << oJ.val() << " " << oJ.index();
 
   m_pSortFilterProxyModel->invalidate();
 }
@@ -734,6 +755,7 @@ void Speechdownloader::deleteQuiz(QString sName, QString sPwd, int nDbId)
 {
   QString sUrl = QString::asprintf(GLOS_SERVER2 "/deletequiz.php?qname=%s&qpwd=%s&dbid=%d",
                                    Enc()(sName), Enc()(sPwd), nDbId);
+
   QNetworkRequest request(sUrl);
   m_oDeleteQuizNetMgr.get(request);
 }
@@ -827,13 +849,9 @@ void Speechdownloader::sortRowset(QJSValue p0, QJSValue p1, int nCount, QJSValue
   }
 }
 
-// {"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword , "answer": sA, "extra":
-// sE, "state1" : rs.rows.item(i).state }
-// 0 answer
-// 1 extra
-// 2 number
-// 3 question
-// 4 state
+// {"number": rs.rows.item(i).number, "question": rs.rows.item(i).quizword ,
+// "answer": sA, "extra": sE, "state1" : rs.rows.item(i).state } 0 answer 1
+// extra 2 number 3 question 4 state
 
 void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, QString sPwd,
                                       QString sDesc, QString sCmd, QObject* pProgressIndicator)
@@ -958,8 +976,8 @@ void Speechdownloader::transDownloaded()
 void Speechdownloader::translateWord(QString sWord, QString sFromLang, QString sToLang,
                                      QObject* pBtn)
 {
-  QString sFmt =
-      "https://api.mymemory.translated.net/get?q=%ls&mt=1&langpair=%ls|%ls&de=faxling11@gmail.com";
+  QString sFmt = "https://api.mymemory.translated.net/"
+                 "get?q=%ls&mt=1&langpair=%ls|%ls&de=faxling11@gmail.com";
 
   QString sUrl =
       QString::asprintf(sFmt.toLatin1(), sWord.utf16(), sFromLang.utf16(), sToLang.utf16());
@@ -1042,7 +1060,6 @@ bool Speechdownloader::isStackEmpty()
 
 int Speechdownloader::popIndex()
 {
-
   if (m_ocIndexStack.isEmpty())
     return -1;
 
@@ -1050,12 +1067,12 @@ int Speechdownloader::popIndex()
 
   return m_ocIndexStack.takeLast();
 }
-
+/*
 void Speechdownloader::startTimer()
 {
   m_pStopWatch = new StopWatch("timing %1");
 }
-
+*/
 void Speechdownloader::storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTrTextModel,
                                       QObject* pTrSynModel, QObject* pTrMeanModel)
 {
@@ -1077,9 +1094,10 @@ void Speechdownloader::storeCurrentIndex(int n)
   if (m_ocTextInputElem[n]->property("visible").toBool() == true)
     QMetaObject::invokeMethod(m_ocTextInputElem[n], "forceActiveFocus");
 }
-
+/*
 void Speechdownloader::stopTimer()
 {
   delete m_pStopWatch;
   m_pStopWatch = nullptr;
 }
+*/

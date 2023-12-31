@@ -34,13 +34,19 @@ public:
   Q_INVOKABLE void importQuiz(QString sName, QObject* pProgressIndicator);
   Q_INVOKABLE QObject* setFilterProxy(QObject* pModel);
   Q_INVOKABLE QObject* setOLFilterProxy(QObject* pModel);
-  Q_INVOKABLE void sortOn(int n,int nRole);
+  // sorts the localquiz list
+ /*
+      AscendingOrder = 0
+      DescendingOrder = 1
+  */
+  Q_INVOKABLE void sortOn(int nRole, int nOrder);
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void listQuizLang(QString sLang);
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, int nDbId);
   Q_INVOKABLE void storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTrTextModel,
                                   QObject* pTrSynModel, QObject* pTrMeanModel);
   Q_INVOKABLE void storeTextInputField(QObject* p);
+  void AssignRoles();
   Q_INVOKABLE bool isSpecial(QString s);
   Q_INVOKABLE void storeCurrentIndex(int);
   Q_INVOKABLE void toClipBoard(QString s);
@@ -54,8 +60,8 @@ public:
   Q_INVOKABLE void downLoadAllSpeech(QVariant pModel, QString sLang);
   Q_INVOKABLE void initUrls(QVariant p);
   Q_INVOKABLE int indexFromGlosNr(QVariant p, int nNr);
-  Q_INVOKABLE void startTimer();
-  Q_INVOKABLE void stopTimer();
+ //  Q_INVOKABLE void startTimer();
+  // Q_INVOKABLE void stopTimer();
   Q_INVOKABLE QString ignoreAccent(QString s);
   QString ignoreAccentLC(QString s);
   Q_INVOKABLE QString removeDiacritics(QString str);

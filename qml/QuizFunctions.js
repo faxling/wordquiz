@@ -407,8 +407,8 @@ function updateDesc1(sDesc) {
   var o = quizFromCurrentItem()
   var nDbId = o.number
 
-  idWindow.sQuizDesc = sDesc
-
+  sQuizDesc = sDesc
+  idTextInputQuizDesc.text = sDesc
   var sDateStr = MyDownloader.dateStr()
   var sDescAndDate = sDesc + "###" + sDateStr
 
@@ -551,19 +551,40 @@ function getAndInitDb() {
                               })
     }
 
-    glosModelIndex = MyDownloader.setOLFilterProxy(idGlosModelIndex)
+    if (idGlosModelIndex.count === 0) {
+      idGlosModelIndex.append({
+                                "number": 1,
+                                "quizname": "-",
+                                "state1": "-",
+                                "langpair": "-",
+                                "desc1": "-",
+                                "descdate": ""
+                              })
 
-    MyDownloader.sortOn(0, 4)
+      glosModelIndex = MyDownloader.setOLFilterProxy(idGlosModelIndex)
+      idGlosModelIndex.remove(0)
+    } else {
+      glosModelIndex = MyDownloader.setOLFilterProxy(idGlosModelIndex)
+    }
+
+
+    /*
+    enum SortOrder {
+        AscendingOrder,
+        DescendingOrder
+   };
+   */
+    // Role 0 = Name 1 = Lang
+    MyDownloader.sortOn(0, 0)
 
     // Set to last assigned Quiz
     if (idWindow.quizListView !== undefined) {
-      var bDoChanged = (idWindow.quizListView.currentIndex === -1
-                        && nGlosaDbLastIndex === 0)
+      var nC = idWindow.quizListView.currentIndex
       idWindow.quizListView.currentIndex = MyDownloader.indexFromGlosNr(
             glosModelIndex, nGlosaDbLastIndex)
 
-      if (bDoChanged) {
-        idWindow.quizListView.currentIndexChanged()
+      if (nC === idWindow.quizListView.currentIndex) {
+        idWindow.quizListView.currentItemChanged()
       }
     }
   })
@@ -770,13 +791,14 @@ function loadFromDb(tx, nSelectFromCurrentIndex) {
   }
 }
 
-function sortOn(nSortRoleIn, o) {
+// Sort role 0 Name 1 lang
+function sortOn(nSortRoleIn, nOrder) {
   idTextAvailable.nSortRole = nSortRoleIn
-  o.bSortAsc = !o.bSortAsc
+  nOrder.bSortAsc = !nOrder.bSortAsc
   if (idQuizList.currentItem !== null)
     var j = idQuizList.currentItem.nNumber
 
-  MyDownloader.sortOn(o.bSortAsc, idTextAvailable.nSortRole)
+  MyDownloader.sortOn(idTextAvailable.nSortRole, nOrder.bSortAsc)
 
   if (j !== undefined)
     idQuizList.currentIndex = MyDownloader.indexFromGlosNr(glosModelIndex, j)
@@ -851,7 +873,6 @@ function loadFromQuizList() {
   sScoreText = o.state1
   sQuizDesc = o.desc1
   sQuizDate = o.descdate
-  idTextInputQuizDesc.text = idWindow.sQuizDesc
   var res = sLangLang.split("-")
   sLangLangRev = res[1] + "-" + res[0]
   sToLang = res[1]
@@ -921,8 +942,12 @@ function newQuiz() {
           idWindow.glosModelIndex, nNr)
 
     // kick changed at initialization
+
+
+    /*
     if (idQuizList.currentIndex === 0)
-      idWindow.quizListView.currentIndexChanged()
+      idWindow.quizListView.currentItemChanged()
+      */
   })
 }
 
@@ -1132,8 +1157,12 @@ function loadFromList(nCount, oDD, sLangLoaded) {
 
     idQuizList.currentIndex = MyDownloader.indexFromGlosNr(glosModelIndex, nNr)
 
+
+    /*
     if (idQuizList.currentIndex === 0)
       idWindow.quizListView.currentIndexChanged()
+
+      */
   })
 }
 

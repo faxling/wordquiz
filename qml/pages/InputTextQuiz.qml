@@ -11,9 +11,12 @@ Rectangle {
   TextInput {
 
     onActiveFocusChanged: {
+
+      // Emit signal
       if (activeFocus)
         gotFocus()
     }
+
     cursorDelegate: Rectangle {
       visible: idTextInput.focus
       height: parent.height

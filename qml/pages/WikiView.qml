@@ -7,5 +7,6 @@ WebViewPage {
   WebView {
     id: idWebView
     anchors.fill: parent
+    anchors.leftMargin: 25
   }
 }

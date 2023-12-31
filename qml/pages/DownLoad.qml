@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../QuizFunctions.js" as QuizLib
 
 RectRounded {
   id: idContainer
@@ -67,19 +68,17 @@ RectRounded {
     width: parent.width
     height: Theme.fontSizeLarge
     anchors.top: idImport.bottomClose
+    anchors.topMargin: 15
     InputTextQuizSilicaEx {
       id: idTextEdit1
-      placeholderText: "Filter name or lang key"
-      onActiveFocusChanged: {
-        if (activeFocus)
-          MyDownloader.setFilterQList(displayText)
-      }
+      placeholderText: "Filter on name and lang (eg en_)"
+
       onDisplayTextChanged: {
         MyDownloader.setFilterQList(displayText)
       }
       height: Theme.fontSizeLarge * 1.5
       labelVisible: false
-      width: parent.width
+      width: parent.width - 10
     }
   }
 
@@ -94,12 +93,33 @@ RectRounded {
   ListViewHi {
     id: idServerListView
 
+    highlightFollowsCurrentItem: true
     anchors.top: idFilterRow.bottom
     anchors.topMargin: 5
     width: idImport.width - 20
     x: 10
     height: parent.height - idDeleteQuiz.height * 3 + 10
     model: oFilteredQListModel
+
+    onCurrentItemChanged: {
+      if (currentItem == null) {
+        idContainer.sSelectedQ = ""
+        nSelectedQ = -1
+        idContainer.sImportMsg = ""
+        idContainer.sDesc1 = "-"
+        idContainer.sDescDate = "-"
+        return
+      }
+      var j = currentItem.nNumber
+      j = MyDownloader.indexFromGlosNr(idServerQModel, j)
+      var o = idServerQModel.get(j)
+      idContainer.sSelectedQ = o.qname
+      nSelectedQ = o.number
+      idContainer.sImportMsg = ""
+      idContainer.sDesc1 = o.desc1
+      idContainer.sDescDate = o.date1
+    }
+
     delegate: Item {
       property int nW: idServerListView.width / 6
       property int nNumber: number
@@ -126,14 +146,19 @@ RectRounded {
           height: parent.height
         }
       }
+
       MouseArea {
         anchors.fill: idServerRow
         onClicked: {
+
+
+          /*
           nSelectedQ = number
           idContainer.sImportMsg = ""
           idContainer.sDesc1 = desc1
           idContainer.sDescDate = date1
           idContainer.sSelectedQ = qname
+          */
           idServerListView.currentIndex = index
         }
       }

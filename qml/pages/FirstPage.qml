@@ -47,7 +47,7 @@ Page {
   property variant quizListView
   property variant oTakeQuiz
   property bool bAllok: false
-  property int nGlosaDbLastIndex: -1
+  // property int nGlosaDbLastIndex: -1
   property string sSearchQuery
   property int nGlosaTakeQuizIndex
   property int nMargin: Screen.height > 1000 ? 50 : 25
@@ -281,6 +281,10 @@ Page {
     }
   }
 
+  onStateChanged: {
+    console.log("forceActiveFocus")
+    idTab5.forceActiveFocus()
+  }
   states: [
     State {
       name: "idTab1"

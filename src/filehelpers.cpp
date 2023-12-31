@@ -1,14 +1,14 @@
 #include "filehelpers.h"
 
-#include <QRegExp>
-#include <QElapsedTimer>
 #include <QDebug>
+#include <QElapsedTimer>
+#include <QRegExp>
 
 StopWatch::StopWatch(const QString& sMsg)
 {
   m_oTimer = new QElapsedTimer;
   m_sMsg = sMsg;
-  m_oTimer->start(); 
+  m_oTimer->start();
   return;
 }
 
@@ -34,7 +34,6 @@ StopWatch::~StopWatch()
   delete m_oTimer;
 }
 
-
 double StopWatch::StopTimeSec()
 {
   qint64 nanoSec = m_oTimer->nsecsElapsed();
@@ -51,7 +50,6 @@ void StopWatch::Stop()
   qDebug() << sMsg;
 }
 
-
 void StopWatch::Pause()
 {
   // FIXTIT
@@ -62,24 +60,26 @@ void StopWatch::Continue()
   // FIXTIT
 }
 
-
 static const QRegExp SLASH("[\\\\/]");
-QString JustFileName(const QString & sFileName) {
+QString JustFileName(const QString& sFileName)
+{
   int n = sFileName.lastIndexOf(SLASH);
   if (n < 0)
     return sFileName;
   return sFileName.right(sFileName.size() - n - 1);
 }
 
-QString BaseName(const QString & sFileName) {
+QString BaseName(const QString& sFileName)
+{
   return sFileName.left(sFileName.lastIndexOf('.'));
 }
 
-QString JustFileNameNoExt(const QString & sFileName) {
+QString JustFileNameNoExt(const QString& sFileName)
+{
   return BaseName(JustFileName(sFileName));
 }
 
-QString operator^(const QString &sIn, const QString &s2In)
+QString operator^(const QString& sIn, const QString& s2In)
 {
   QString s(sIn), s2(s2In);
   int nLen1 = s.length() - 1;
@@ -119,4 +119,3 @@ QString operator^(const QString &sIn, const QString &s2In)
   else
     return s + "/" + s2;
 }
-

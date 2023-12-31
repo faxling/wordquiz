@@ -33,6 +33,7 @@ Item {
         idEditWordImage.source = ""
         idEditWordImage.source = MyDownloader.imageSrc(idTextEdit1.text,
                                                        sFromLang)
+        idGlosList.currentItem.hasImg = true
       }
     }
   }
@@ -42,7 +43,6 @@ Item {
     spacing: 20
     anchors.topMargin: 20
     anchors.fill: parent
-
     Item {
       id: idSearchResultRowItem
       height: idTextInput.height
@@ -255,7 +255,7 @@ Item {
     }
     ListViewHi {
       id: idGlosList
-      height: idAppWnd.height - idDictRow.height - idBtnRow.height * 6 - 40
+      height: idEditQuiz.height - idDictRow.height - idBtnRow.height * 4
               - idTextInput.height - idHeader1Text.height
 
       width: parent.width
@@ -266,7 +266,7 @@ Item {
       model: glosModel
       delegate: Row {
         spacing: 5
-
+        property bool hasImg: MyDownloader.hasImage(question, sFromLang)
         TextList {
           id: idQuestionText
           width: n3BtnWidth
@@ -294,7 +294,9 @@ Item {
           id: idRmBtn
           height: idAnswer.height
           width: idAnswer.height
-          source: "image://theme/icon-s-edit"
+
+          source: "image://theme/icon-s-edit?"
+                  + (hasImg ? Theme.highlightColor : Theme.primaryColor)
           onClicked: {
             idEditDlg.visible = true
             idTextEdit1.text = question
@@ -302,11 +304,9 @@ Item {
             idTextEdit3.text = extra
             idGlosState.checked = state1 !== 0
             idGlosList.currentIndex = index
-            idEditWordImage.visible = MyDownloader.hasImage(idTextEdit1.text,
-                                                            sFromLang)
-            idEditWordImage.source = idEditWordImage.visible ? MyDownloader.imageSrc(
-                                                                 idTextEdit1.text,
-                                                                 sFromLang) : ""
+            // idEditWordImage.visible = hasImg
+            idEditWordImage.source = MyDownloader.imageSrc(idTextEdit1.text,
+                                                           sFromLang)
             idWindow.nGlosaTakeQuizIndex = index
           }
         }
@@ -322,27 +322,6 @@ Item {
           source: "qrc:qml/pages/horn.png"
           onClicked: MyDownloader.playWord(answer, sToLang)
         }
-      }
-    }
-  }
-  Row {
-    id: idLowerButtonRow
-    y: idTab2.height - (Theme.itemSizeExtraSmall * 1.6)
-    spacing: 10
-    ButtonQuiz {
-      id: idResetBtn
-      text: "Reset"
-      onClicked: {
-        idGlosState.checked = false
-        QuizLib.resetQuiz()
-      }
-    }
-
-    ButtonQuiz {
-      id: idReverseBtn
-      text: "Reverse"
-      onClicked: {
-        QuizLib.reverseQuiz()
       }
     }
   }
@@ -456,6 +435,27 @@ Item {
       text: "Delete"
       onClicked: {
         QuizLib.deleteWordInQuiz()
+      }
+    }
+  }
+  Row {
+    id: idLowerButtonRow
+    y: Screen.height - 450
+    spacing: 10
+    ButtonQuiz {
+      id: idResetBtn
+      text: "Reset"
+      onClicked: {
+        idGlosState.checked = false
+        QuizLib.resetQuiz()
+      }
+    }
+
+    ButtonQuiz {
+      id: idReverseBtn
+      text: "Reverse"
+      onClicked: {
+        QuizLib.reverseQuiz()
       }
     }
   }

@@ -183,7 +183,7 @@ Item {
         width: n4BtnWidth * 2
         text: "Name"
         property bool bSortAsc
-        onClick: QuizLib.sortOn(4, this)
+        onClick: QuizLib.sortOn(0, this)
       }
 
       TextList {
@@ -191,7 +191,7 @@ Item {
         font.bold: parent.nSortRole === 2
         property bool bSortAsc
         text: "Lang keys"
-        onClick: QuizLib.sortOn(2, this)
+        onClick: QuizLib.sortOn(1, this)
       }
     }
 
@@ -208,12 +208,18 @@ Item {
         QuizLib.connectMyDownloader()
       }
 
-      onCurrentIndexChanged: {
+      onCurrentItemChanged: {
+        console.log("onCurrentItemChanged " + currentIndex)
+        QuizLib.loadFromQuizList()
+
+
+        /*
         if (nGlosaDbLastIndex >= 0) {
           QuizLib.loadFromQuizList()
         } else {
           nGlosaDbLastIndex = 0
         }
+        */
       }
 
       delegate: Item {
@@ -281,7 +287,8 @@ Item {
       id: idExportTitle
       anchors.top: idExport.bottomClose
       x: 20
-      text: "Add a description off the quiz '" + sQuizName + "'"
+      text: idTextInputQuizDesc.text.length
+            > 3 ? "Description" : "Add a Description for '" + sQuizName + "!'"
     }
 
     InputTextQuiz {
@@ -413,15 +420,16 @@ Item {
     width: parent.width
     height: Theme.itemSizeExtraSmall * 5
     Column {
-      x: 20
+      x: 10
       id: idQnameInput
-      spacing: 10
-      width: parent.width - 40
+      // spacing: 10
+      width: parent.width - 20
       anchors.top: parent.bottomClose
       anchors.topMargin: -10
       // spacing: 5
       Label {
         id: idAddInfo
+        font.pixelSize: Theme.fontSizeSmall
         text: "Quiz Name:"
       }
 
@@ -431,12 +439,14 @@ Item {
       }
     } // Col
     Column {
-      x: 20
-      width: parent.width - 40
+      x: 10
+      width: parent.width - 20
       anchors.top: idQnameInput.bottom
+      anchors.topMargin: 10
       //spacing: 5
       Label {
         text: "Quiz Description:"
+        font.pixelSize: Theme.fontSizeSmall
       }
 
       InputTextQuizSilicaEx {
@@ -485,7 +495,7 @@ Item {
 
                               idGlosModelIndex.remove(
                                     QuizLib.indexQuizFromCurrentItem())
-                              quizListView.currentIndex = -1
+                              // quizListView.currentIndex = -1
                             })
         idEditQuizEntryDlg.visible = false
       }
