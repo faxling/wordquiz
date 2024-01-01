@@ -308,20 +308,16 @@ function sortModel() {
 function setAnswerVisible() {
   var i = nQuizIndex1_3
   idQuizModel.get(i).answerVisible = true
-  idWindow.oTakeQuiz.bAnswerVisible = true
 }
 
 function toggleAnswerVisible() {
   var i = nQuizIndex1_3
   idQuizModel.get(i).answerVisible = !idQuizModel.get(i).answerVisible
-  idWindow.oTakeQuiz.bAnswerVisible = idQuizModel.get(i).answerVisible
 }
 
 function resetTakeQuizTab() {
   if (idWindow.oTakeQuiz !== undefined) {
     idWindow.oTakeQuiz.bExtraInfoVisible = false
-    idWindow.oTakeQuiz.bAnswerVisible = false
-    idWindow.oTakeQuiz.bImageMode = false
     var nC = idQuizModel.count
     for (var i = 0; i < nC; ++i) {
       idQuizModel.get(i).answerVisible = false
@@ -940,14 +936,6 @@ function newQuiz() {
 
     idQuizList.currentIndex = MyDownloader.indexFromGlosNr(
           idWindow.glosModelIndex, nNr)
-
-    // kick changed at initialization
-
-
-    /*
-    if (idQuizList.currentIndex === 0)
-      idWindow.quizListView.currentItemChanged()
-      */
   })
 }
 
@@ -1382,12 +1370,7 @@ function checkAndReplace(nNumberDb, nReplaceWidthIndexInWorking) {
 
 function assigNextQuizWord() {
 
-  //var nLastIndex = idTakeQuizView.nLastIndex
-  // idQuizModel.get(nQuizIndex1_3).answerVisible = false
-
-  //nQuizIndex the index of the view with 3 items that swipes left or right
-  //  nQuizIndex = nI
-  // idTakeQuizView.nLastIndex = nI
+  //nQuizIndex1_3 the index of the view with 3 items that swipes left or right
   var nLastNumber = idQuizModel.get(nLastQuizIndex1_3).numberDb
   if (idQuizModel.bDir === -1) {
     var i = nLastQuizIndex1_3
@@ -1418,31 +1401,49 @@ function assigNextQuizWord() {
     }
   }
 
-  // MyDownloader.storeCurrentIndex(nQuizIndex1_3)
-  if (glosModelWorking.count > 0) {
-
-    var nIndexNewWordInModelWorking = 0
-    while (glosModelWorking.count > 1) {
-      nIndexNewWordInModelWorking = Math.floor(Math.random(
-                                                 ) * glosModelWorking.count)
-      // var nNumberNewWord = glosModelWorking.get(nIndexNewWord).number
-      if (glosModelWorking.get(
-            nIndexNewWordInModelWorking).number !== nLastNumber)
-        break
-    }
-
-    if (glosModelWorking.count === 1) {
-      assignQuizModel(0, nLastQuizIndex1_3)
-    } else {
-      assignQuizModel(nIndexNewWordInModelWorking, nLastQuizIndex1_3)
-    }
-
-    if (idQuizModel.bDir === -1)
-      checkAndReplace(nLastNumber, nIndexNewWordInModelWorking)
-
-    idWindow.nGlosaTakeQuizIndex = MyDownloader.indexFromGlosNr(
-          glosModel, idQuizModel.get(nQuizIndex1_3).numberDb)
+  if (glosModelWorking.count === 0) {
+    resetTakeQuizTab()
+    return
   }
+
+  while (glosModelWorking.count > 3) {
+    var nIndexNewWordInModelWorking = Math.floor(Math.random(
+                                                   ) * glosModelWorking.count)
+    var nNumberOfNewWord = glosModelWorking.get(
+          nIndexNewWordInModelWorking).number
+    var Found = 0
+    for (i = 0; i < 3; ++i) {
+      if (idQuizModel.get(i).numberDb === nNumberOfNewWord) {
+        console.log("Found " + i)
+        Found = 1
+        break
+      }
+    }
+    if (Found === 0)
+      break
+  }
+
+  if (glosModelWorking.count === 1) {
+    assignQuizModel(0, 0)
+    assignQuizModel(0, 1)
+    assignQuizModel(0, 2)
+  } else if (glosModelWorking.count === 2) {
+    assignQuizModel(0, 0)
+    assignQuizModel(1, 1)
+    assignQuizModel(1, 2)
+  } else if (glosModelWorking.count === 3) {
+    assignQuizModel(0, 0)
+    assignQuizModel(1, 1)
+    assignQuizModel(2, 2)
+  } else {
+    assignQuizModel(nIndexNewWordInModelWorking, nLastQuizIndex1_3)
+  }
+
+  idWindow.nGlosaTakeQuizIndex = MyDownloader.indexFromGlosNr(
+        glosModel, idQuizModel.get(nQuizIndex1_3).numberDb)
+
+  if (bTextMode)
+    MyDownloader.focusOnQuizText(nQuizIndex1_3)
 
   resetTakeQuizTab()
 }

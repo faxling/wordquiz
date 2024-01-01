@@ -282,7 +282,6 @@ Page {
   }
 
   onStateChanged: {
-    console.log("forceActiveFocus")
     idTab5.forceActiveFocus()
   }
   states: [

@@ -209,7 +209,7 @@ Item {
       }
 
       onCurrentItemChanged: {
-        console.log("onCurrentItemChanged " + currentIndex)
+
         QuizLib.loadFromQuizList()
 
 

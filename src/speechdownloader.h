@@ -11,11 +11,14 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
-class QAbstractListModel;
-class StopWatch;
 
+class StopWatch;
 class QuizFilterModel;
 
+
+// Maybe more that just downloading audio
+// Handles network connections and some utility functions eg for sorting
+// and calculating file names
 class Speechdownloader : public QObject
 {
   Q_OBJECT
@@ -32,7 +35,10 @@ public:
   Q_INVOKABLE void updateCurrentQuiz(QVariant p, QString sName, QString sLang, QString sPwd,
                                      QString sDesc, QObject* pProgressIndicator);
   Q_INVOKABLE void importQuiz(QString sName, QObject* pProgressIndicator);
+  // For downloading
   Q_INVOKABLE QObject* setFilterProxy(QObject* pModel);
+
+  // For the ones in the local db
   Q_INVOKABLE QObject* setOLFilterProxy(QObject* pModel);
   // sorts the localquiz list
  /*
@@ -45,10 +51,13 @@ public:
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, int nDbId);
   Q_INVOKABLE void storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTrTextModel,
                                   QObject* pTrSynModel, QObject* pTrMeanModel);
-  Q_INVOKABLE void storeTextInputField(QObject* p);
+  Q_INVOKABLE void storeTextInputField(int n,QObject* p);
   void AssignRoles();
   Q_INVOKABLE bool isSpecial(QString s);
-  Q_INVOKABLE void storeCurrentIndex(int);
+
+  // For taking keyboard input on quiz in textmod on desktop
+  Q_INVOKABLE void focusOnQuizText(int nIndex1_3);
+
   Q_INVOKABLE void toClipBoard(QString s);
   Q_INVOKABLE void pushIndex(int);
   Q_INVOKABLE int popIndex();
@@ -57,11 +66,9 @@ public:
   Q_INVOKABLE void setFilterQList(QString regExp);
   Q_INVOKABLE void sortRowset(QJSValue p, QJSValue p1, int nCount, QJSValue jsArray);
 
-  Q_INVOKABLE void downLoadAllSpeech(QVariant pModel, QString sLang);
   Q_INVOKABLE void initUrls(QVariant p);
   Q_INVOKABLE int indexFromGlosNr(QVariant p, int nNr);
- //  Q_INVOKABLE void startTimer();
-  // Q_INVOKABLE void stopTimer();
+
   Q_INVOKABLE QString ignoreAccent(QString s);
   QString ignoreAccentLC(QString s);
   Q_INVOKABLE QString removeDiacritics(QString str);
@@ -99,7 +106,6 @@ private:
   void listDownloaded(QNetworkReply* pReply);
   void quizExported(QNetworkReply* pReply);
   void quizDeleted(QNetworkReply* pReply);
-
   void wordDownloaded(QNetworkReply* pReply);
   void imgDownloaded(QNetworkReply* pReply);
   void transDownloaded();
@@ -109,7 +115,7 @@ private:
 private:
   void currentQuizCmd(QVariant p, QString sName, QString sLang, QString sPwd, QString sDesc,
                       QString sCmd, QObject* pProgressIndicator);
-  // QVector<int> m_ocIndexMap;
+
   QString AudioPath(const QString& s, const QString& sLang);
   QString ImgPath(const QString& s, const QString& sLang);
   QString m_sStoragePath;
@@ -122,7 +128,7 @@ private:
   QNetworkAccessManager m_oTransNetMgr;
   QVector<int> m_ocIndexStack;
   bool m_bSkipNextPush = false;
-  QVector<QObject*> m_ocTextInputElem;
+  QMap<int, QObject*> m_ocTextInputElem;
   QObject* m_sTranslatedText;
   QObject* m_pErrorTextField;
   QObject* m_pTrTextModel;

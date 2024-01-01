@@ -3,7 +3,7 @@ import Sailfish.Silica 1.0
 
 SilicaListView {
   id: idSilicaListView
-  // @disable-check M301
+
   VerticalScrollDecorator {
     flickable: idSilicaListView
   }

@@ -187,6 +187,7 @@ function popupOnPress(charRect, textBox, fontMetrics) {
     idInputBox.t.text = charRect.text
     idInputBox.nIndex = charRect.nIndex
     idInputBox.visible = true
+    idInputBox.parent = charRect
     idInputBox.t.forceActiveFocus()
   } else {
     Qt.inputMethod.hide()

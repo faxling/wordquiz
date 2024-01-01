@@ -177,7 +177,7 @@ Item {
     color: Theme.highlightColor
     font.pixelSize: Theme.fontSizeMedium
   }
-  // @disable-check M301
+
   ButtonQuiz {
     id: idHangBtn5
     visible: !idHangBtn.visible

@@ -785,19 +785,6 @@ void Speechdownloader::toClipBoard(QString s)
   QGuiApplication::clipboard()->setText(s);
 }
 
-void Speechdownloader::downLoadAllSpeech(QVariant p, QString sLang)
-{
-  QAbstractListModel* pp = qvariant_cast<QAbstractListModel*>(p);
-  QStringList ocLang = sLang.split("-");
-  int nC = pp->rowCount();
-  for (int i = 0; i < nC; i++)
-  {
-    QString sAnswer = pp->data(pp->index(i), 0).toString();
-    QString sQuestion = pp->data(pp->index(i), 3).toString();
-    downloadWord(sQuestion, ocLang[0]);
-    downloadWord(sAnswer, ocLang[1]);
-  }
-}
 
 void Speechdownloader::updateCurrentQuiz(QVariant p, QString sName, QString sLang, QString sPwd,
                                          QString sDesc, QObject* pProgressIndicator)
@@ -1067,12 +1054,7 @@ int Speechdownloader::popIndex()
 
   return m_ocIndexStack.takeLast();
 }
-/*
-void Speechdownloader::startTimer()
-{
-  m_pStopWatch = new StopWatch("timing %1");
-}
-*/
+
 void Speechdownloader::storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTrTextModel,
                                       QObject* pTrSynModel, QObject* pTrMeanModel)
 {
@@ -1083,21 +1065,22 @@ void Speechdownloader::storeTransText(QObject* p, QObject* pErrorTextField, QObj
   m_pTrMeanModel = pTrMeanModel;
 }
 
-void Speechdownloader::storeTextInputField(QObject* p)
+void Speechdownloader::storeTextInputField(int n, QObject* p)
 {
-  m_ocTextInputElem.push_back(p);
+  m_ocTextInputElem[n] = p;
 }
 
-void Speechdownloader::storeCurrentIndex(int n)
+void Speechdownloader::focusOnQuizText(int n)
 {
-  m_ocTextInputElem[n]->setProperty("text", "");
-  if (m_ocTextInputElem[n]->property("visible").toBool() == true)
-    QMetaObject::invokeMethod(m_ocTextInputElem[n], "forceActiveFocus");
+  auto i = m_ocTextInputElem.find(n);
+  if (i == m_ocTextInputElem.end())
+    return;
+  QObject* pTI = i.value(); // TextInput
+
+  if (pTI->property("visible").toBool() == true)
+  {
+    pTI->setProperty("text", "*");
+    pTI->setProperty("text", "");
+    QMetaObject::invokeMethod(pTI, "forceActiveFocus");
+  }
 }
-/*
-void Speechdownloader::stopTimer()
-{
-  delete m_pStopWatch;
-  m_pStopWatch = nullptr;
-}
-*/

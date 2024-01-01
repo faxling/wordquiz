@@ -4,7 +4,7 @@ import "../QuizFunctions.js" as QuizLib
 
 Flipable {
   id: flipable
-  property bool bTextAnswerOk: false
+
   width: idTakeQuizView.width
   height: idRectTakeQuiz.height - 200
 
@@ -69,10 +69,11 @@ Flipable {
 
     TextField {
       id: idTextEditYourAnswer
-      Component.onCompleted: {
+      focus: true
 
-        // MyDownloader.storeTextInputField(idTextEditYourAnswer)
-      }
+      Component.onCompleted: MyDownloader.storeTextInputField(
+                               number, idTextEditYourAnswer)
+
       y: 50
       anchors.horizontalCenter: parent.horizontalCenter
       visible: bTextMode && (!allok)
@@ -80,8 +81,8 @@ Flipable {
       labelVisible: false
       placeholderText: "your answer"
       onTextChanged: {
-        var bAnswerVisible = QuizLib.isAnswerOk(text, answer)
-        if (bAnswerVisible)
+        bTextAnswerOk = QuizLib.isAnswerOk(text, answer)
+        if (bTextAnswerOk)
           QuizLib.setAnswerVisible()
       }
     }
@@ -110,7 +111,8 @@ Flipable {
         width: 500
         fillMode: Image.PreserveAspectFit
         anchors.horizontalCenter: parent.horizontalCenter
-        visible: bImageMode
+        visible: !allok && bImageMode
+                 && imgUrl !== "image://theme/icon-m-file-image"
         // && MyDownloader.hasImg
         source: imgUrl
       }
@@ -128,6 +130,7 @@ Flipable {
 
       ButtonQuizImg {
         id: idBtnAnswer
+        focus: false
         fillMode: Image.Pad
         anchors.horizontalCenter: parent.horizontalCenter
         width: Theme.itemSizeExtraSmall * 2
@@ -137,19 +140,6 @@ Flipable {
           QuizLib.toggleAnswerVisible()
         }
       }
-
-
-      /*
-      ButtonQuiz {
-        id: idBtnAnswer
-
-        anchors.horizontalCenter: parent.horizontalCenter
-        text: "Show Answer"
-        onClicked: {
-          bAnswerVisible = !bAnswerVisible
-        }
-      }
-      */
     }
 
     Image {
@@ -184,17 +174,6 @@ Flipable {
         onClicked: QuizLib.toggleAnswerVisible()
       }
 
-
-      /*
-      ButtonQuiz {
-        id: idBtnAnswer2
-        text: "Back"
-        anchors.horizontalCenter: parent.horizontalCenter
-        onClicked: {
-          bAnswerVisible = !bAnswerVisible
-        }
-      }
-      */
       ButtonQuizImg {
         anchors.horizontalCenter: parent.horizontalCenter
         width: Theme.itemSizeExtraSmall

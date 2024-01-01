@@ -8,7 +8,7 @@ Item {
   property bool bTextMode: false
   property bool bImageMode: false
   property bool bVoiceMode: false
-  property bool bAnswerVisible: false
+  property bool bTextAnswerOk: false
   property bool allok: idWindow.bAllok
   Component.onCompleted: {
     idWindow.oTakeQuiz = idRectTakeQuiz
@@ -18,13 +18,18 @@ Item {
   PathView {
     id: idTakeQuizView
     clip: true
+    flickDeceleration: 1000
 
     // Making it lock if bTextMode and not correct answer
-    interactive: (!bTextMode || moving || bAnswerVisible)
+    interactive: (!bTextMode || bTextAnswerOk || moving)
     width: idRectTakeQuiz.width
     height: idRectTakeQuiz.height
 
-    onCurrentIndexChanged: {
+    property int nLastIndex
+    onMovementEnded: {
+      if (nLastIndex === currentIndex)
+        return
+      nLastIndex = currentIndex
       QuizLib.calcSwipeDirection(currentIndex)
       QuizLib.assigNextQuizWord()
     }
