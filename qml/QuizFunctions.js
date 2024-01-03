@@ -366,9 +366,10 @@ function reqTranslation(oBtnIn, bIsSecond) {
   }
 }
 
-function openWwwPage(sUrl) {
+function openWwwPage(sUrl, sTitle) {
   pageStack.push("pages/WikiView.qml", {
-                   "url": sUrl
+                   "url": sUrl,
+                   "sTitle": sTitle
                  })
 }
 
@@ -392,9 +393,13 @@ function lookUppInWiki() {
 
   var sUrl = "http://" + sLang + ".wiktionary.org/w/index.php?title=" + oInText.toLowerCase()
 
+
+  /*
   pageStack.push("pages/WikiView.qml", {
                    "url": sUrl
                  })
+  */
+  openWwwPage(sUrl, sLang + " Wiktionary on \"" + oInText + "\"")
 }
 
 function updateDesc1(sDesc) {
@@ -1374,7 +1379,6 @@ function assigNextQuizWord() {
   var nLastNumber = idQuizModel.get(nLastQuizIndex1_3).numberDb
   if (idQuizModel.bDir === -1) {
     var i = nLastQuizIndex1_3
-
     var ii = MyDownloader.indexFromGlosNr(glosModelWorking, nLastNumber)
     if (ii >= 0)
       glosModelWorking.remove(ii)

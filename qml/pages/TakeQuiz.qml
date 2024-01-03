@@ -18,7 +18,7 @@ Item {
   PathView {
     id: idTakeQuizView
     clip: true
-    flickDeceleration: 1000
+
 
     // Making it lock if bTextMode and not correct answer
     interactive: (!bTextMode || bTextAnswerOk || moving)

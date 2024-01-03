@@ -130,7 +130,7 @@ Page {
     height: idTab2Btn.height
     x: idTab2Btn.x + nMargin + idTab2Btn.width + idTabMain.spacing
     y: idTabRow.y + idTabMain.y
-    width: Screen.width / 2
+    width: Screen.width - idTab2Btn.width - idTab1Btn.width - idTabMain.spacing * 2 - nMargin * 2
     opacity: 0.4
     radius: 4
     color: "steelblue"
@@ -188,7 +188,8 @@ Page {
           anchors.top: parent.top
           source: "image://theme/icon-m-search"
           onClicked: QuizLib.openWwwPage(
-                       "https://www.google.com/search?q=" + sSearchQuery)
+                       "https://www.google.com/search?q=" + sSearchQuery,
+                       "Search for " + "\"" + sSearchQuery + "\"")
         }
       }
 
@@ -216,9 +217,8 @@ Page {
         ComboBox {
 
           id: idCombo
-          //  width: 200
-          label: "Games"
 
+          label: "Games"
           menu: ContextMenu {
 
             MenuItem {
