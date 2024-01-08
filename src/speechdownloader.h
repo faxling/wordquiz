@@ -58,6 +58,7 @@ public:
   // For taking keyboard input on quiz in textmod on desktop
   Q_INVOKABLE void focusOnQuizText(int nIndex1_3);
 
+  Q_INVOKABLE QString fromClipBoard();
   Q_INVOKABLE void toClipBoard(QString s);
   Q_INVOKABLE void pushIndex(int);
   Q_INVOKABLE int popIndex();

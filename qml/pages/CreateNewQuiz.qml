@@ -174,12 +174,12 @@ Item {
     Row {
       id: idTextAvailable
       height: idHeader1Text.height - 10
-      property int nSortRole: 4
+      property int nSortRole: 0
 
       TextList {
         id: idHeader1Text
         color: "steelblue"
-        font.bold: parent.nSortRole === 4
+        font.bold: parent.nSortRole === 0
         width: n4BtnWidth * 2
         text: "Name"
         property bool bSortAsc
@@ -188,7 +188,7 @@ Item {
 
       TextList {
         color: "steelblue"
-        font.bold: parent.nSortRole === 2
+        font.bold: parent.nSortRole === 1
         property bool bSortAsc
         text: "Lang keys"
         onClick: QuizLib.sortOn(1, this)

@@ -597,7 +597,7 @@ void Speechdownloader::sortOn(int nRole, int sortOrder)
 {
   if (nRole == 0)
     m_pOLSortFilterProxyModel->setSortRole(QUIZNAME);
-  else if (nRole == 0)
+  else if (nRole == 1)
     m_pOLSortFilterProxyModel->setSortRole(LANGPAIR);
   m_pOLSortFilterProxyModel->sort(0, (Qt::SortOrder)sortOrder);
   //  m_pOLSortFilterProxyModel->invalidate();
@@ -778,6 +778,12 @@ void Speechdownloader::importQuiz(QString sName, QObject* pProgressIndicator)
   pProgressIndicator->setProperty("visible", true);
   QObject::connect(pNR, &QNetworkReply::downloadProgress, this,
                    &Speechdownloader::loadProgressSlot);
+}
+
+
+QString Speechdownloader::fromClipBoard()
+{
+  return QGuiApplication::clipboard()->text();
 }
 
 void Speechdownloader::toClipBoard(QString s)

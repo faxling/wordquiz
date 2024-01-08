@@ -42,13 +42,15 @@ Page {
   property int n2BtnWidth: idTabMain.width / 2
   property int nDlgHeight: idWindow.height / 5 + 45
   property bool bQSort: true
+  property bool bDESC: true
   property string sQSort: bQSort ? "UPPER(quizword)" : "UPPER(answer)"
+  property string sDESCASC: bDESC ? " DESC " : " ASC "
   property variant glosListView
   property variant quizListView
   property variant oTakeQuiz
   property bool bAllok: false
   // property int nGlosaDbLastIndex: -1
-  property string sSearchQuery
+  // property string sSearchQuery
   property int nGlosaTakeQuizIndex
   property int nMargin: Screen.height > 1000 ? 50 : 25
   property bool bInitHangMan: true
@@ -187,9 +189,18 @@ Page {
           anchors.leftMargin: -nMargin
           anchors.top: parent.top
           source: "image://theme/icon-m-search"
-          onClicked: QuizLib.openWwwPage(
-                       "https://www.google.com/search?q=" + sSearchQuery,
-                       "Search for " + "\"" + sSearchQuery + "\"")
+          onClicked: {
+            var sSearchQuery = MyDownloader.fromClipBoard()
+            if (sSearchQuery.length > 3)
+
+              QuizLib.openWwwPage(
+                    "https://www.google.com/search?q=" + sSearchQuery,
+                    "Search for " + "\"" + sSearchQuery + "\"")
+            else
+              QuizLib.openWwwPage(
+                    "https://www.google.com/search?q=Clipboard&num=2&pws=0&complete=0",
+                    "Search")
+          }
         }
       }
 

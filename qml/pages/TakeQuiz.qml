@@ -19,7 +19,6 @@ Item {
     id: idTakeQuizView
     clip: true
 
-
     // Making it lock if bTextMode and not correct answer
     interactive: (!bTextMode || bTextAnswerOk || moving)
     width: idRectTakeQuiz.width

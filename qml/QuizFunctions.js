@@ -403,17 +403,20 @@ function lookUppInWiki() {
 }
 
 function updateDesc1(sDesc) {
-  sDesc = sDesc.trim()
+
   // var nCurIndexInQList = idWindow.quizListView.currentIndex
   var o = quizFromCurrentItem()
   var nDbId = o.number
 
-  sQuizDesc = sDesc
-  idTextInputQuizDesc.text = sDesc
+  if (sDesc !== undefined) {
+    sDesc = sDesc.trim()
+    sQuizDesc = sDesc
+    idTextInputQuizDesc.text = sDesc
+    o.desc1 = sDesc
+  }
   var sDateStr = MyDownloader.dateStr()
-  var sDescAndDate = sDesc + "###" + sDateStr
+  var sDescAndDate = sQuizDesc + "###" + sDateStr
 
-  o.desc1 = sDesc
   o.descdate = sDateStr
   idWindow.sQuizDate = sDateStr
 
@@ -611,7 +614,7 @@ function setAllok(bval) {
   idWindow.bAllok = bval
 }
 
-// Updates the description of the Quiz
+// Updates the description of the Quiz with new date
 function insertGlosa(dbnumber, nC, question, answer) {
   var sQ = capitalizeStr(question)
   var sA = capitalizeStr(answer)
@@ -636,7 +639,6 @@ function insertGlosa(dbnumber, nC, question, answer) {
                             "extra": ""
                           })
 
-  // idWindow.glosListView.positionViewAtBeginning()
   idWindow.glosListView.currentIndex = 0
   sScoreText = glosModelWorking.count + "/" + glosModel.count
 
@@ -655,11 +657,11 @@ function insertGlosa(dbnumber, nC, question, answer) {
     }
   }
 
-  updateDesc1(idWindow.sQuizDesc)
+  updateDesc1()
 }
 
-function assignQuizModel(nIndexNewWordInModelWorking, nNumberInQuizModel) {
-  var i = nNumberInQuizModel
+function assignQuizModel(nIndexNewWordInModelWorking, nIndexInQuizModel) {
+  var i = nIndexInQuizModel
   var j = nIndexNewWordInModelWorking
   var sQ = glosModelWorking.get(j).question
   idQuizModel.get(i).question = sQ
@@ -668,8 +670,25 @@ function assignQuizModel(nIndexNewWordInModelWorking, nNumberInQuizModel) {
   var nNumberDbNewWord = glosModelWorking.get(j).number
   idQuizModel.get(i).numberDb = nNumberDbNewWord
   idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ, sQuestionLang))
-  // MyDownloader.setImgWord(idQuizModel.get(i).question, sQuestionLang)
-  // idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(glosModel, sNumberNewWord)
+}
+
+function assignQuizModelUnique(nIndexNewWordInModelWorking, nNumberInQuizModel) {
+  var i = nNumberInQuizModel
+  var j = nIndexNewWordInModelWorking
+  var nNumberDbNewWord = glosModelWorking.get(j).number
+  for (var k = 0; k < 3; ++k) {
+    if (idQuizModel.get(k).numberDb === nNumberDbNewWord) {
+      return false
+    }
+  }
+  var sQ = glosModelWorking.get(j).question
+  idQuizModel.get(i).question = sQ
+  idQuizModel.get(i).answer = glosModelWorking.get(j).answer
+  idQuizModel.get(i).extra = glosModelWorking.get(j).extra
+
+  idQuizModel.get(i).numberDb = nNumberDbNewWord
+  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ, sQuestionLang))
+  return true
 }
 
 function assignQuizModelAll() {
@@ -678,9 +697,27 @@ function assignQuizModelAll() {
     return
   }
   setAllok(false)
-  for (var i = 0; i < 3; ++i) {
-    var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
-    assignQuizModel(nIndexOwNewWord, i)
+  var i = 0
+  for (i; i < 3; ++i)
+    idQuizModel.get(i).numberDb = -1
+
+  if (glosModelWorking.count > 3) {
+    i = 0
+    while (i < 3) {
+      var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
+      if (assignQuizModelUnique(nIndexOwNewWord, i))
+        ++i
+    }
+  } else if (glosModelWorking.count === 3) {
+    assignQuizModel(0, 0)
+    assignQuizModel(1, 1)
+    assignQuizModel(2, 2)
+  } else if (glosModelWorking.count === 2) {
+    assignQuizModel(0, 0)
+    assignQuizModel(1, 1)
+    assignQuizModel(1, 2)
+  } else if (glosModelWorking.count === 1) {
+    assignOneWorkingItem()
   }
 }
 
@@ -706,8 +743,6 @@ function loadQuiz() {
 
   for (i = 0; i < nC; ++i) {
     if (glosModel.get(i).state1 === 0) {
-
-      //glosModelWorking.append(glosModel.get(i))
       glosModelWorking.append({
                                 "answer": glosModel.get(i).answer,
                                 "question": glosModel.get(i).question,
@@ -743,7 +778,7 @@ function loadFromDb(tx, nSelectFromCurrentIndex) {
   glosModel.clear()
 
   var rs = tx.executeSql(
-        "SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + sQSort)
+        "SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + sQSort + sDESCASC)
 
   var hasNonInt = false
   for (var i = 0; i < rs.rows.length; i++) {
@@ -840,17 +875,6 @@ function quizFromCurrentItem() {
   var j = MyDownloader.indexFromGlosNr(
         idGlosModelIndex, idWindow.quizListView.currentItem.nNumber)
   return idGlosModelIndex.get(j)
-
-
-  /*
-  var i = idQuizList.currentItem.nNumber
-
-  var c = idGlosModelIndex.count
-  for (var j = 0; j < c; ++j) {
-    var o =
-    if (o.number === i)
-      return o
-  }*/
 }
 
 function loadFromQuizList() {
@@ -889,7 +913,6 @@ function loadFromQuizList() {
 
   db.transaction(function (tx) {
 
-    // tx.executeSql('DROP TABLE Glosa');
     tx.executeSql('CREATE TABLE IF NOT EXISTS Glosa' + nDbNumber
                   + '( number INT , quizword TEXT, answer TEXT, state INT)')
 
@@ -1228,6 +1251,12 @@ function resetQuiz() {
                             })
   }
 
+
+  /*
+  nQuizIndex1_3 = 1
+  nLastQuizIndex1_3 = -1
+  idWindow.oTakeQuiz.resetQuizView()
+*/
   assignQuizModelAll()
 }
 
@@ -1319,7 +1348,7 @@ function updateQuiz() {
     glosModel.get(idGlosList.currentIndex).question = sQ
     glosModel.get(idGlosList.currentIndex).answer = sA_Org
     glosModel.get(idGlosList.currentIndex).extra = sE
-    updateDesc1(idWindow.sQuizDesc)
+    updateDesc1()
   }
 
   glosModel.get(idGlosList.currentIndex).state1 = nState
@@ -1361,10 +1390,6 @@ function updateDbWithWordState(nLastNumber) {
   })
 }
 
-function Timer() {
-  return Qt.createQmlObject("import QtQuick 2.0; Timer {}", idWindow)
-}
-
 function checkAndReplace(nNumberDb, nReplaceWidthIndexInWorking) {
   for (var i = 0; i < 3; ++i) {
     if (idQuizModel.get(i).numberDb === nNumberDb) {
@@ -1373,16 +1398,55 @@ function checkAndReplace(nNumberDb, nReplaceWidthIndexInWorking) {
   }
 }
 
+function assignOneWorkingItem() {
+  for (var i = 0; i < 3; ++i) {
+    assignQuizModel(0, i)
+  }
+}
+
+function assignTwoWorkingItems() {
+  var nNumber = idQuizModel.get(nQuizIndex1_3).numberDb
+  // Get index in working set for the glosa not shown in QuizView (PathView)
+  // assign that to all hidden items ( 2 items )
+  // This shoul avoid user visible updates
+  var ii = (MyDownloader.indexFromGlosNr(glosModelWorking, nNumber) + 1) % 2
+  for (var i = 0; i < 3; ++i) {
+    if (nQuizIndex1_3 === i)
+      continue
+    assignQuizModel(ii, i)
+  }
+}
+
+function isInQuizModel(jIndexWorking) {
+  var nNumber = glosModelWorking.get(jIndexWorking).number
+  for (var i = 0; i < 3; ++i) {
+    if (idQuizModel.get(i).numberDb === nNumber)
+      return true
+  }
+  return false
+}
+
+function assignThreeWorkingItem() {
+  if (idQuizModel.bDir > 0)
+    return
+  for (var i = 0; i < 3; ++i) {
+    if (!isInQuizModel(i)) {
+      assignQuizModel(i, nLastQuizIndex1_3)
+      break
+    }
+  }
+}
+
 function assigNextQuizWord() {
 
-  //nQuizIndex1_3 the index of the view with 3 items that swipes left or right
   var nLastNumber = idQuizModel.get(nLastQuizIndex1_3).numberDb
+
   if (idQuizModel.bDir === -1) {
     var i = nLastQuizIndex1_3
     var ii = MyDownloader.indexFromGlosNr(glosModelWorking, nLastNumber)
-    if (ii >= 0)
+    if (ii >= 0) {
       glosModelWorking.remove(ii)
-    else {
+    } else {
       console.log("not found in working model " + nLastNumber + " "
                   + glosModelWorking.count + " " + idQuizModel.get(i).question)
     }
@@ -1394,7 +1458,7 @@ function assigNextQuizWord() {
       idQuizModel.get(i).answer = ""
       idQuizModel.get(i).question = ""
       idQuizModel.get(i).extra = ""
-      idQuizModel.get(i).numberDb = 0
+      idQuizModel.get(i).numberDb = -1
     }
 
     sScoreText = glosModelWorking.count + "/" + glosModel.count
@@ -1410,38 +1474,30 @@ function assigNextQuizWord() {
     return
   }
 
-  while (glosModelWorking.count > 3) {
-    var nIndexNewWordInModelWorking = Math.floor(Math.random(
-                                                   ) * glosModelWorking.count)
-    var nNumberOfNewWord = glosModelWorking.get(
-          nIndexNewWordInModelWorking).number
-    var Found = 0
-    for (i = 0; i < 3; ++i) {
-      if (idQuizModel.get(i).numberDb === nNumberOfNewWord) {
-        console.log("Found " + i)
-        Found = 1
-        break
-      }
-    }
-    if (Found === 0)
-      break
-  }
+  if (glosModelWorking.count > 3) {
+    for (; ; ) {
+      var nIndexNewWordInModelWorking = Math.floor(Math.random(
+                                                     ) * glosModelWorking.count)
+      var nNumberOfNewWord = glosModelWorking.get(
+            nIndexNewWordInModelWorking).number
+      var Found = 0
 
-  if (glosModelWorking.count === 1) {
-    assignQuizModel(0, 0)
-    assignQuizModel(0, 1)
-    assignQuizModel(0, 2)
-  } else if (glosModelWorking.count === 2) {
-    assignQuizModel(0, 0)
-    assignQuizModel(1, 1)
-    assignQuizModel(1, 2)
-  } else if (glosModelWorking.count === 3) {
-    assignQuizModel(0, 0)
-    assignQuizModel(1, 1)
-    assignQuizModel(2, 2)
-  } else {
+      for (i = 0; i < 3; ++i) {
+        if (idQuizModel.get(i).numberDb === nNumberOfNewWord) {
+          Found = 1
+          break
+        }
+      }
+      if (Found === 0)
+        break
+    }
     assignQuizModel(nIndexNewWordInModelWorking, nLastQuizIndex1_3)
-  }
+  } else if (glosModelWorking.count === 3)
+    assignThreeWorkingItem()
+  else if (glosModelWorking.count === 2)
+    assignTwoWorkingItems()
+  else
+    assignOneWorkingItem()
 
   idWindow.nGlosaTakeQuizIndex = MyDownloader.indexFromGlosNr(
         glosModel, idQuizModel.get(nQuizIndex1_3).numberDb)

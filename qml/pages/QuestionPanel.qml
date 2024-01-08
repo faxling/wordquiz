@@ -23,7 +23,6 @@ Flipable {
 
     ButtonQuizImg {
       id: idTextBtn
-      visible: !allok
       anchors.right: parent.right
       anchors.rightMargin: 20
       anchors.top: parent.top
@@ -35,7 +34,6 @@ Flipable {
 
     ButtonQuizImg {
       id: idVoiceModeBtn
-      visible: !allok
       anchors.left: parent.left
       anchors.leftMargin: 20
       anchors.top: idInfoBtn.bottom
@@ -47,7 +45,7 @@ Flipable {
 
     ButtonQuizImg {
       id: idImgBtn
-      visible: !allok && imgUrl !== "image://theme/icon-m-file-image"
+      visible: imgUrl !== "image://theme/icon-m-file-image"
       anchors.right: parent.right
       anchors.rightMargin: 20
       anchors.top: idTextBtn.bottom
@@ -76,7 +74,7 @@ Flipable {
 
       y: 50
       anchors.horizontalCenter: parent.horizontalCenter
-      visible: bTextMode && (!allok)
+      visible: bTextMode
       width: parent.width - 150
       labelVisible: false
       placeholderText: "your answer"
@@ -87,7 +85,6 @@ Flipable {
       }
     }
     ButtonQuizImg {
-      visible: !allok
       anchors.right: parent.right
       anchors.rightMargin: 20
       width: Theme.itemSizeExtraSmall
@@ -102,7 +99,7 @@ Flipable {
       spacing: 20
       anchors.horizontalCenter: parent.horizontalCenter
       y: parent.height / 4.5
-      visible: !allok
+
       // && (idWindow.nQuizIndex === index)
       Image {
         id: idWordImage
@@ -111,8 +108,7 @@ Flipable {
         width: 500
         fillMode: Image.PreserveAspectFit
         anchors.horizontalCenter: parent.horizontalCenter
-        visible: !allok && bImageMode
-                 && imgUrl !== "image://theme/icon-m-file-image"
+        visible: bImageMode && imgUrl !== "image://theme/icon-m-file-image"
         // && MyDownloader.hasImg
         source: imgUrl
       }
@@ -141,17 +137,12 @@ Flipable {
         }
       }
     }
-
-    Image {
-      visible: allok
-      anchors.centerIn: parent
-      source: "qrc:qml/pages/thumb.png"
-    }
   }
 
   back: QuestionPanelRect {
 
     Column {
+      visible: !allok
       y: parent.height / 4.5
       spacing: 20
       anchors.horizontalCenter: parent.horizontalCenter
@@ -182,6 +173,11 @@ Flipable {
         onClicked: MyDownloader.playWord(answer, sAnswerLang)
       }
     }
+    Image {
+      visible: allok
+      anchors.centerIn: parent
+      source: "qrc:qml/pages/thumb.png"
+    }
   }
 
   transform: Rotation {
@@ -200,7 +196,7 @@ Flipable {
       target: rotation
       angle: 180
     }
-    when: answerVisible
+    when: answerVisible || allok
   }
 
   transitions: Transition {

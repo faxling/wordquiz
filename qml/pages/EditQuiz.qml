@@ -68,7 +68,7 @@ Item {
                 + (focus ? Theme.highlightColor : Theme.primaryColor)
         onClicked: {
           focus = true
-          sSearchQuery = idTextInput.text
+          // sSearchQuery = idTextInput.text
           MyDownloader.toClipBoard(idTextInput.text)
         }
       }
@@ -91,7 +91,7 @@ Item {
                 + (focus ? Theme.highlightColor : Theme.primaryColor)
         onClicked: {
           focus = true
-          sSearchQuery = idTextInput2.text
+          // sSearchQuery = idTextInput2.text
           MyDownloader.toClipBoard(idTextInput2.text)
         }
       }
@@ -238,6 +238,9 @@ Item {
         text: "Question"
         onClick: {
           bQSort = true
+          if (bQSort)
+            bDESC = !bDESC
+
           QuizLib.sortModel()
         }
       }
@@ -248,15 +251,19 @@ Item {
         width: n25BtnWidth
         text: "Answer"
         onClick: {
+          if (!bQSort)
+            bDESC = !bDESC
           bQSort = false
+
           QuizLib.sortModel()
         }
       }
     }
     ListViewHi {
       id: idGlosList
-      height: idEditQuiz.height - idDictRow.height - idBtnRow.height * 4
-              - idTextInput.height - idHeader1Text.height
+      property double nScreenQuote: Screen.height === idWindow.height ? 4 : 2.5
+      height: idEditQuiz.height - idDictRow.height - idTextInput.height
+              - idHeader1Text.height - idBtnRow.height * nScreenQuote
 
       width: parent.width
       spacing: 3
@@ -265,6 +272,7 @@ Item {
       }
       model: glosModel
       delegate: Row {
+
         spacing: 5
         property bool hasImg: MyDownloader.hasImage(question, sFromLang)
         TextList {
@@ -322,6 +330,28 @@ Item {
           source: "qrc:qml/pages/horn.png"
           onClicked: MyDownloader.playWord(answer, sToLang)
         }
+      }
+    }
+  }
+
+  Row {
+    id: idLowerButtonRow
+    y: Screen.height - 450
+    spacing: 10
+    ButtonQuiz {
+      id: idResetBtn
+      text: "Reset"
+      onClicked: {
+        idGlosState.checked = false
+        QuizLib.resetQuiz()
+      }
+    }
+
+    ButtonQuiz {
+      id: idReverseBtn
+      text: "Reverse"
+      onClicked: {
+        QuizLib.reverseQuiz()
       }
     }
   }
@@ -435,27 +465,6 @@ Item {
       text: "Delete"
       onClicked: {
         QuizLib.deleteWordInQuiz()
-      }
-    }
-  }
-  Row {
-    id: idLowerButtonRow
-    y: Screen.height - 450
-    spacing: 10
-    ButtonQuiz {
-      id: idResetBtn
-      text: "Reset"
-      onClicked: {
-        idGlosState.checked = false
-        QuizLib.resetQuiz()
-      }
-    }
-
-    ButtonQuiz {
-      id: idReverseBtn
-      text: "Reverse"
-      onClicked: {
-        QuizLib.reverseQuiz()
       }
     }
   }
