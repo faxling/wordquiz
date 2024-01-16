@@ -63,8 +63,7 @@ Item {
         width: n3BtnWidth
         text: ""
         onClicked: {
-          idExport.visible = true
-          idExportError.visible = false
+          QuizLib.showUpploadDlg()
         }
         Image {
           anchors.centerIn: parent
@@ -179,19 +178,19 @@ Item {
       TextList {
         id: idHeader1Text
         color: "steelblue"
-        font.bold: parent.nSortRole === 0
+        font.bold: idTextAvailable.nSortRole === 0
         width: n4BtnWidth * 2
         text: "Name"
         property bool bSortAsc
-        onClick: QuizLib.sortOn(0, this)
+        onClick: QuizLib.sortQuizModel(0, this)
       }
 
       TextList {
         color: "steelblue"
-        font.bold: parent.nSortRole === 1
+        font.bold: idTextAvailable.nSortRole === 1
         property bool bSortAsc
         text: "Lang keys"
-        onClick: QuizLib.sortOn(1, this)
+        onClick: QuizLib.sortQuizModel(1, this)
       }
     }
 

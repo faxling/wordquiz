@@ -71,8 +71,7 @@ RectRounded {
     anchors.topMargin: 15
     InputTextQuizSilicaEx {
       id: idTextEdit1
-      placeholderText: "Filter on name and lang (eg en_)"
-
+      placeholderText: "Filter on name and lang (eg en-)"
       onDisplayTextChanged: {
         MyDownloader.setFilterQList(displayText)
       }

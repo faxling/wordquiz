@@ -13,6 +13,7 @@ Item {
   function newQ() {
     idDrawing.setColor(Theme.secondaryColor)
     QuizLib.hangNewQ()
+    QuizLib.hangAddWord()
   }
   Component {
     id: idChar
@@ -69,7 +70,9 @@ Item {
     anchors.rightMargin: 20
     spacing: 10
   }
-  // @disable-check M301
+
+
+  /*
   ButtonQuiz {
     id: idHangBtn
     width: n25BtnWidth
@@ -81,11 +84,10 @@ Item {
       visible = !visible
     }
   }
+  */
   Image {
     id: idFlagImg
-    visible: idHangBtn.visible
-    anchors.top: idHangBtn.bottom
-    anchors.topMargin: 20
+    anchors.centerIn: parent
     anchors.horizontalCenter: parent.horizontalCenter
   }
   MouseArea {
@@ -94,6 +96,8 @@ Item {
     onClicked: {
       bIsReverseHang = !bIsReverseHang
       QuizLib.hangUpdateImage()
+      idDrawing.renderId(1)
+      QuizLib.hangAddWord()
     }
   }
 
@@ -110,7 +114,7 @@ Item {
     anchors.top: idOrdRow.bottom
     anchors.topMargin: 20
     x: 20
-    visible: !idHangBtn.visible
+    //  visible: !idHangBtn.visible
     height: idHangBtn2.height
     width: idHangBtn2.width
     property alias text: idT.text
@@ -147,7 +151,7 @@ Item {
     width: height
     anchors.left: idCharRect.right
     anchors.leftMargin: 10
-    visible: !idHangBtn.visible
+    //visible: !idHangBtn.visible
     source: "image://theme/icon-m-enter"
     onClicked: {
       QuizLib.hangEnterChar()
@@ -160,7 +164,7 @@ Item {
     anchors.left: idCharRect.left
     anchors.topMargin: 10
     anchors.top: idCharRect.bottom
-    visible: !idHangBtn.visible
+    // visible: !idHangBtn.visible
     source: "image://theme/icon-m-keyboard"
     onClicked: {
       Qt.inputMethod.show()
@@ -180,7 +184,7 @@ Item {
 
   ButtonQuiz {
     id: idHangBtn5
-    visible: !idHangBtn.visible
+    //  visible: !idHangBtn.visible
     width: n4BtnWidth / nBtnWidthQuote
     anchors.right: idHangBtn3.left
     anchors.rightMargin: 20
@@ -196,7 +200,7 @@ Item {
   ButtonQuiz {
     id: idHangBtn3
     width: n4BtnWidth / nBtnWidthQuote
-    visible: !idHangBtn.visible
+    //visible: !idHangBtn.visible
     property bool bAV: false
     anchors.right: idHangBtn4.left
     anchors.rightMargin: 20
@@ -214,7 +218,7 @@ Item {
     id: idHangBtn4
     width: idHangBtn3.height
     height: idHangBtn3.height
-    visible: !idHangBtn.visible
+    // visible: !idHangBtn.visible
     anchors.right: idSoundBtn.left
     anchors.rightMargin: 20
     anchors.bottom: parent.bottom
@@ -223,13 +227,14 @@ Item {
     onClicked: {
       idDrawing.setColor(Theme.secondaryColor)
       idDrawing.renderId(1)
+      idFlagImg.visible = true
       QuizLib.hangAddWord()
     }
   }
 
   ButtonQuizImg {
     id: idSoundBtn
-    visible: !idHangBtn.visible
+    //visible: !idHangBtn.visible
     width: idHangBtn3.height
     height: idHangBtn3.height
     anchors.right: parent.right

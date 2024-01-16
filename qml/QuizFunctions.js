@@ -105,7 +105,7 @@ function hangNewQ() {
   hangClearThings()
   idDrawing.renderId(1)
   hangUpdateImage()
-  idHangBtn.visible = true
+  idFlagImg.visible = true
 }
 
 function hangAddWord() {
@@ -181,6 +181,7 @@ function hangCheckChar(sChar) {
 }
 
 function hangEnterChar() {
+  idFlagImg.visible = false
   Qt.inputMethod.hide()
   if (idCharRect.text === " " || idCharRect.text === "")
     return
@@ -299,10 +300,37 @@ Array.prototype.indexOfObject = function arrayObjectIndexOf(property, value) {
   return -1
 }
 
-function sortModel() {
+// Sorts the questions and answer in the selected quiz
+function sortQuestionModel(nSortRoleIn, nOrder) {
+
+  if (nSortRoleIn === nQuizSortRole)
+    nOrder.bSortAsc = !nOrder.bSortAsc
+  else
+    nQuizSortRole = nSortRoleIn
+
+  bDESC = nOrder.bSortAsc
+
   db.readTransaction(function (tx) {
     QuizLib.loadFromDb(tx, 1)
   })
+}
+
+// Sorts the list of aviable quizes
+// Sort role 0 Name 1 lang
+function sortQuizModel(nSortRoleIn, nOrder) {
+  if (idTextAvailable.nSortRole === nSortRoleIn)
+    nOrder.bSortAsc = !nOrder.bSortAsc
+  else
+    idTextAvailable.nSortRole = nSortRoleIn
+
+  if (idQuizList.currentItem !== null)
+    var j = idQuizList.currentItem.nNumber
+
+  idQuizList.currentIndex = -1
+  MyDownloader.sortQuizModel(idTextAvailable.nSortRole, nOrder.bSortAsc)
+
+  if (j !== undefined)
+    idQuizList.currentIndex = MyDownloader.indexFromGlosNr(glosModelIndex, j)
 }
 
 function setAnswerVisible() {
@@ -367,10 +395,13 @@ function reqTranslation(oBtnIn, bIsSecond) {
 }
 
 function openWwwPage(sUrl, sTitle) {
-  pageStack.push("pages/WikiView.qml", {
-                   "url": sUrl,
-                   "sTitle": sTitle
-                 })
+  if (typeof pageStack === "undefined") {
+    MyDownloader.openUrl(sUrl)
+  } else
+    pageStack.push("pages/WikiView.qml", {
+                     "url": sUrl,
+                     "sTitle": sTitle
+                   })
 }
 
 function openManPage() {
@@ -402,6 +433,11 @@ function lookUppInWiki() {
   openWwwPage(sUrl, sLang + " Wiktionary on \"" + oInText + "\"")
 }
 
+function showUpploadDlg() {
+  idExport.visible = true
+  idTextInputQuizDesc.text = idWindow.sQuizDesc
+  idExportError.visible = false
+}
 function updateDesc1(sDesc) {
 
   // var nCurIndexInQList = idWindow.quizListView.currentIndex
@@ -579,7 +615,7 @@ function getAndInitDb() {
    };
    */
     // Role 0 = Name 1 = Lang
-    MyDownloader.sortOn(0, 0)
+    MyDownloader.sortQuizModel(0, 0)
 
     // Set to last assigned Quiz
     if (idWindow.quizListView !== undefined) {
@@ -825,19 +861,6 @@ function loadFromDb(tx, nSelectFromCurrentIndex) {
     idWindow.nGlosaTakeQuizIndex = -1
     idWindow.glosListView.currentIndex = -1
   }
-}
-
-// Sort role 0 Name 1 lang
-function sortOn(nSortRoleIn, nOrder) {
-  idTextAvailable.nSortRole = nSortRoleIn
-  nOrder.bSortAsc = !nOrder.bSortAsc
-  if (idQuizList.currentItem !== null)
-    var j = idQuizList.currentItem.nNumber
-
-  MyDownloader.sortOn(idTextAvailable.nSortRole, nOrder.bSortAsc)
-
-  if (j !== undefined)
-    idQuizList.currentIndex = MyDownloader.indexFromGlosNr(glosModelIndex, j)
 }
 
 function renameQuiz(sQuizName) {
@@ -1402,6 +1425,11 @@ function assignOneWorkingItem() {
   for (var i = 0; i < 3; ++i) {
     assignQuizModel(0, i)
   }
+  var nLeftItem = nQuizIndex1_3 - 1
+  if (nLeftItem < 0)
+    nLeftItem = 2
+
+  idQuizModel.get(nLeftItem).question = ""
 }
 
 function assignTwoWorkingItems() {

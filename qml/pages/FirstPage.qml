@@ -41,10 +41,13 @@ Page {
   property int n25BtnWidth: idTabMain.width / 2.4 - 7
   property int n2BtnWidth: idTabMain.width / 2
   property int nDlgHeight: idWindow.height / 5 + 45
-  property bool bQSort: true
+
+  // Sorting 0 Question 1 Answer
+  property int nQuizSortRole: 0
   property bool bDESC: true
-  property string sQSort: bQSort ? "UPPER(quizword)" : "UPPER(answer)"
+  property string sQSort: nQuizSortRole === 0 ? "UPPER(quizword)" : "UPPER(answer)"
   property string sDESCASC: bDESC ? " DESC " : " ASC "
+
   property variant glosListView
   property variant quizListView
   property variant oTakeQuiz
@@ -191,7 +194,7 @@ Page {
           source: "image://theme/icon-m-search"
           onClicked: {
             var sSearchQuery = MyDownloader.fromClipBoard()
-            if (sSearchQuery.length > 3)
+            if (sSearchQuery.length > 1)
 
               QuizLib.openWwwPage(
                     "https://www.google.com/search?q=" + sSearchQuery,

@@ -67,7 +67,7 @@ Item {
         source: "image://theme/icon-s-clipboard?"
                 + (focus ? Theme.highlightColor : Theme.primaryColor)
         onClicked: {
-          focus = true
+          // focus = true
           // sSearchQuery = idTextInput.text
           MyDownloader.toClipBoard(idTextInput.text)
         }
@@ -90,7 +90,7 @@ Item {
         source: "image://theme/icon-s-clipboard?"
                 + (focus ? Theme.highlightColor : Theme.primaryColor)
         onClicked: {
-          focus = true
+          //focus = true
           // sSearchQuery = idTextInput2.text
           MyDownloader.toClipBoard(idTextInput2.text)
         }
@@ -233,29 +233,23 @@ Item {
       TextList {
         id: idHeader1Text
         color: "steelblue"
-        font.bold: bQSort
+        font.bold: nQuizSortRole === 0
         width: n3BtnWidth
         text: "Question"
+        property bool bSortAsc: true
         onClick: {
-          bQSort = true
-          if (bQSort)
-            bDESC = !bDESC
-
-          QuizLib.sortModel()
+          QuizLib.sortQuestionModel(0, this)
         }
       }
 
       TextList {
         color: "steelblue"
-        font.bold: !bQSort
+        font.bold: nQuizSortRole === 1
         width: n25BtnWidth
         text: "Answer"
+        property bool bSortAsc: true
         onClick: {
-          if (!bQSort)
-            bDESC = !bDESC
-          bQSort = false
-
-          QuizLib.sortModel()
+          QuizLib.sortQuestionModel(1, this)
         }
       }
     }

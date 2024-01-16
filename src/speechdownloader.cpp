@@ -39,21 +39,43 @@
 
 // https://dictionary.yandex.net/api/v1/dicservice/getLangs?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478.20679d5d18a62fa88bd53b643af2dee64416b739
 
-#define GLOS_SERVER2 "http://212.112.183.157/glosquiz"
+#define GLOS_SERVER2 "http://mss7000.com/glosquiz/"
 
 static const QString GLOS_SERVER1("http://192.168.2.1");
 
-// Känns som det går att hitta någon bättre
-class Enc
+struct EncUrl
 {
-public:
-  const char* operator()(const QString& s)
+  operator QUrl()
   {
-    oR = QUrl::toPercentEncoding(s);
-    return oR.constData();
+    QByteArray ocRet = oc;
+    oc.clear();
+    return QUrl::fromEncoded(ocRet);
   }
-  QByteArray oR;
+
+  EncUrl& operator<<(const QString& s)
+  {
+    oc.append(QUrl::toPercentEncoding(s));
+    return *this;
+  }
+  EncUrl& operator<<(const char* sz)
+  {
+    oc.append(sz);
+    return *this;
+  }
+  EncUrl& operator<<(int n)
+  {
+    char sz[20];
+    sprintf(sz, "%d", n);
+    oc.append(QByteArray(sz));
+    return *this;
+  }
+  QByteArray oc;
 };
+
+namespace
+{
+  EncUrl url;
+}
 
 Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject* pParent) : QObject(pParent)
 {
@@ -497,7 +519,6 @@ void Speechdownloader::playWord(QString sWord, QString sLang)
   else
   {
     m_bPlayAfterDownload = true;
-    qDebug() << "Download " << sWord;
     downloadWord(sWord, sLang);
   }
 }
@@ -545,8 +566,8 @@ void Speechdownloader::downloadWord(QString sWord, QString sLang)
 
 void Speechdownloader::listQuizLang(QString sLang)
 {
-  QString sUrl = QString::asprintf(GLOS_SERVER2 "/quizlist_lang.php?qlang=%s", Enc()(sLang));
-  QNetworkRequest request(sUrl);
+  url << GLOS_SERVER2 "quizlist_lang.php?qlang=" << sLang;
+  QNetworkRequest request(url);
   m_oListQuizNetMgr.get(request);
 }
 
@@ -593,7 +614,7 @@ static int QUIZNUMBER = -1;
 static int QUIZNAME = -1;
 static int LANGPAIR = -1;
 
-void Speechdownloader::sortOn(int nRole, int sortOrder)
+void Speechdownloader::sortQuizModel(int nRole, int sortOrder)
 {
   if (nRole == 0)
     m_pOLSortFilterProxyModel->setSortRole(QUIZNAME);
@@ -686,14 +707,13 @@ QObject* Speechdownloader::setFilterProxy(QObject* pModel)
 
 void Speechdownloader::listQuiz()
 {
-  QNetworkRequest request(QUrl(GLOS_SERVER2 "/quizlist.php"));
+  QNetworkRequest request(QUrl(GLOS_SERVER2 "quizlist.php"));
   m_oListQuizNetMgr.get(request);
 }
 
 void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
 {
   m_oDownloadedData = pReply->readAll();
-
   QObject* p0 = qvariant_cast<QObject*>(pReply->property("progressIndicator"));
   p0->setProperty("visible", false);
 
@@ -753,10 +773,9 @@ void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
 
 void Speechdownloader::deleteQuiz(QString sName, QString sPwd, int nDbId)
 {
-  QString sUrl = QString::asprintf(GLOS_SERVER2 "/deletequiz.php?qname=%s&qpwd=%s&dbid=%d",
-                                   Enc()(sName), Enc()(sPwd), nDbId);
-
-  QNetworkRequest request(sUrl);
+  url << GLOS_SERVER2 << "deletequiz.php?qname=" << sName << "&qpwd=" << sPwd
+       << "&dbid=" << nDbId;
+  QNetworkRequest request(url);
   m_oDeleteQuizNetMgr.get(request);
 }
 
@@ -770,8 +789,11 @@ void Speechdownloader::loadProgressSlot(qint64 bytes, qint64 bytesTotal)
 
 void Speechdownloader::importQuiz(QString sName, QObject* pProgressIndicator)
 {
-  QString sUrl = QString::asprintf(GLOS_SERVER2 "/quizload.php?qname=%s", Enc()(sName + ".txt"));
-  QNetworkRequest request(sUrl);
+//  QString sUrl = QString::asprintf(GLOS_SERVER2 "/quizload.php?qname=%s", Enc()(sName + ".txt"));
+
+  url << GLOS_SERVER2 << "quizload.php?qname=" << sName << ".txt";
+
+  QNetworkRequest request(url);
   QNetworkReply* pNR = m_oQuizNetMgr.get(request);
   pNR->setProperty("progressIndicator", QVariant::fromValue(pProgressIndicator));
   pProgressIndicator->setProperty("progress", 0);
@@ -779,7 +801,6 @@ void Speechdownloader::importQuiz(QString sName, QObject* pProgressIndicator)
   QObject::connect(pNR, &QNetworkReply::downloadProgress, this,
                    &Speechdownloader::loadProgressSlot);
 }
-
 
 QString Speechdownloader::fromClipBoard()
 {
@@ -790,7 +811,6 @@ void Speechdownloader::toClipBoard(QString s)
 {
   QGuiApplication::clipboard()->setText(s);
 }
-
 
 void Speechdownloader::updateCurrentQuiz(QVariant p, QString sName, QString sLang, QString sPwd,
                                          QString sDesc, QObject* pProgressIndicator)
@@ -906,12 +926,19 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
     ss << oF.readAll();
     oF.close();
   };
+  /*
   QString sUrl =
       QString::asprintf(GLOS_SERVER2 "/%s.php?qname=%s&slang=%s&qcount=%d&desc1=%s&pwd=%s",
                         Enc()(sCmd), Enc()(sName), Enc()(sLang), nC, Enc()(sDesc), Enc()(sPwd));
-  // qDebug() << "Cmd to glosserver " << sCmd << " size " << ocArray.size();
+
+                        */
+
+  url << GLOS_SERVER2  << sCmd << ".php?qname=" << sName << "&slang=" << sLang << "&qcount=" << nC
+      << "&desc1=" << sDesc << "&pwd=" << sPwd;
+
+//  qDebug() << "Cmd to glosserver " << sCmd << " size " << ocArray.size();
   ss.setVersion(2);
-  QNetworkRequest request(sUrl);
+  QNetworkRequest request(url);
   request.setRawHeader("Content-Type", "application/octet-stream");
   request.setRawHeader("Content-Length", QByteArray::number(ocArray.size()));
   QNetworkReply* pNR = m_oQuizExpNetMgr.post(request, ocArray);

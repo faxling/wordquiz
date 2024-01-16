@@ -45,7 +45,7 @@ public:
       AscendingOrder = 0
       DescendingOrder = 1
   */
-  Q_INVOKABLE void sortOn(int nRole, int nOrder);
+  Q_INVOKABLE void sortQuizModel(int nRole, int nOrder);
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void listQuizLang(QString sLang);
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, int nDbId);
