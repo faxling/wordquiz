@@ -59,12 +59,13 @@ Flipable {
 
       ButtonQuizImg {
         id: idImgBtn
-        visible: imgUrl !== "image://theme/icon-m-file-image"
+        bgColorDefault: imgUrl === "image://theme/icon-m-file-image"
         anchors.right: parent.right
         anchors.rightMargin: 20
         anchors.top: idTextBtn.bottom
         anchors.topMargin: 20
         source: "image://theme/icon-m-image?"
+                + (bImageMode ? Theme.highlightColor : Theme.primaryColor)
         onClicked: bImageMode = !bImageMode
       }
 

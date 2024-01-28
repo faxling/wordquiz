@@ -10,21 +10,21 @@ private:
   //  typedef typename T::iterator IterT; does not compile
   typedef decltype(p->begin()) IterT;
   typedef decltype(*p->begin()) ValT;
-  IterT m_iterLast;
+ //  IterT m_iterLast;
   IterT m_iterEnd;
 
 public:
   class B {
     int m_index;
     IterT m_iter;
-    IterT m_iterLast;
+   // IterT m_iterLast;
     IterT m_iterEnd;
 
   public:
     B(IterT b, IterT c) : m_iter(b) {
       m_index = 0;
-      m_iterLast = c;
-      ++c;
+     //  m_iterLast = c;
+      // ++c;
       m_iterEnd = c;
     }
 
@@ -40,23 +40,25 @@ public:
     B& operator++() {
       // std::cout << "++";
       ++m_index;
-      ++m_iter;
+      std::advance(m_iter,1);
       return *this;
     }
     B& operator--() {
       // std::cout << "--";
       --m_index;
-      --m_iter;
+      std::advance(m_iter,-1);
       return *this;
     }
     IterT& iter() { return m_iter; }
     const IterT& iter() const { return m_iter; }
-    typename T::iterator& iterLast() const { return m_iterLast; }
+    // typename T::iterator& iterLast() const { return m_iterLast; }
     ValT& val() { return *m_iter; }
 
     auto& key() { return m_iter.key(); }
     int index() { return m_index; }
-    bool isLast() { return m_iterLast == m_iter; }
+    bool isLast() {
+      return ((m_iter + 1) ==   m_iterEnd);
+    }
 
   private:
   };
@@ -64,33 +66,30 @@ public:
   A(T* _p) : p(_p) {
     auto oI = p->end();
     m_iterEnd = oI;
-    if (oI != p->begin())
-      --oI;
-    m_iterLast = oI;
   }
 
   A(T* _p, int fromend) : p(_p) {
     auto oI = p->end();
-    for (int i = 0; i <= fromend; ++i)
-      --oI;
-    m_iterLast = oI;
-    ++oI;
+    for (int i = 0; i < fromend; ++i)
+      std::advance(oI,-1);;
+   //  m_iterLast = oI;
+  //  ++oI;
     m_iterEnd = oI;
   }
 
   A(T* _p, typename T::iterator iterLast) : p(_p) {
-    m_iterLast = iterLast;
+   //  m_iterLast = iterLast;
     ++iterLast;
     m_iterEnd = iterLast;
   }
 
   B begin() {
     p->begin();
-    B o(p->begin(), m_iterLast);
+    B o(p->begin(), m_iterEnd);
     return o;
   }
 
-  B end() { return B(m_iterEnd, m_iterLast); }
+  B end() { return B(m_iterEnd, m_iterEnd); }
 
   auto& last() { return *(m_iterEnd); }
 };

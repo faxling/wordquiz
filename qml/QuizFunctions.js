@@ -346,7 +346,7 @@ function toggleAnswerVisible() {
 function resetTakeQuizTab() {
   if (idWindow.oTakeQuiz !== undefined) {
     idWindow.oTakeQuiz.bExtraInfoVisible = false
-    idWindow.oTakeQuiz.bImageMode = false
+
     var nC = idQuizModel.count
     for (var i = 0; i < nC; ++i) {
       idQuizModel.get(i).answerVisible = false
@@ -932,7 +932,7 @@ function loadFromQuizList() {
   })
 
   idTextSelected.text = sQuizName
-
+  idWindow.oTakeQuiz.bImageMode = false
   resetTakeQuizTab()
 }
 
@@ -1329,9 +1329,10 @@ function updateQuiz() {
         setAllok(false)
         assignOneWorkingItem()
       } else if (glosModelWorking.count === 2) {
-        resetTakeQuizTab()
-        setAllok(false)
         assignTwoWorkingItems()
+      }
+      if (glosModelWorking.count === 3) {
+        assignThreeUpdatedWorkingItem()
       }
     }
   }
@@ -1430,6 +1431,16 @@ function isInQuizModel(jIndexWorking) {
       return true
   }
   return false
+}
+
+function assignThreeUpdatedWorkingItem() {
+  for (var i = 0; i < 3; ++i) {
+    if (!isInQuizModel(i)) {
+      for (var j = 0; j < 3; ++j)
+        if (assignQuizModelUnique(i, j))
+          break
+    }
+  }
 }
 
 function assignThreeWorkingItem() {

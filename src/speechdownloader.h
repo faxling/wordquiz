@@ -75,12 +75,12 @@ public:
   Q_INVOKABLE QString removeDiacritics(QString str);
   Q_INVOKABLE bool hasImage(QString sWord, QString sLang);
   Q_INVOKABLE QUrl imageSrc(QString sWord, QString sLang);
-  Q_INVOKABLE void setImgWord(QString sWord, QString sLang);
-  void checkAndEmit(QString sPath1, QString sPath2);
-  Q_INVOKABLE void setImgFile(QString sWord, QString sLang, QString sWord2, QString sLang2,
-                              QString sImgFilePath);
-  Q_PROPERTY(QUrl urlImg READ urlImg NOTIFY urlImgChanged)
-  Q_PROPERTY(bool hasImg READ hasImg NOTIFY hasImgChanged)
+ // Q_INVOKABLE void setImgWord(QString sWord, QString sLang);
+ //  void checkAndEmit(QString sPath1, QString sPath2);
+ //Q_INVOKABLE void setImgFile(QString sWord, QString sLang, QString sWord2, QString sLang2,
+ //                              QString sImgFilePath);
+  // Q_PROPERTY(QUrl urlImg READ urlImg NOTIFY urlImgChanged)
+ // Q_PROPERTY(bool hasImg READ hasImg NOTIFY hasImgChanged)
   Q_INVOKABLE QString dateStr();
   Q_INVOKABLE double rand();
   Q_INVOKABLE void showKey(bool b);
@@ -97,12 +97,12 @@ signals:
   void downloadedImgSignal();
   void exportedSignal(int nResponce);
   void deletedSignal(int nResponce);
-  void hasImgChanged();
-  void urlImgChanged();
+//  void hasImgChanged();
+ // void urlImgChanged();
 
 private:
-  QUrl urlImg();
-  bool hasImg();
+  //QUrl urlImg();
+  // bool hasImg();
   void quizDownloaded(QNetworkReply* pReply);
   void listDownloaded(QNetworkReply* pReply);
   void quizExported(QNetworkReply* pReply);
@@ -144,7 +144,7 @@ private:
   StopWatch* m_pStopWatch;
   QUrl m_oImgUrl;
   QString m_sImgPath;
-  bool m_bHasImg = false;
+//  bool m_bHasImg = false;
 };
 
 #endif // SPEECHDOWNLOADER_H

@@ -62,7 +62,7 @@ struct EncUrl
 
   EncUrl& operator<<(const char* sz)
   {
-    int n = strlen(sz);
+    size_t n = strlen(sz);
     if (sz[n-1] != '=')
     {
       oc.append(sz);
@@ -219,7 +219,7 @@ QString Speechdownloader::dateStr()
   wcsftime(szStr, 20, szFormat, localtime(&tNow));
   return QString::fromWCharArray(szStr);
 }
-
+/*
 void Speechdownloader::setImgWord(QString sWord, QString sLang)
 {
   m_sImgPath = ImgPath(sWord, sLang);
@@ -238,7 +238,7 @@ void Speechdownloader::setImgWord(QString sWord, QString sLang)
 
   emit urlImgChanged();
 }
-
+*/
 // Try Select image from both languages in a pair
 QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
 {
@@ -269,7 +269,7 @@ QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
   GetImg(sWord, oc[1],oRet);
   return oRet;
 }
-
+/*
 void Speechdownloader::checkAndEmit(QString sPath1, QString sPath2)
 {
   if (m_sImgPath == sPath1 || m_sImgPath == sPath2)
@@ -288,7 +288,10 @@ void Speechdownloader::checkAndEmit(QString sPath1, QString sPath2)
     emit urlImgChanged();
   }
 }
+*/
 
+
+/*
 void Speechdownloader::setImgFile(QString sWord, QString sLang, QString sWord2, QString sLang2,
                                   QString sImgFilePath)
 {
@@ -300,9 +303,9 @@ void Speechdownloader::setImgFile(QString sWord, QString sLang, QString sWord2, 
   oImageScaled.save(sImg1);
   QString sImg2 = ImgPath(sWord2, sLang2);
   QFile::copy(sImg1, sImg2);
-  checkAndEmit(sImg1, sImg2);
+   checkAndEmit(sImg1, sImg2);
 }
-
+*/
 bool Speechdownloader::hasImage(QString sWord, QString sLang)
 {
   if (sWord.isEmpty())
@@ -314,16 +317,18 @@ bool Speechdownloader::hasImage(QString sWord, QString sLang)
   return QFile::exists(s);
 }
 
+/*
 bool Speechdownloader::hasImg()
 {
   return m_bHasImg;
 }
-
+*/
+/*
 QUrl Speechdownloader::urlImg()
 {
   return m_oImgUrl;
 }
-
+*/
 void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
 {
   m_oDownloadedData = pReply->readAll();
@@ -356,7 +361,7 @@ void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
   QString sImg2 = ImgPath(sWord2, sLang2);
   QFile::copy(sFileName, sImg2);
 
-  checkAndEmit(sFileName, sImg2);
+ //  checkAndEmit(sFileName, sImg2);
 
   if (uQ.queryItemValue("emit").toInt() == 1)
   {

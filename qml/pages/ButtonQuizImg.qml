@@ -3,13 +3,14 @@ import QtQuick 2.0
 Image {
   fillMode: Image.Stretch
   id: idImageBtn
+  property bool bgColorDefault: true
   signal clicked
 
   Rectangle {
     id: idRect
     opacity: 0.4
     radius: 8
-    color: "steelblue"
+    color: bgColorDefault ? "steelblue" : "green"
     anchors.fill: parent
   }
   MouseArea {
