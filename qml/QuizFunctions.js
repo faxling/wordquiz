@@ -346,6 +346,7 @@ function toggleAnswerVisible() {
 function resetTakeQuizTab() {
   if (idWindow.oTakeQuiz !== undefined) {
     idWindow.oTakeQuiz.bExtraInfoVisible = false
+    idWindow.oTakeQuiz.bImageMode = false
     var nC = idQuizModel.count
     for (var i = 0; i < nC; ++i) {
       idQuizModel.get(i).answerVisible = false
@@ -424,12 +425,6 @@ function lookUppInWiki() {
 
   var sUrl = "http://" + sLang + ".wiktionary.org/w/index.php?title=" + oInText.toLowerCase()
 
-
-  /*
-  pageStack.push("pages/WikiView.qml", {
-                   "url": sUrl
-                 })
-  */
   openWwwPage(sUrl, sLang + " Wiktionary on \"" + oInText + "\"")
 }
 
@@ -568,9 +563,6 @@ function getAndInitDb() {
 
     var nRowLen = rs.rows.length
 
-    // var ocRet = new Array(nRowLen)
-
-    // MyDownloader.sortRowset(rs.rows.item, rs.rows, nRowLen, ocRet)
     for (var j = 0; j < nRowLen; j++) {
       var nDbnumber = rs.rows.item(j).dbnumber
       var nN = oc.indexOfObject("dbnumber", nDbnumber)
@@ -631,13 +623,6 @@ function getAndInitDb() {
   return db
 }
 
-
-/*
-ocL.append(oJJ["qname"].toString());
-ocL.append(oJJ["desc1"].toString());
-ocL.append(oJJ["slang"].toString());
-ocL.append(oJJ["qcount"].toString());
-*/
 function assignTextInputField(text) {
   text = text.trim()
   if (nLastSearch !== 1)
@@ -647,7 +632,10 @@ function assignTextInputField(text) {
 }
 
 function setAllok(bval) {
-  idWindow.bAllok = bval
+  var nC = idQuizModel.count
+  for (var i = 0; i < nC; ++i) {
+    idQuizModel.get(i).allOk1_3 = bval
+  }
 }
 
 // Updates the description of the Quiz with new date
@@ -683,8 +671,7 @@ function insertGlosa(dbnumber, nC, question, answer) {
   if (glosModelWorking.count === 1) {
     nC = idQuizModel.count
     for (var i = 0; i < nC; ++i) {
-      idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ,
-                                                               sQuestionLang))
+      idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ, sLangLang))
       idQuizModel.get(i).answerVisible = false
       idQuizModel.get(i).question = sQ
       idQuizModel.get(i).answer = sA
@@ -705,9 +692,10 @@ function assignQuizModel(nIndexNewWordInModelWorking, nIndexInQuizModel) {
   idQuizModel.get(i).extra = glosModelWorking.get(j).extra
   var nNumberDbNewWord = glosModelWorking.get(j).number
   idQuizModel.get(i).numberDb = nNumberDbNewWord
-  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ, sQuestionLang))
+  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ, sLangLang))
 }
 
+// Return false if already existing in the three item model
 function assignQuizModelUnique(nIndexNewWordInModelWorking, nNumberInQuizModel) {
   var i = nNumberInQuizModel
   var j = nIndexNewWordInModelWorking
@@ -723,7 +711,7 @@ function assignQuizModelUnique(nIndexNewWordInModelWorking, nNumberInQuizModel) 
   idQuizModel.get(i).extra = glosModelWorking.get(j).extra
 
   idQuizModel.get(i).numberDb = nNumberDbNewWord
-  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ, sQuestionLang))
+  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ, sLangLang))
   return true
 }
 
@@ -1175,8 +1163,6 @@ function loadFromList(nCount, oDD, sLangLoaded) {
                               "descdate": idImport.sDescDate
                             })
 
-    // answer, question , state
-
 
     /*
               answer
@@ -1195,13 +1181,6 @@ function loadFromList(nCount, oDD, sLangLoaded) {
     idImport.state = ""
 
     idQuizList.currentIndex = MyDownloader.indexFromGlosNr(glosModelIndex, nNr)
-
-
-    /*
-    if (idQuizList.currentIndex === 0)
-      idWindow.quizListView.currentIndexChanged()
-
-      */
   })
 }
 
@@ -1274,12 +1253,6 @@ function resetQuiz() {
                             })
   }
 
-
-  /*
-  nQuizIndex1_3 = 1
-  nLastQuizIndex1_3 = -1
-  idWindow.oTakeQuiz.resetQuizView()
-*/
   assignQuizModelAll()
 }
 
@@ -1354,6 +1327,11 @@ function updateQuiz() {
       if (glosModelWorking.count === 1) {
         resetTakeQuizTab()
         setAllok(false)
+        assignOneWorkingItem()
+      } else if (glosModelWorking.count === 2) {
+        resetTakeQuizTab()
+        setAllok(false)
+        assignTwoWorkingItems()
       }
     }
   }
@@ -1429,7 +1407,7 @@ function assignOneWorkingItem() {
   if (nLeftItem < 0)
     nLeftItem = 2
 
-  idQuizModel.get(nLeftItem).question = ""
+  idQuizModel.get(nLeftItem).allOk1_3 = true
 }
 
 function assignTwoWorkingItems() {
@@ -1467,6 +1445,9 @@ function assignThreeWorkingItem() {
 
 function assigNextQuizWord() {
 
+  if (glosModelWorking.count === 0)
+    return
+
   var nLastNumber = idQuizModel.get(nLastQuizIndex1_3).numberDb
 
   if (idQuizModel.bDir === -1) {
@@ -1498,6 +1479,7 @@ function assigNextQuizWord() {
   }
 
   if (glosModelWorking.count === 0) {
+    setAllok(true)
     resetTakeQuizTab()
     return
   }

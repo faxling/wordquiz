@@ -32,7 +32,7 @@ Item {
         idEditWordImage.visible = true
         idEditWordImage.source = ""
         idEditWordImage.source = MyDownloader.imageSrc(idTextEdit1.text,
-                                                       sFromLang)
+                                                       sLangLang)
         idGlosList.currentItem.hasImg = true
       }
     }
@@ -306,9 +306,8 @@ Item {
             idTextEdit3.text = extra
             idGlosState.checked = state1 !== 0
             idGlosList.currentIndex = index
-            // idEditWordImage.visible = hasImg
             idEditWordImage.source = MyDownloader.imageSrc(idTextEdit1.text,
-                                                           sFromLang)
+                                                           sLangLang)
             idWindow.nGlosaTakeQuizIndex = index
           }
         }

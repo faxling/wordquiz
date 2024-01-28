@@ -99,6 +99,7 @@ Page {
       imgUrl: ""
       answer: ""
       answerVisible: false
+      allOk1_3: false
     }
     ListElement {
       number: 1
@@ -108,6 +109,7 @@ Page {
       answer: ""
       imgUrl: ""
       answerVisible: false
+      allOk1_3: false
     }
     ListElement {
       number: 2
@@ -117,6 +119,7 @@ Page {
       answer: ""
       imgUrl: ""
       answerVisible: false
+      allOk1_3: false
     }
   }
 

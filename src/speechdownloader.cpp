@@ -45,10 +45,12 @@ static const QString GLOS_SERVER1("http://192.168.2.1");
 
 struct EncUrl
 {
+
   operator QUrl()
   {
     QByteArray ocRet = oc;
     oc.clear();
+    m_bFirstPar = true;
     return QUrl::fromEncoded(ocRet);
   }
 
@@ -57,8 +59,24 @@ struct EncUrl
     oc.append(QUrl::toPercentEncoding(s));
     return *this;
   }
+
   EncUrl& operator<<(const char* sz)
   {
+    int n = strlen(sz);
+    if (sz[n-1] != '=')
+    {
+      oc.append(sz);
+      return *this;
+    }
+    if (m_bFirstPar)
+    {
+      m_bFirstPar = false;
+      oc.append("?");
+    }
+    else
+    {
+      oc.append("&");
+    }
     oc.append(sz);
     return *this;
   }
@@ -69,8 +87,12 @@ struct EncUrl
     oc.append(QByteArray(sz));
     return *this;
   }
+
+private:
+  bool m_bFirstPar = true;
   QByteArray oc;
 };
+
 
 namespace
 {
@@ -217,15 +239,35 @@ void Speechdownloader::setImgWord(QString sWord, QString sLang)
   emit urlImgChanged();
 }
 
+// Try Select image from both languages in a pair
 QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
 {
-  QString s = ImgPath(sWord, sLang);
-  bool bEx = QFile::exists(s);
+  auto oc = sLang.split("-");
 
-  if (bEx == true)
-    return QUrl::fromLocalFile(s);
-  else
-    return QUrl("image://theme/icon-m-file-image");
+  auto GetImg = [&] (QString sWord, QString sLang, QUrl& oOut)
+  {
+    QString s = ImgPath(sWord, sLang);
+    bool bEx = QFile::exists(s);
+    if (bEx == true)
+    {
+     oOut = QUrl::fromLocalFile(s);
+     return true;
+    }
+    else
+    {
+      oOut =  QUrl("image://theme/icon-m-file-image");
+      return false;
+    }
+  };
+
+  QUrl oRet;
+  if (GetImg(sWord, oc[0],oRet))
+    return oRet;
+
+  if (oc.size() < 2)
+    return oRet;
+  GetImg(sWord, oc[1],oRet);
+  return oRet;
 }
 
 void Speechdownloader::checkAndEmit(QString sPath1, QString sPath2)
@@ -566,7 +608,8 @@ void Speechdownloader::downloadWord(QString sWord, QString sLang)
 
 void Speechdownloader::listQuizLang(QString sLang)
 {
-  url << GLOS_SERVER2 "quizlist_lang.php?qlang=" << sLang;
+  url << GLOS_SERVER2 "quizlist_lang.php"
+      << "qlang=" << sLang;
   QNetworkRequest request(url);
   m_oListQuizNetMgr.get(request);
 }
@@ -621,7 +664,7 @@ void Speechdownloader::sortQuizModel(int nRole, int sortOrder)
   else if (nRole == 1)
     m_pOLSortFilterProxyModel->setSortRole(LANGPAIR);
   m_pOLSortFilterProxyModel->sort(0, (Qt::SortOrder)sortOrder);
-  //  m_pOLSortFilterProxyModel->invalidate();
+
 }
 
 // Sort for local quizlist
@@ -707,7 +750,10 @@ QObject* Speechdownloader::setFilterProxy(QObject* pModel)
 
 void Speechdownloader::listQuiz()
 {
-  QNetworkRequest request(QUrl(GLOS_SERVER2 "quizlist.php"));
+  QString ss = GLOS_SERVER2 "quizlist.php";
+  QUrl u(ss);
+  qDebug() << ss;
+  QNetworkRequest request(u);
   m_oListQuizNetMgr.get(request);
 }
 
@@ -773,8 +819,7 @@ void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
 
 void Speechdownloader::deleteQuiz(QString sName, QString sPwd, int nDbId)
 {
-  url << GLOS_SERVER2 << "deletequiz.php?qname=" << sName << "&qpwd=" << sPwd
-       << "&dbid=" << nDbId;
+  url << GLOS_SERVER2 "deletequiz.php" << "qname=" << sName << "qpwd=" << sPwd << "dbid=" << nDbId;
   QNetworkRequest request(url);
   m_oDeleteQuizNetMgr.get(request);
 }
@@ -789,9 +834,10 @@ void Speechdownloader::loadProgressSlot(qint64 bytes, qint64 bytesTotal)
 
 void Speechdownloader::importQuiz(QString sName, QObject* pProgressIndicator)
 {
-//  QString sUrl = QString::asprintf(GLOS_SERVER2 "/quizload.php?qname=%s", Enc()(sName + ".txt"));
+  //  QString sUrl = QString::asprintf(GLOS_SERVER2 "/quizload.php?qname=%s", Enc()(sName +
+  //  ".txt"));
 
-  url << GLOS_SERVER2 << "quizload.php?qname=" << sName << ".txt";
+  url << GLOS_SERVER2 "quizload.php" << "qname=" << sName << ".txt";
 
   QNetworkRequest request(url);
   QNetworkReply* pNR = m_oQuizNetMgr.get(request);
@@ -926,17 +972,12 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
     ss << oF.readAll();
     oF.close();
   };
-  /*
-  QString sUrl =
-      QString::asprintf(GLOS_SERVER2 "/%s.php?qname=%s&slang=%s&qcount=%d&desc1=%s&pwd=%s",
-                        Enc()(sCmd), Enc()(sName), Enc()(sLang), nC, Enc()(sDesc), Enc()(sPwd));
 
-                        */
+  url << GLOS_SERVER2 << sCmd << ".php"
+      << "qname=" << sName << "slang=" << sLang << "qcount=" << nC << "desc1=" << sDesc
+      << "pwd=" << sPwd;
 
-  url << GLOS_SERVER2  << sCmd << ".php?qname=" << sName << "&slang=" << sLang << "&qcount=" << nC
-      << "&desc1=" << sDesc << "&pwd=" << sPwd;
-
-//  qDebug() << "Cmd to glosserver " << sCmd << " size " << ocArray.size();
+  qDebug() << "Cmd to glosserver " << sCmd << " size " << ocArray.size();
   ss.setVersion(2);
   QNetworkRequest request(url);
   request.setRawHeader("Content-Type", "application/octet-stream");
@@ -1108,12 +1149,14 @@ void Speechdownloader::focusOnQuizText(int n)
   auto i = m_ocTextInputElem.find(n);
   if (i == m_ocTextInputElem.end())
     return;
+
+  for (auto oI : m_ocTextInputElem)
+    oI->setProperty("text", "");
+
   QObject* pTI = i.value(); // TextInput
 
   if (pTI->property("visible").toBool() == true)
   {
-    pTI->setProperty("text", "*");
-    pTI->setProperty("text", "");
     QMetaObject::invokeMethod(pTI, "forceActiveFocus");
   }
 }

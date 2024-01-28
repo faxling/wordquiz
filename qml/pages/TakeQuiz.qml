@@ -9,12 +9,11 @@ Item {
   property bool bImageMode: false
   property bool bVoiceMode: false
   property bool bTextAnswerOk: false
-  property bool allok: idWindow.bAllok
+
   Component.onCompleted: {
     idWindow.oTakeQuiz = idRectTakeQuiz
   }
 
-  // May be the filler is calculated (PathLen - NoElem*sizeElem) /  (NoElem )
   PathView {
     id: idTakeQuizView
     clip: true
