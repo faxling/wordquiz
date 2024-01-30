@@ -77,8 +77,8 @@ public:
   Q_INVOKABLE QUrl imageSrc(QString sWord, QString sLang);
  // Q_INVOKABLE void setImgWord(QString sWord, QString sLang);
  //  void checkAndEmit(QString sPath1, QString sPath2);
- //Q_INVOKABLE void setImgFile(QString sWord, QString sLang, QString sWord2, QString sLang2,
- //                              QString sImgFilePath);
+  Q_INVOKABLE void setImgFile(QString sWord, QString sLang, QString sWord2, QString sLang2,
+                             QString sImgFilePath);
   // Q_PROPERTY(QUrl urlImg READ urlImg NOTIFY urlImgChanged)
  // Q_PROPERTY(bool hasImg READ hasImg NOTIFY hasImgChanged)
   Q_INVOKABLE QString dateStr();

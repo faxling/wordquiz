@@ -59,7 +59,7 @@ Flipable {
 
       ButtonQuizImg {
         id: idImgBtn
-        bgColorDefault: imgUrl === "image://theme/icon-m-file-image"
+        bgColorDefault: imgUrl === sDEFAULT_IMG
         anchors.right: parent.right
         anchors.rightMargin: 20
         anchors.top: idTextBtn.bottom
@@ -120,12 +120,11 @@ Flipable {
         // && (idWindow.nQuizIndex === index)
         Image {
           id: idWordImage
-          //         cache:false
           height: 350
           width: 500
           fillMode: Image.PreserveAspectFit
           anchors.horizontalCenter: parent.horizontalCenter
-          visible: bImageMode && imgUrl !== "image://theme/icon-m-file-image"
+          visible: bImageMode && imgUrl !== sDEFAULT_IMG
           // && MyDownloader.hasImg
           source: imgUrl
         }

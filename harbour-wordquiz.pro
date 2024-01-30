@@ -41,6 +41,7 @@ DISTFILES += qml/harbour-wordquiz.qml \
     qml/pages/InputTextQuizSilicaEx.qml \
     qml/pages/QuestionPanel.qml \
     qml/pages/QuestionPanelRect.qml \
+    qml/pages/WebPopup.qml \
     qml/pages/WikiView.qml \
     qml/pages/DownLoad.qml \
     qml/pages/FirstPage.qml \

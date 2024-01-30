@@ -515,6 +515,13 @@ function getTextInputAndAdd() {
   MyDownloader.downloadWord(sNewWordFrom, sFromLang)
 
   QuizLib.insertGlosa(nDbNumber, nC, sNewWordFrom, sNewWordTo)
+
+  if (glosModelWorking.count === 3)
+    assignThreeWorkingItem()
+  else if (glosModelWorking.count === 2)
+    assignTwoWorkingItems()
+  else if (glosModelWorking.count === 1)
+    assignOneWorkingItem()
 }
 
 function getAndInitDb() {
@@ -668,18 +675,6 @@ function insertGlosa(dbnumber, nC, question, answer) {
 
   setAllok(false)
 
-  if (glosModelWorking.count === 1) {
-    nC = idQuizModel.count
-    for (var i = 0; i < nC; ++i) {
-      idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ, sLangLang))
-      idQuizModel.get(i).answerVisible = false
-      idQuizModel.get(i).question = sQ
-      idQuizModel.get(i).answer = sA
-      idQuizModel.get(i).number = nC
-      idQuizModel.get(i).extra = ""
-    }
-  }
-
   updateDesc1()
 }
 
@@ -692,7 +687,8 @@ function assignQuizModel(nIndexNewWordInModelWorking, nIndexInQuizModel) {
   idQuizModel.get(i).extra = glosModelWorking.get(j).extra
   var nNumberDbNewWord = glosModelWorking.get(j).number
   idQuizModel.get(i).numberDb = nNumberDbNewWord
-  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ, sLangLang))
+  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(
+                                       sQ, sLangLang)) + "?abc=" + Math.random()
 }
 
 // Return false if already existing in the three item model
@@ -721,12 +717,9 @@ function assignQuizModelAll() {
     return
   }
   setAllok(false)
-  var i = 0
-  for (i; i < 3; ++i)
-    idQuizModel.get(i).numberDb = -1
 
   if (glosModelWorking.count > 3) {
-    i = 0
+    var i = 0
     while (i < 3) {
       var nIndexOwNewWord = Math.floor(Math.random() * glosModelWorking.count)
       if (assignQuizModelUnique(nIndexOwNewWord, i))
@@ -753,7 +746,7 @@ function loadQuiz() {
   if (glosModel.count < 1) {
     var nC = idQuizModel.count
     for (var i = 0; i < nC; ++i) {
-      idQuizModel.get(i).imgUrl = "image://theme/icon-m-file-image"
+      idQuizModel.get(i).imgUrl = sDEFAULT_IMG
       idQuizModel.get(i).answerVisible = false
       idQuizModel.get(i).question = "-"
       idQuizModel.get(i).answer = "-"
@@ -1276,10 +1269,22 @@ function updateQuiz() {
           [sQ, sA, nState, nNumber])
 
     // Assign The updated values
+
+
+    /*
     var nC = idQuizModel.count
     for (var i = 0; i < nC; ++i) {
-      if (idQuizModel.get(i).number === nNumber) {
+      if (idQuizModel.get(i).numberDb === nNumber) {
         idQuizModel.get(i).extra = sE
+        var sImgUrl = String(MyDownloader.imageSrc(sQ, sLangLang))
+        console.log("update in 1_3 quiz nNumber " + nNumber)
+        console.log(sImgUrl)
+        console.log(idQuizModel.get(i).imgUrl)
+        // Emmit changed
+        //  if (sImgUrl !== sDEFAULT_IMG && idQuizModel.get(i).imgUrl === sImgUrl)
+        idQuizModel.get(i).imgUrl = sDEFAULT_IMG
+
+        // idQuizModel.get(i).imgUrl = sImgUrl
         if (bIsReverse) {
           idQuizModel.get(i).question = sA_Org
           idQuizModel.get(i).answer = sQ
@@ -1289,6 +1294,7 @@ function updateQuiz() {
         }
       }
     }
+    */
   })
 
   var i = MyDownloader.indexFromGlosNr(glosModelWorking, nNumber)
@@ -1296,6 +1302,7 @@ function updateQuiz() {
   if (i >= 0) {
 
     if (nState !== 0) {
+      // Done
       glosModelWorking.remove(i)
       if (glosModelWorking.count === 0)
         setAllok(true)
@@ -1309,8 +1316,6 @@ function updateQuiz() {
       }
       glosModelWorking.get(i).number = nNumber
       glosModelWorking.get(i).extra = sE
-
-      String(MyDownloader.imageSrc(sQ, sQuestionLang))
 
       checkAndReplace(nNumber, i)
     }
@@ -1326,7 +1331,6 @@ function updateQuiz() {
       // We change the quize state  from Allok (Thumbs upp) to not allok
       if (glosModelWorking.count === 1) {
         resetTakeQuizTab()
-        setAllok(false)
         assignOneWorkingItem()
       } else if (glosModelWorking.count === 2) {
         assignTwoWorkingItems()
@@ -1402,6 +1406,7 @@ function checkAndReplace(nNumberDb, nReplaceWidthIndexInWorking) {
 
 function assignOneWorkingItem() {
   for (var i = 0; i < 3; ++i) {
+    idQuizModel.get(i).allOk1_3 = false
     assignQuizModel(0, i)
   }
   var nLeftItem = nQuizIndex1_3 - 1
@@ -1418,6 +1423,7 @@ function assignTwoWorkingItems() {
   // This shoul avoid user visible updates
   var ii = (MyDownloader.indexFromGlosNr(glosModelWorking, nNumber) + 1) % 2
   for (var i = 0; i < 3; ++i) {
+    idQuizModel.get(i).allOk1_3 = false
     if (nQuizIndex1_3 === i)
       continue
     assignQuizModel(ii, i)
@@ -1473,7 +1479,7 @@ function assigNextQuizWord() {
 
     if (glosModelWorking.count === 0) {
       setAllok(true)
-      idQuizModel.get(i).imgUrl = "image://theme/icon-m-file-image"
+      idQuizModel.get(i).imgUrl = sDEFAULT_IMG
       idQuizModel.get(i).answerVisible = false
       idQuizModel.get(i).answer = ""
       idQuizModel.get(i).question = ""

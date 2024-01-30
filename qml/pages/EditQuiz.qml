@@ -391,7 +391,7 @@ Item {
       anchors.leftMargin: 20
       anchors.top: idEditDlg.top
       anchors.topMargin: 20
-      source: "image://theme/icon-m-file-image"
+      source: sDEFAULT_IMG
       onClicked: {
         pageStack.push(idImagePickerPage)
       }

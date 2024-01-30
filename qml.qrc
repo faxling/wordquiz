@@ -22,5 +22,6 @@
         <file alias="sweden-flag-button-round-icon-128.png">../glosquiz/glosquiz/flags/sweden-flag-button-round-icon-128.png</file>
         <file alias="united-kingdom-flag-button-round-icon-128.png">../glosquiz/glosquiz/flags/united-kingdom-flag-button-round-icon-128.png</file>
         <file alias="south-korea-flag-button-round-icon-128.png">../glosquiz/glosquiz/flags/south-korea-flag-button-round-icon-128.png</file>
+        <file>qml/pages/WebPopup.qml</file>
     </qresource>
 </RCC>

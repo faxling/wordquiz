@@ -8,11 +8,24 @@
         font-size: 120pt;
       }
 
-      img {
+      h3 {
+        font-size: 25pt;
+      }
+
+      li {
+        font-size: 18pt;
+      }
+
+      .mainimg {
         display: block;
         margin-left: auto;
         margin-right: auto;
         width: 60%;
+      }
+
+      .inlineimg {
+        height: 25pt;
+        position:relative; top:5px;
       }
     </style>
 
@@ -22,11 +35,12 @@
   </head>
 
   <body style="background-color:rgb(169, 197, 202)">
-    <img src="cover.png">
+    <img class="mainimg" src="cover.png">
     <h2>
       Language learning app.
     </h2>
-    <h3>Create your own quiz (Flashcard set) from a book or any subject of interest e.g food greetings. The words can be
+    <h3>Create your own quiz (Flashcard set) from a book or any subject of interest e.g food or greetings. The words can
+      be
       looked up in online dictionary or entered manually. Play games with the entered questions, listen to the
       pronunciation of the words rehearse and more.
     </h3>
@@ -35,22 +49,22 @@
     </h3>
     <ol>
       <li>Press "+" </li>
-      <li>Enter a name e.g "Animals" for the new quiz in the Tab "Home"</li>
+      <li>Enter a name e.g "Animals" for the new quiz in the Tab "Home"<img class=inlineimg src="data:image/png;base64,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"></li>
       <li>Select Language pair e.g Swedish-Russian (sv-ru)</li>
       <li>Press "Create" </li>
       <li>Press "+" again to hide the create options</li>
-      <li>Select tab with the "Edit" (pen) icon</li>
-      <li>Enter a word e.g <em>hund</em> (dog) in this case pres button "sv-ru"</li>
+      <li>Select tab with the "Edit" (pen) icon<img class="inlineimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAADnRFWHRHcmF5c2NhbGUAdHJ1ZV9bPUYAAAIkSURBVGiB7Zo/axRRFEfPjQpGLXaNpJAgCiJaaWEIBCwkaKPfxMIvYOVHUEux1sZKGzEggmhkk60TVxFFCIJRQTFa+LOYHQzZ7MybP5mZXe7pZua9d+/hDsPMfQOO4ziO4zijitWdwHYkTQDzwCngB7BoZl/yrtcoQUkHgGvAyS2nN4FbZvY2z5qNEezLXQeO73D5N3DHzNayrtsIwRS5mFyStQtKOgo8BI4AHeB7wvDMkrUKSpoGloGZ/qlfwGNgI2HaJnAz9MEzUSjDAkhqAY/4LwcwCVwBDidM3Q8shMapRbAv9wSY3eFyLNlOWOJQaKzKBVPkYiaBqwyXXA2NV6lgoFzMMMke8DI05p7g7AoiqQ08Bc5nmLYPOAG8J3qCfgRum9mf0hMsgqS2pI7y05N0Q9LBul0GKEFOkpbGWe6TopeBZiGpJel1QbmupJn0aBVTktyKpKm6XQZwOZdzuWpxOZdzuWrpyxV9/eoo+rpoHpIelFC5pJZEfUi6MLaVA5B0d2zlACS9ySnX3NtyK5K+jWXlACRNSfowanJZumpzQBdQ4Phl4JKZfc2cVYlkEZwF1oFF4G/K2C5wuW45CBSUdAyI+yLvgGcMr+R94KKZJe0vVMbewHFz2457RLuv54ja6BvAc+Cemb0oL73ipApKMgabtetEGydLZvZ5NxIri5AKngZawE9gBXhlZr1dzapKJJ2VdEbRzwGO4ziO44wQ/wDO4/RqKyIyCgAAAABJRU5ErkJggg=="></li>
+      <li>Enter a word e.g <em>hund</em> (dog) in this case pres button "sv-ru" to look up in online dictionary</li>
       <li>Select a synonym if more feasible by touching it</li>
       <li>Press "Add"</li>
-      <li>Look up in Wiktionary by press button <em>Wiki</em>You can copy from there and enter in the quiz as well</li>
-      <li>Repeat until you have a convenient number of questions for a WordQuiz</li>
+      <li>Look up in Wiktionary by press button "Wiki" You can copy from there and enter in the quiz as well</li>
+      <li>Repeat until you have a convenient number of word pairs for a WordQuiz</li>
       <li>To run the Quiz select Quiz from the Games tab</li>
       <li>You can reherse Quiz in "Edit" tab</li>
-      <li>If "i" is visible you have extra information to view it press "i"</li>
+      <li>If "i" is visible you have extra information (if enterad when creating/edit quiz)), to view it press "i"</li>
       <li>Go a head and swipe left , if you dont know the answer or right if you are confident until you pass the exam!
       </li>
-      <li>To view the answer press the flip symbol</li>
+      <li>To view the answer press the flip symbol<img class="inlineimg" src="data:image/png;base64,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"></li>
       <li>If you like to practice your spelling press the keyboard icon the swiping is then locked until you get type
         the correct answer</li>
       <li>If you find some thing wrong go back to "Edit", the question should be selected, press the edit symbol and fix
@@ -61,19 +75,21 @@
       Games
     </h3>
     <ul>
-      <li>Quiz (Flashcards). Answer questions turn around to se answer</li>
-      <li>Hang Man. The well known hangman game with words from the selected quiz</li>
-      <li>CrossWord. A crossword is generated from the selected quiz</li>
+      <li><em>Quiz (Flashcards)</em> - Answer questions turn around to see answer</li>
+      <li><em>Hang man</em> - The well known hangman game with words from the selected quiz</li>
+      <li><em>CrossWord</em> - A crossword is generated from the selected quiz</li>
     </ul>
     <h3>
       Quiz Modes
     </h3>
     <ul>
-      <li><em>Normal</em>question as text and swipe to right if you know the answer or flip around to se the answer</li>
-      <li><em>Text</em> mode press the keyboard symbol. Then type the answer and swipe when you typed the right answer
+      <li><em>Normal</em> - Question as text and swipe to right if you know the answer or flip around to se the answer
       </li>
-      <li><em>Illustrated</em>Press image symbol to show the illustration if available</li>
-      <li><em>Speech mode</em> press the headphones. You listen to the questions</li>
+      <li><em>Text</em> - Text mode press the keyboard symbol. Then type the answer and swipe when you typed the right
+        answer
+      </li>
+      <li><em>Illustrated</em> - Press image symbol to show the illustration if available</li>
+      <li><em>Speech mode</em> - Press the headphones. You listen to the questions</li>
     </ul>
     <h3>
       To retake a quiz after pass
@@ -90,9 +106,11 @@
       To Download an available Quiz
     </h3>
     <ol>
-      <li>Press download from cloud symbol</li>
+      <li>Press download from cloud symbol<img class="inlineimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAADnRFWHRHcmF5c2NhbGUAdHJ1ZV9bPUYAAANOSURBVGiB7ZlJaxRRFIW/m5g4dRwwCXEAISAG1KyiqIhGnBERRQWX/gB/iishOwdQEBHFnbssBBEhIHERgxBRnGM0aIxRozkuqhKrTdv1akp1S3+r6q5b757Dq1fv1i2oUaNGjRrxsTQGkbQQWAe0A0uAJkDAV+At8BQYMrNfaeSLQiKDkpYCu4FOoC4kfBy4Dzwws8kkeaMQ26CkLcB+YF7ESz8At8zsVYkxFwBdQAfQCtQDY8Bz4KGZPYuqM7JBSQYc9oXEZRK4aWaDgXHXAqeAxWWuewzcNrPvroniGNwL7Ih6XQl+AlfN7Jmk9cBJ3O6GN8AlM/vhkiRs3RQhaQPpmAPPzAlJrcBR3G/1lcAh1yTOMyipATiL95RMk0mgIeI1AnrM7H1YYJQZ3Ez65iC6OfAmZqNLYBSDnTGEZMkalyAng5KWAW2J5KTPIpcg1xlcnUBIVky4BLkaLCQQkhXvXILKPpolrQJW4VUWlcY8SR3AqJn902zJbULSOrwyrCUjcWnzEbgL9JuZgidmGZTUDewqda4KGMSrc2eqnKI16BfQ3VSnOfCW0nG/XgYCBiU1AfvyUJUyHcCm6R/BGdxGvKqiEtk5fRA0WIlPyrg0S2oB36CkemB5xknrgK14y6Ap41zg7wDT+2Aj2T9YuoAD/nEbcCXjfI3w5xb9hvcCmiXBPbU141wAX8A36G+OL+Yg6VwxBbyC4ofMo3y0ZMITM5uAYoP9wHA+elLlF9A7/WPGoJlNATfw1mM1c8fMZiaqqFTzexwX8YrXamMSr6XYF/xz1uuSmQ1L6sHrwXTidbEqmTFgALhnZp//Phm69/lFQIGILcYSnAPO+MfDpFM5jYf1R0N7kf4Hk09JlUgKdqOnzGw06ZguJJ2Viue/Nxj1y1AokgqULsWCTeN6Se0lYsbL9VdyR9J8SWNKxsE0NaV6i/qftXpDA//NCNAXGpUnklZKGok5e6fy1u+EpNMxzF3LW3ckJF2PYO61pBV5a46EpGZJbxwNHstbbywkHXEwdyFvnYmQdLmMuZeSsm52ZYukpZKelzA3JelA+AhVgKQ9vqEg5/PWlSqSegLmhuSVdP8PkgqSBiRNSNqet55M8E1W4ufwGjVqZMRvqVdrz3iIl9QAAAAASUVORK5CYII=">
+      </li>
       <li>Scroll around, a description off the quiz i shown at the top</li>
-      <li>You can enter a search pattern by a key string and/or a optional languag key eg "sv" available quiz in swedish
+      <li>You can enter a search pattern by a key string and/or a optional language key e.g "sv" available quiz in
+        swedish
         are listed</li>
       <li>Select a quiz with prefered language combination</li>
       <li>Press "Download"</li>
@@ -101,39 +119,50 @@
     <h3>
       To Upload a Quiz
     </h3>
-    <ol>
-      <li>Press the upload to cloud symbol</li>
+    <ol>     
+      <li>Press the upload to cloud symbol<img class="inlineimg"
+          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAADnRFWHRHcmF5c2NhbGUAdHJ1ZV9bPUYAAAMVSURBVGiB7ZndSxRRGMZ/r19prpaQVhZFhSVoQlBCFGVkQXphRPUndFH079Rd3QRdRNFdd0FBRBGEXZQIhRFiGSVkauXH08XM2q6temb2zOrC/GBhl3nPPO/DO+ecd85CSkpKSkp8zMdNJNUBbcBeoBFoAARMA5+BD8B7M5v3oReFogxK2gScArqAilXCp4DnwAszmy1GNwqxDUrqBs4CVRGHfgMemNlogXvWAoeBdqAFqAQmgY/AazMbiZpnZIOSDOgPE4nLLHDfzIZy7rsbuAzUrzDuHfDQzH67CsUx2AscjzquAHPAHTMbkXQAuITb0zAG3DazPy4iq82bPCR14MccBGYuSmoBBnB/1LcD51xFnCsoqRq4TrBK+mQWqI44RsANM/u6WmCUCh7BvzmIbg6CwnS6BEYx2BUjkSTZ6RLkZFDSZmBbUen4Z6NLkGsFdxSRSFLMuAS5GswUkUhSfHEJWnFpltQKtBJ0FuuNKkntwISZLWu24DYhqY2gDWtOKDnffAeeAoNmptwL/xmU1AOcLHStDBgi6HMXu5y8ORg20D2UpzkIptKFsF8GcgxKagDOrEVWnmkHDmZ/5FbwKPG6ivXIieyXXIOlWCkbga0l0NkiqRlCg5IqgaaERTPAlfCzJ2EtCHeAbAVrSH5h6Sd4ma0AzgO1CevVwD+DvwheQJPiEPlToJFgn02SnxAaDDfHTwkJNVDYzFLTPlkARiF/kXmTkNgAyz+O/UBdAprDZjYD+QYHgXHPQt3AvhWuZ4A+z5rzwOPsj0WDZrYA3COYjz5oAk47xHUCHZ40AR6Z2WKh8lq18IzjFkHzWgxG8GjWOMb3Ufwr2SzBkeKrpYn8h6QqgjOYLoJTrKgcA3ojjhkG7sbQmgTeAs/M7MfSi6vufWETkMH95Xg/8ATYECHJLNeIZnLK9XzUC5JM0kvFZyI8J/VGpINfB+qBXUWMr6U0bZx/JN3MqdRYqXR9V3DdkRosd1KD5U5qsNxJDXok99+g6RLqlgZJXZLGJc1JurrW+SSCpGpJSfwNnpKSkpKSEoe/ttAIU2BkZlYAAAAASUVORK5CYII=">
+      </li>
       <li>Add a short description</li>
       <li>Enter a key (password), this is needed if you want to remove the Quiz</li>
       <li>Press "Upload"</li>
     </ol>
     <h3>
-      To Edit a Quiz
+      To Edit or Add to a Quiz
     </h3>
     <ol>
       <li>Press "Edit" tab</li>
-      <li>Select the question with the edit symbol</li>
-      <li>If you are running a Quiz the current question is selected for edit just press Edit tab and do corrections
+      <li>Select the word pair with the edit symbol</li>
+      <li>If you are running a Quiz the current word pair is selected for edit just press Edit tab and do corrections
         needed</li>
-      <li>To look up detailed description of word by press button <em>Wiki</em></li>
+      <li>To look up detailed description of word by press button "Wiki"</li>
       <li>Enter the new information</li>
       <li>You can do search for information by the info in the clipboard by pressing the search symbol in the upper
         left.
       </li>
       <li>You can also change the individual status of word e.g uncheck it if you think you need to rehearse that
         particular word</li>
+
+
+    </ol>
+    <h3>
+      Add images
+    </h3>
+    <ol>
       <li>You can add an image representing the word by pressing the image symbol in the edit dialog. Copy the word and
         press search symbol and look for images download and go back and select image symbol an select the newly
         downloaded image</li>
+      <li>To download un image "press and hold" and press button "Save for use in WordQuiz"</li>
+      <li>Select the image in the edit dialog</li>
       <li>Press Update to update the local database</li>
-      <li>To update it on server folow the steps in "To Upload a Quiz" but press update at the end</li>
-
+      <li>To update it on server folow the steps in "To Upload a Quiz" but press "Update" at the end</li>
     </ol>
+
     <h3>
       To Delete an uploaded Quiz
     </h3>
     <ol>
-      <li>Press "Download"</li>
+      <li>Press "Download"<img class="inlineimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAADnRFWHRHcmF5c2NhbGUAdHJ1ZV9bPUYAAANOSURBVGiB7ZlJaxRRFIW/m5g4dRwwCXEAISAG1KyiqIhGnBERRQWX/gB/iishOwdQEBHFnbssBBEhIHERgxBRnGM0aIxRozkuqhKrTdv1akp1S3+r6q5b757Dq1fv1i2oUaNGjRrxsTQGkbQQWAe0A0uAJkDAV+At8BQYMrNfaeSLQiKDkpYCu4FOoC4kfBy4Dzwws8kkeaMQ26CkLcB+YF7ESz8At8zsVYkxFwBdQAfQCtQDY8Bz4KGZPYuqM7JBSQYc9oXEZRK4aWaDgXHXAqeAxWWuewzcNrPvroniGNwL7Ih6XQl+AlfN7Jmk9cBJ3O6GN8AlM/vhkiRs3RQhaQPpmAPPzAlJrcBR3G/1lcAh1yTOMyipATiL95RMk0mgIeI1AnrM7H1YYJQZ3Ez65iC6OfAmZqNLYBSDnTGEZMkalyAng5KWAW2J5KTPIpcg1xlcnUBIVky4BLkaLCQQkhXvXILKPpolrQJW4VUWlcY8SR3AqJn902zJbULSOrwyrCUjcWnzEbgL9JuZgidmGZTUDewqda4KGMSrc2eqnKI16BfQ3VSnOfCW0nG/XgYCBiU1AfvyUJUyHcCm6R/BGdxGvKqiEtk5fRA0WIlPyrg0S2oB36CkemB5xknrgK14y6Ap41zg7wDT+2Aj2T9YuoAD/nEbcCXjfI3w5xb9hvcCmiXBPbU141wAX8A36G+OL+Yg6VwxBbyC4ofMo3y0ZMITM5uAYoP9wHA+elLlF9A7/WPGoJlNATfw1mM1c8fMZiaqqFTzexwX8YrXamMSr6XYF/xz1uuSmQ1L6sHrwXTidbEqmTFgALhnZp//Phm69/lFQIGILcYSnAPO+MfDpFM5jYf1R0N7kf4Hk09JlUgKdqOnzGw06ZguJJ2Viue/Nxj1y1AokgqULsWCTeN6Se0lYsbL9VdyR9J8SWNKxsE0NaV6i/qftXpDA//NCNAXGpUnklZKGok5e6fy1u+EpNMxzF3LW3ckJF2PYO61pBV5a46EpGZJbxwNHstbbywkHXEwdyFvnYmQdLmMuZeSsm52ZYukpZKelzA3JelA+AhVgKQ9vqEg5/PWlSqSegLmhuSVdP8PkgqSBiRNSNqet55M8E1W4ufwGjVqZMRvqVdrz3iIl9QAAAAASUVORK5CYII="></li>
       <li>Select the quiz to remove</li>
       <li>Press "Remove"</li>
       <li>Enter the password entered when it was uploaded</li>

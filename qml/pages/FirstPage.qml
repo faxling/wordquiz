@@ -15,7 +15,7 @@ Page {
   property string sReqUrl
   property string sReqUrlRev
   property string sReqUrlEn
-
+  property string sDEFAULT_IMG
   property variant db
   property string sLangLangSelected
   property string sLangLang

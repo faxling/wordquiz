@@ -136,9 +136,12 @@ static const QString sReqUrlBase = "https://translate.yandex.net/api/v1.5/tr/"
                                    "translate?key=trnsl.1.1.20190526T164138Z.e99d5807bb2acb8d."
                                    "d11f94738ea722cfaddf111d2e8f756cb3b71f4f&lang=";
 
+static const QString sDEFAULT_IMG = "image://theme/icon-m-file-image";
+
 void Speechdownloader::initUrls(QVariant p)
 {
   QObject* pp = qvariant_cast<QObject*>(p);
+  pp->setProperty("sDEFAULT_IMG", sDEFAULT_IMG);
   pp->setProperty("sReqDictUrlBase", sReqDictUrlBase);
   pp->setProperty("sReqDictUrl", sReqDictUrl);
   pp->setProperty("sReqDictUrlRev", sReqDictUrlRev);
@@ -255,7 +258,7 @@ QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
     }
     else
     {
-      oOut =  QUrl("image://theme/icon-m-file-image");
+      oOut =  QUrl(sDEFAULT_IMG);
       return false;
     }
   };
@@ -291,7 +294,6 @@ void Speechdownloader::checkAndEmit(QString sPath1, QString sPath2)
 */
 
 
-/*
 void Speechdownloader::setImgFile(QString sWord, QString sLang, QString sWord2, QString sLang2,
                                   QString sImgFilePath)
 {
@@ -303,9 +305,9 @@ void Speechdownloader::setImgFile(QString sWord, QString sLang, QString sWord2, 
   oImageScaled.save(sImg1);
   QString sImg2 = ImgPath(sWord2, sLang2);
   QFile::copy(sImg1, sImg2);
-   checkAndEmit(sImg1, sImg2);
+   // checkAndEmit(sImg1, sImg2);
 }
-*/
+
 bool Speechdownloader::hasImage(QString sWord, QString sLang)
 {
   if (sWord.isEmpty())
