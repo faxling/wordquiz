@@ -9,8 +9,8 @@ Name:       harbour-wordquiz
 # << macros
 
 Summary:    Word quiz studio
-Version:    4.1
-Release:    1
+Version:    4.2
+Release:    0
 Group:      Qt/Qt
 License:    LICENSE
 URL:        https://github.com/faxling

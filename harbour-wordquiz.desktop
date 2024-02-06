@@ -4,7 +4,7 @@ X-Nemo-Application-Type=silica-qt5
 Icon=harbour-wordquiz
 Exec=harbour-wordquiz
 Name=WordQuiz Studio
-MimeType=application/gpx+xml
+Categories=Education
 
 [X-Sailjail]
 Permissions=UserDirs;Audio;Internet;MediaIndexing

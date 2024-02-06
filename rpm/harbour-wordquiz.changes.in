@@ -12,12 +12,29 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
-* Wed Aug 1 2019 Fredrik Axling <faxling11@gmail.com> 1.0-1
-- Initial released Version of Word Quiz
+* Tue Feb 6 2024 Fredrik Axling <faxling11@gmail.com> 4.2-0
+- Flashcard flip
+- Use WebView with custom popup
+- Filter and Sorting
+- Buggfixes
 
-* Wed Oct 23 2019 Fredrik Axling <faxling11@gmail.com> 2.0-1
-- Add Extra Info to word.
-- Add Uppload and Download from a quiz server
+* Sat Mar 27 2021 Fredrik Axling <faxling11@gmail.com> 4.1-1
+- Polish chars in Hangman
+- Handle Diacritics
+
+* Sun Mar 14 2021 Fredrik Axling <faxling11@gmail.com> 4.0-1
+- Add Hangman game
+
+* Wed Aug 19 2020 Fredrik Axling <faxling11@gmail.com> 3.2-1
+- New translation service mymemory.translated.net
+- Buggfixes
+
+* Mon Jul 13 2020 Fredrik Axling <faxling11@gmail.com> 3.1-1
+- Rename to WordQuiz Studio
+- Quiz Modify time
+- Sort Quiz list on Langauage pair
+- Lookup in wiktionary
+- Adjust for Jolla Phone
 - Buggfixes
 
 * Sun May 10 2020 Fredrik Axling <faxling11@gmail.com> 3.0-1
@@ -29,22 +46,18 @@
 - Web Search on text in clipboard
 - Buggfixes
 
-* Mon Jul 13 2020 Fredrik Axling <faxling11@gmail.com> 3.1-1
-- Rename to WordQuiz Studio
-- Quiz Modify time
-- Sort Quiz list on Langauage pair
-- Lookup in wiktionary
-- Adjust for Jolla Phone
+
+* Wed Oct 23 2019 Fredrik Axling <faxling11@gmail.com> 2.0-1
+- Add Extra Info to word.
+- Add Uppload and Download from a quiz server
 - Buggfixes
 
-* Wed Aug 19 2020 Fredrik Axling <faxling11@gmail.com> 3.2-1
-- New translation service mymemory.translated.net
-- Buggfixes
+* Wed Aug 1 2019 Fredrik Axling <faxling11@gmail.com> 1.0-1
+- Initial released Version of Word Quiz
 
-* Sun Mar 14 2021 Fredrik Axling <faxling11@gmail.com> 4.0-1
-- Add Hangman game
 
-* Sat Mar 27 2021 Fredrik Axling <faxling11@gmail.com> 4.1-1
-- Polish chars in Hangman
-- Handle Diacritics
+
+
+
+
 
