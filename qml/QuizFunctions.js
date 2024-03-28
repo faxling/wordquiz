@@ -688,7 +688,7 @@ function assignQuizModel(nIndexNewWordInModelWorking, nIndexInQuizModel) {
   var nNumberDbNewWord = glosModelWorking.get(j).number
   idQuizModel.get(i).numberDb = nNumberDbNewWord
   idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(
-                                       sQ, sLangLang)) + "?abc=" + Math.random()
+                                       sQ, sLangLang))
 }
 
 // Return false if already existing in the three item model
@@ -707,7 +707,8 @@ function assignQuizModelUnique(nIndexNewWordInModelWorking, nNumberInQuizModel) 
   idQuizModel.get(i).extra = glosModelWorking.get(j).extra
 
   idQuizModel.get(i).numberDb = nNumberDbNewWord
-  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ, sLangLang))
+  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(
+                                       sQ, sLangLang))
   return true
 }
 
@@ -1479,7 +1480,7 @@ function assigNextQuizWord() {
 
     if (glosModelWorking.count === 0) {
       setAllok(true)
-      idQuizModel.get(i).imgUrl = sDEFAULT_IMG
+      idQuizModel.get(i).imgUrl = idWindow.sDEFAULT_IMG
       idQuizModel.get(i).answerVisible = false
       idQuizModel.get(i).answer = ""
       idQuizModel.get(i).question = ""

@@ -63,7 +63,7 @@ struct EncUrl
   EncUrl& operator<<(const char* sz)
   {
     size_t n = strlen(sz);
-    if (sz[n-1] != '=')
+    if (sz[n - 1] != '=')
     {
       oc.append(sz);
       return *this;
@@ -92,7 +92,6 @@ private:
   bool m_bFirstPar = true;
   QByteArray oc;
 };
-
 
 namespace
 {
@@ -245,31 +244,33 @@ void Speechdownloader::setImgWord(QString sWord, QString sLang)
 // Try Select image from both languages in a pair
 QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
 {
+
+  // + "?abc=" + Math.random()
   auto oc = sLang.split("-");
 
-  auto GetImg = [&] (QString sWord, QString sLang, QUrl& oOut)
-  {
+  auto GetImg = [&](QString sWord, QString sLang, QUrl& oOut) {
     QString s = ImgPath(sWord, sLang);
     bool bEx = QFile::exists(s);
     if (bEx == true)
     {
-     oOut = QUrl::fromLocalFile(s);
-     return true;
+      oOut = QUrl::fromLocalFile(s);
+      oOut.setQuery("abc=" + QString::number(rand()));
+      return true;
     }
     else
     {
-      oOut =  QUrl(sDEFAULT_IMG);
+      oOut = QUrl(sDEFAULT_IMG);
       return false;
     }
   };
 
   QUrl oRet;
-  if (GetImg(sWord, oc[0],oRet))
+  if (GetImg(sWord, oc[0], oRet))
     return oRet;
 
   if (oc.size() < 2)
     return oRet;
-  GetImg(sWord, oc[1],oRet);
+  GetImg(sWord, oc[1], oRet);
   return oRet;
 }
 /*
@@ -293,7 +294,6 @@ void Speechdownloader::checkAndEmit(QString sPath1, QString sPath2)
 }
 */
 
-
 void Speechdownloader::setImgFile(QString sWord, QString sLang, QString sWord2, QString sLang2,
                                   QString sImgFilePath)
 {
@@ -305,7 +305,7 @@ void Speechdownloader::setImgFile(QString sWord, QString sLang, QString sWord2, 
   oImageScaled.save(sImg1);
   QString sImg2 = ImgPath(sWord2, sLang2);
   QFile::copy(sImg1, sImg2);
-   // checkAndEmit(sImg1, sImg2);
+  // checkAndEmit(sImg1, sImg2);
 }
 
 bool Speechdownloader::hasImage(QString sWord, QString sLang)
@@ -363,7 +363,7 @@ void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
   QString sImg2 = ImgPath(sWord2, sLang2);
   QFile::copy(sFileName, sImg2);
 
- //  checkAndEmit(sFileName, sImg2);
+  //  checkAndEmit(sFileName, sImg2);
 
   if (uQ.queryItemValue("emit").toInt() == 1)
   {
@@ -671,7 +671,6 @@ void Speechdownloader::sortQuizModel(int nRole, int sortOrder)
   else if (nRole == 1)
     m_pOLSortFilterProxyModel->setSortRole(LANGPAIR);
   m_pOLSortFilterProxyModel->sort(0, (Qt::SortOrder)sortOrder);
-
 }
 
 // Sort for local quizlist
@@ -826,7 +825,8 @@ void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
 
 void Speechdownloader::deleteQuiz(QString sName, QString sPwd, int nDbId)
 {
-  url << GLOS_SERVER2 "deletequiz.php" << "qname=" << sName << "qpwd=" << sPwd << "dbid=" << nDbId;
+  url << GLOS_SERVER2 "deletequiz.php"
+      << "qname=" << sName << "qpwd=" << sPwd << "dbid=" << nDbId;
   QNetworkRequest request(url);
   m_oDeleteQuizNetMgr.get(request);
 }
@@ -844,7 +844,8 @@ void Speechdownloader::importQuiz(QString sName, QObject* pProgressIndicator)
   //  QString sUrl = QString::asprintf(GLOS_SERVER2 "/quizload.php?qname=%s", Enc()(sName +
   //  ".txt"));
 
-  url << GLOS_SERVER2 "quizload.php" << "qname=" << sName << ".txt";
+  url << GLOS_SERVER2 "quizload.php"
+      << "qname=" << sName << ".txt";
 
   QNetworkRequest request(url);
   QNetworkReply* pNR = m_oQuizNetMgr.get(request);
