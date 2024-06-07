@@ -1,28 +1,28 @@
 #ifndef SVGDRAWING_H
 #define SVGDRAWING_H
-#include <QtQuick/QQuickPaintedItem>
-#include <QSvgRenderer>
-#include <QImage>
-#include <QDomNode>
 #include "QMutex"
+#include <QDomNode>
+#include <QImage>
+#include <QSvgRenderer>
+#include <QtQuick/QQuickPaintedItem>
 
 class SvgDrawing : public QQuickPaintedItem
 {
   Q_OBJECT
 public:
-
   // 0 Glad gubbe 1 Clear 2 Increment
   Q_INVOKABLE bool renderId(int nId);
   Q_INVOKABLE void answerShown();
   Q_INVOKABLE void setColor(const QColor& sColor);
   // 1 = Fantastic 2 = Greate 3 You Made it , Well (if sheeted)
   Q_INVOKABLE QString getRating();
-  void paint(QPainter *painter) override;
+  void paint(QPainter* painter) override;
   SvgDrawing();
+
 private:
   void setOpacityOnId(const QString& id, const QString& op);
-  void geometryChanged(const QRectF &newGeometry,
-                       const QRectF &oldGeometry) override;
+  void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) ;
+   void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) ;
   QSvgRenderer m_oSvg;
   QVector<QString> m_oSvgIds;
   QVector<QString> m_oSvgHIds;

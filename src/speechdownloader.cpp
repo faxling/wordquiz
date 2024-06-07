@@ -14,8 +14,10 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonValue>
-#include <QSound>
+#include <QRegularExpression>
+#include <QSoundEffect>
 #include <QTextDocument>
+#include <QTextDocumentFragment>
 #include <QUrl>
 #include <QUrlQuery>
 #include <random>
@@ -115,7 +117,9 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject* pParent
   m_sStoragePath = sStoragePath;
 
   qDebug() << "WordQuiz StoragePath: " << m_sStoragePath;
-  QSound::play("qrc:welcome_en.wav");
+
+  m_oSound.Play("qrc:welcome_en.wav");
+
   m_pStopWatch = nullptr;
 }
 
@@ -152,7 +156,7 @@ QString Speechdownloader::ignoreAccentLC(QString str)
 {
   static QString sssIn = QString::fromWCharArray(L"íîàáâãèéêëòóôõõùúûçёщąćęłńóśźż");
   static QString sssOut = QString::fromWCharArray(L"iiaaaaeeeeooooouuucешacelnoszz");
-  static QRegExp oReg("[\\W]"); // Matches a non-word character.
+  static QRegularExpression oReg("[\\W]"); // Matches a non-word character.
   str.replace(oReg, "");
 
   str = str.toLower();
@@ -178,7 +182,7 @@ QString Speechdownloader::ignoreAccent(QString str)
 {
   static QString sssIn = QString::fromWCharArray(L"ÍÎÀÁÂÃÈÉÊËÒÓÔÕÕÙÚÛÇЁЩĄĆĘŁŃÓŚŹŻ");
   static QString sssOut = QString::fromWCharArray(L"IIAAAAEEEEOOOOOUUUCЕШACELNOSZZ");
-  static QRegExp oReg("[\\W]"); // Matches a non-word character.
+  static QRegularExpression oReg("[\\W]"); // Matches a non-word character.
   str.replace(oReg, "");
 
   str = str.toUpper();
@@ -198,6 +202,16 @@ void Speechdownloader::openUrl(QString sUrl)
 {
   //  QProcess::startDetached("/usr/bin/sailfish-browser " + sUrl);
   QDesktopServices::openUrl(QUrl(sUrl));
+}
+
+QString Speechdownloader::trim(QString str)
+{
+  static QRegularExpression oB("^[\\s:.]+");
+  static QRegularExpression oE("[\\s:.]+$");
+
+  str.replace(oB, "");
+  str.replace(oE, "");
+  return str;
 }
 
 QString Speechdownloader::removeDiacritics(QString str)
@@ -405,7 +419,7 @@ void Speechdownloader::wordDownloaded(QNetworkReply* pReply)
   emit downloadedSignal();
   if (uQ.hasQueryItem("PlayAfterDownload") == true)
   {
-    QSound::play(sFileName);
+    m_oSound.Play(sFileName);
   }
 }
 
@@ -557,13 +571,19 @@ QString sVoicetechKo(QStringLiteral("http://"
                                     "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
                                     "44khz_16bit_mono&hl=ko-kr&src="));
 
+void Sound::Play(const QString& sUrl)
+{
+  setSource(QUrl::fromLocalFile(sUrl));
+  play();
+}
+
 void Speechdownloader::playWord(QString sWord, QString sLang)
 {
   QString sFileName = AudioPath(sWord, sLang);
   QFileInfo oWavFile(sFileName);
   if (oWavFile.size() > 10000)
   {
-    QSound::play(sFileName);
+    m_oSound.Play(sFileName);
   }
   else
   {
@@ -576,6 +596,83 @@ void Speechdownloader::deleteWord(QString sWord, QString sLang)
 {
   if (QFile::exists(AudioPath(sWord, sLang)))
     QFile::remove(AudioPath(sWord, sLang));
+}
+
+QStringList Speechdownloader::ChildList(const QString& sNodeName, QDomNode& oNode)
+{
+  QDomNode n = oNode.firstChildElement(sNodeName);
+  QStringList ocRet;
+  while (n.isNull() == false)
+  {
+    qDebug() << n.firstChild().nodeValue();
+    qDebug() << n.nodeName();
+    ocRet.append(n.firstChild().nodeValue());
+    n = n.nextSiblingElement(sNodeName);
+  }
+
+  return ocRet;
+}
+
+QStringList Speechdownloader::ChildList(const QString& sNodeName, const QString& sSubNodeName,
+                                        QDomNode& oNode)
+{
+  QDomNode n = oNode.firstChildElement(sNodeName);
+
+  QStringList ocRet;
+
+  while (n.isNull() == false)
+  {
+    QDomNode nn = n.firstChildElement(sSubNodeName);
+    qDebug() << nn.nodeName();
+    QString s = nn.firstChild().nodeValue();
+    ocRet.append(s);
+    n = n.nextSiblingElement(sNodeName);
+  }
+
+  return ocRet;
+}
+
+QStringList Speechdownloader::synListFromWord(QString sWord)
+{
+  return m_ocSyn[sWord];
+}
+
+QStringList Speechdownloader::meanListFromWord(QString sWord)
+{
+  return m_ocMean[sWord];
+}
+
+QString Speechdownloader::assignTranslateModelFromXml(QByteArray o)
+{
+
+  m_oDomTranslate.setContent(o);
+  QStringList ocRet;
+  auto oDic = m_oDomTranslate.elementsByTagName("DicResult");
+
+  QDomNode oDicNodes = oDic.item(0);
+  QDomNode nn = oDicNodes.firstChildElement("def");
+
+  for (QDomNode oI = nn.firstChildElement("tr"); oI.isElement(); oI = oI.nextSiblingElement("tr"))
+  {
+    QString sKey = ChildList("text", oI).first();
+    auto oc1 = ChildList("syn", "text", oI);
+    auto oc2 = ChildList("mean", "text", oI);
+    if ((oc1.count() + oc2.count()) > 0)
+      sKey += "...";
+    ocRet.append(sKey);
+    m_ocMean[sKey] = oc2;
+    m_ocSyn[sKey] = oc1;
+  }
+
+  m_pTrTextList->setProperty("model", ocRet);
+  if (ocRet.isEmpty())
+  {
+    QString sKey = "-";
+    m_ocMean[sKey].clear();
+    m_ocSyn[sKey].clear();
+    return sKey;
+  }
+  return ocRet.first();
 }
 
 void Speechdownloader::downloadImageSlot(const QList<QUrl>& vImgUrl, QString sWord, QString sLang,
@@ -1021,22 +1118,20 @@ void Speechdownloader::transDownloaded()
   QObject* pO = qvariant_cast<QObject*>(pReply->property("button"));
   pO->setProperty("bProgVisible", false);
   QString sLang = pReply->property("tolang").toString();
+
   if (sLang != "ru" && sLang != "en")
   {
-    auto addText = [](const QJsonValue& s) { return "<tr><text>" + s.toString() + "</text></tr>"; };
-
-    static QString sDictXmlBegin("<DicResult><def>");
-    static QString sDictXmlEnd("</def></DicResult>");
     QJsonArray jsMatches = ocJson["matches"].toArray();
-    QString sDictXml(sDictXmlBegin);
+    QStringList sDictList;
     for (const auto& oI : jsMatches)
-    {
-      sDictXml.append(addText(oI.toObject()["translation"]));
-    }
-    sDictXml.append(sDictXmlEnd);
-    m_pTrTextModel->setProperty("xml", sDictXml);
-    m_pTrSynModel->setProperty("xml", "");
-    m_pTrMeanModel->setProperty("xml", "");
+      sDictList.append(
+          QTextDocumentFragment::fromHtml(oI.toObject()["translation"].toString()).toPlainText());
+
+    m_pTrTextList->setProperty("model", sDictList);
+
+    // m_pTrTextModel->setProperty("xml", sDictXml);
+    // m_pTrSynModel->setProperty("xml", "");
+    // m_pTrMeanModel->setProperty("xml", "");
   }
 
   pReply->deleteLater();
@@ -1137,14 +1232,13 @@ int Speechdownloader::popIndex()
   return m_ocIndexStack.takeLast();
 }
 
-void Speechdownloader::storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTrTextModel,
-                                      QObject* pTrSynModel, QObject* pTrMeanModel)
+void Speechdownloader::storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTransTextList)
 {
   m_pErrorTextField = pErrorTextField;
   m_sTranslatedText = p;
-  m_pTrTextModel = pTrTextModel;
-  m_pTrSynModel = pTrSynModel;
-  m_pTrMeanModel = pTrMeanModel;
+  m_pTrTextList = pTransTextList;
+  // m_pTrSynModel = pTrSynModel;
+  // m_pTrMeanModel = pTrMeanModel;
 }
 
 void Speechdownloader::storeTextInputField(int n, QObject* p)

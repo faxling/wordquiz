@@ -2,7 +2,7 @@
 
 #include <QDebug>
 #include <QElapsedTimer>
-#include <QRegExp>
+#include <QRegularExpression>
 
 StopWatch::StopWatch(const QString& sMsg)
 {
@@ -60,7 +60,7 @@ void StopWatch::Continue()
   // FIXTIT
 }
 
-static const QRegExp SLASH("[\\\\/]");
+static const QRegularExpression SLASH("[\\\\/]");
 QString JustFileName(const QString& sFileName)
 {
   int n = sFileName.lastIndexOf(SLASH);

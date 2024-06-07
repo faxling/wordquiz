@@ -1,20 +1,28 @@
 #ifndef SPEECHDOWNLOADER_H
 #define SPEECHDOWNLOADER_H
 
+#include <QDomElement>
+#include <QDomDocument>
+
 #include <QByteArray>
 #include <QEventLoop>
 #include <QJSValue>
 #include <QMap>
 #include <QObject>
-#include <QVector>
 #include <QSortFilterProxyModel>
+#include <QSoundEffect>
+#include <QVector>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
-
 class StopWatch;
 class QuizFilterModel;
 
+class Sound : public QSoundEffect
+{
+public:
+  void Play(const QString& sUrl);
+};
 
 // Maybe more that just downloading audio
 // Handles network connections and some utility functions eg for sorting
@@ -41,17 +49,16 @@ public:
   // For the ones in the local db
   Q_INVOKABLE QObject* setOLFilterProxy(QObject* pModel);
   // sorts the localquiz list
- /*
-      AscendingOrder = 0
-      DescendingOrder = 1
-  */
+  /*
+       AscendingOrder = 0
+       DescendingOrder = 1
+   */
   Q_INVOKABLE void sortQuizModel(int nRole, int nOrder);
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void listQuizLang(QString sLang);
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, int nDbId);
-  Q_INVOKABLE void storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTrTextModel,
-                                  QObject* pTrSynModel, QObject* pTrMeanModel);
-  Q_INVOKABLE void storeTextInputField(int n,QObject* p);
+  Q_INVOKABLE void storeTransText(QObject* p, QObject* pErrorTextField,QObject* pTransTextList);
+  Q_INVOKABLE void storeTextInputField(int n, QObject* p);
   void AssignRoles();
   Q_INVOKABLE bool isSpecial(QString s);
 
@@ -73,14 +80,15 @@ public:
   Q_INVOKABLE QString ignoreAccent(QString s);
   QString ignoreAccentLC(QString s);
   Q_INVOKABLE QString removeDiacritics(QString str);
+  Q_INVOKABLE QString trim(QString str);
   Q_INVOKABLE bool hasImage(QString sWord, QString sLang);
   Q_INVOKABLE QUrl imageSrc(QString sWord, QString sLang);
- // Q_INVOKABLE void setImgWord(QString sWord, QString sLang);
- //  void checkAndEmit(QString sPath1, QString sPath2);
+  // Q_INVOKABLE void setImgWord(QString sWord, QString sLang);
+  //  void checkAndEmit(QString sPath1, QString sPath2);
   Q_INVOKABLE void setImgFile(QString sWord, QString sLang, QString sWord2, QString sLang2,
-                             QString sImgFilePath);
+                              QString sImgFilePath);
   // Q_PROPERTY(QUrl urlImg READ urlImg NOTIFY urlImgChanged)
- // Q_PROPERTY(bool hasImg READ hasImg NOTIFY hasImgChanged)
+  // Q_PROPERTY(bool hasImg READ hasImg NOTIFY hasImgChanged)
   Q_INVOKABLE QString dateStr();
   Q_INVOKABLE double rand();
   Q_INVOKABLE void showKey(bool b);
@@ -88,6 +96,13 @@ public:
 
   void downloadImageSlot(const QList<QUrl>& sImgUrl, QString sWord, QString sLang, QString sWord2,
                          QString sLang2, bool bSignalDownloaded);
+
+  QStringList ChildList(const QString& sElemName,QDomNode& oNode);
+  QStringList ChildList(const QString& sElemName,const QString& sSubElemName,QDomNode& oNode);
+  Q_INVOKABLE QString assignTranslateModelFromXml(QByteArray o);
+  Q_INVOKABLE QStringList synListFromWord(QString sWord);
+  Q_INVOKABLE QStringList meanListFromWord(QString sWord);
+
 signals:
   void downloadImage(const QList<QUrl>& sImgUrl, QString sWord, QString sLang, QString sWord2,
                      QString sLang2, bool bSignalDownloaded = false);
@@ -97,11 +112,11 @@ signals:
   void downloadedImgSignal();
   void exportedSignal(int nResponce);
   void deletedSignal(int nResponce);
-//  void hasImgChanged();
- // void urlImgChanged();
+  //  void hasImgChanged();
+  // void urlImgChanged();
 
 private:
-  //QUrl urlImg();
+  // QUrl urlImg();
   // bool hasImg();
   void quizDownloaded(QNetworkReply* pReply);
   void listDownloaded(QNetworkReply* pReply);
@@ -117,6 +132,7 @@ private:
   void currentQuizCmd(QVariant p, QString sName, QString sLang, QString sPwd, QString sDesc,
                       QString sCmd, QObject* pProgressIndicator);
 
+  QDomDocument m_oDomTranslate;
   QString AudioPath(const QString& s, const QString& sLang);
   QString ImgPath(const QString& s, const QString& sLang);
   QString m_sStoragePath;
@@ -132,11 +148,11 @@ private:
   QMap<int, QObject*> m_ocTextInputElem;
   QObject* m_sTranslatedText;
   QObject* m_pErrorTextField;
-  QObject* m_pTrTextModel;
-  QObject* m_pTrSynModel;
-  QObject* m_pTrMeanModel;
-  QuizFilterModel*  m_pSortFilterProxyModel = nullptr;
-  QSortFilterProxyModel*  m_pOLSortFilterProxyModel = nullptr;
+  QObject* m_pTrTextList;
+ // QObject* m_pTrSynModel;
+ // QObject* m_pTrMeanModel;
+  QuizFilterModel* m_pSortFilterProxyModel = nullptr;
+  QSortFilterProxyModel* m_pOLSortFilterProxyModel = nullptr;
   QByteArray m_oDownloadedData;
 
   bool m_bPlayAfterDownload = false;
@@ -144,7 +160,10 @@ private:
   StopWatch* m_pStopWatch;
   QUrl m_oImgUrl;
   QString m_sImgPath;
-//  bool m_bHasImg = false;
+  Sound m_oSound;
+  QMap<QString,QStringList> m_ocSyn;
+  QMap<QString,QStringList> m_ocMean;
+  //  bool m_bHasImg = false;
 };
 
 #endif // SPEECHDOWNLOADER_H

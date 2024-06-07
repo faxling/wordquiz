@@ -3,7 +3,6 @@ import Sailfish.Silica 1.0
 
 Rectangle {
   radius: 10
-
   anchors.fill: parent
   color: Theme.overlayBackgroundColor
   Image {

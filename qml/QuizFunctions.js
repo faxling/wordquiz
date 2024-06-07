@@ -3,65 +3,65 @@ function initLangList() {
   // https://www.countryflags.com/
   idLangModel.append({
                        "lang": "Swedish",
-                       "imgsource": "qrc:/sweden-flag-button-round-icon-128.png",
+                       "imgsource": "qrc:flags/sweden-flag-button-round-icon-128.png",
                        "code": "sv"
                      })
 
   idLangModel.append({
                        "lang": "Russian",
-                       "imgsource": "qrc:/russia-flag-button-round-icon-128.png",
+                       "imgsource": "qrc:flags/russia-flag-button-round-icon-128.png",
                        "code": "ru"
                      })
 
   idLangModel.append({
                        "lang": "French",
-                       "imgsource": "qrc:/france-flag-button-round-icon-128.png",
+                       "imgsource": "qrc:flags/france-flag-button-round-icon-128.png",
                        "code": "fr"
                      })
   idLangModel.append({
                        "lang": "Italian",
-                       "imgsource": "qrc:/italy-flag-button-round-icon-128.png",
+                       "imgsource": "qrc:flags/italy-flag-button-round-icon-128.png",
                        "code": "it"
                      })
 
   idLangModel.append({
                        "lang": "English",
-                       "imgsource": "qrc:/united-kingdom-flag-button-round-icon-128.png",
+                       "imgsource": "qrc:flags/united-kingdom-flag-button-round-icon-128.png",
                        "code": "en"
                      })
 
   idLangModel.append({
                        "lang": "German",
-                       "imgsource": "qrc:/germany-flag-button-round-icon-128.png",
+                       "imgsource": "qrc:flags/germany-flag-button-round-icon-128.png",
                        "code": "de"
                      })
   idLangModel.append({
                        "lang": "Polish",
-                       "imgsource": "qrc:/poland-flag-button-round-icon-128.png",
+                       "imgsource": "qrc:flags/poland-flag-button-round-icon-128.png",
                        "code": "pl"
                      })
 
   idLangModel.append({
                        "lang": "Norvegian",
-                       "imgsource": "qrc:/norway-flag-button-round-icon-128.png",
+                       "imgsource": "qrc:flags/norway-flag-button-round-icon-128.png",
                        "code": "no"
                      })
 
   idLangModel.append({
                        "lang": "Spanish",
-                       "imgsource": "qrc:/spain-flag-button-round-icon-128.png",
+                       "imgsource": "qrc:flags/spain-flag-button-round-icon-128.png",
                        "code": "es"
                      })
 
   idLangModel.append({
                        "lang": "Hungarian",
-                       "imgsource": "qrc:/hungary-flag-button-round-icon-128.png",
+                       "imgsource": "qrc:flags/hungary-flag-button-round-icon-128.png",
                        "code": "hu"
                      })
 
   idLangModel.append({
                        "lang": "Korean",
-                       "imgsource": "qrc:/south-korea-flag-button-round-icon-128.png",
+                       "imgsource": "qrc:flags/south-korea-flag-button-round-icon-128.png",
                        "code": "ko"
                      })
 }
@@ -465,6 +465,7 @@ function updateDesc1(sDesc) {
   })
 }
 
+
 function downloadDictOnWord(sUrl, sWord) {
   var doc = new XMLHttpRequest()
   doc.open("GET", sUrl + sWord)
@@ -472,11 +473,15 @@ function downloadDictOnWord(sUrl, sWord) {
   doc.onreadystatechange = function () {
 
     if (doc.readyState === XMLHttpRequest.DONE) {
+
       if (doc.status === 200) {
         idErrorText.visible = false
-        idTrSynModel.xml = doc.responseText
-        idTrTextModel.xml = doc.responseText
-        idTrMeanModel.xml = doc.responseText
+        var sFirstWord = MyDownloader.assignTranslateModelFromXml(doc.responseText)
+        idSynListView.model = MyDownloader.synListFromWord(sFirstWord)
+        idMeanListView.model = MyDownloader.meanListFromWord(sFirstWord)
+        //idTrSynModel.xml = doc.responseText
+        //idTrTextModel.xml = doc.responseText
+        //idTrMeanModel.xml = doc.responseText
       } else {
         idErrorText.text = "-"
         idErrorText.visible = true
@@ -630,8 +635,12 @@ function getAndInitDb() {
   return db
 }
 
+
+
+
 function assignTextInputField(text) {
-  text = text.trim()
+  text = MyDownloader.trim(text)
+
   if (nLastSearch !== 1)
     idTextInput2.text = text + " "
   else
@@ -687,8 +696,7 @@ function assignQuizModel(nIndexNewWordInModelWorking, nIndexInQuizModel) {
   idQuizModel.get(i).extra = glosModelWorking.get(j).extra
   var nNumberDbNewWord = glosModelWorking.get(j).number
   idQuizModel.get(i).numberDb = nNumberDbNewWord
-  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(
-                                       sQ, sLangLang))
+  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ, sLangLang))
 }
 
 // Return false if already existing in the three item model
@@ -707,8 +715,7 @@ function assignQuizModelUnique(nIndexNewWordInModelWorking, nNumberInQuizModel) 
   idQuizModel.get(i).extra = glosModelWorking.get(j).extra
 
   idQuizModel.get(i).numberDb = nNumberDbNewWord
-  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(
-                                       sQ, sLangLang))
+  idQuizModel.get(i).imgUrl = String(MyDownloader.imageSrc(sQ, sLangLang))
   return true
 }
 

@@ -177,7 +177,6 @@ Item {
         id: idDicList
         width: n3BtnWidth + 60
         height: parent.height
-        model: idTrTextModel
         highlightFollowsCurrentItem: true
 
         delegate: Row {
@@ -185,43 +184,40 @@ Item {
           TextList {
             id: idSearchItem
             width: idDicList.width
-            text: text1 + " " + (count1 > 0 ? "..." : "")
+            text: modelData
             MouseArea {
               anchors.fill: parent
               onClicked: {
                 idDicList.currentIndex = index
-                var sText = idSearchItem.text.replace("...", "")
+                var sText = idSearchItem.text
                 QuizLib.assignTextInputField(sText)
-                idTrSynModel.query = "/DicResult/def/tr[" + (index + 1) + "]/syn"
-                idTrMeanModel.query = "/DicResult/def/tr[" + (index + 1) + "]/mean"
+                idSynListView.model = MyDownloader.synListFromWord(sText)
+                idMeanListView.model = MyDownloader.meanListFromWord(sText)
               }
             }
           }
         }
       }
       ListView {
-        model: idTrSynModel
+        id: idSynListView
         clip: true
         width: n3BtnWidth
         height: parent.height
         delegate: TextList {
           id: idSynText
-          text: syn
+          text: modelData
           onClick: {
             QuizLib.assignTextInputField(idSynText.text)
           }
         }
       }
       ListView {
-        model: idTrMeanModel
+        id: idMeanListView
         width: n3BtnWidth
         height: parent.height
         delegate: TextList {
           id: idMeanText
-          text: mean
-          onClick: {
-            QuizLib.assignTextInputField(idMeanText.text)
-          }
+          text: modelData
         }
       }
     }
@@ -459,46 +455,6 @@ Item {
       onClicked: {
         QuizLib.deleteWordInQuiz()
       }
-    }
-  }
-
-  XmlListModel {
-    id: idTrTextModel
-    onStatusChanged: {
-      if (status === XmlListModel.Ready) {
-        if (idTrTextModel.count <= 0) {
-          idTextTrans.text = "-"
-          return
-        }
-        idTrSynModel.query = "/DicResult/def/tr[1]/syn"
-        idTrMeanModel.query = "/DicResult/def/tr[1]/mean"
-      }
-    }
-
-    query: "/DicResult/def/tr"
-    XmlRole {
-      name: "count1"
-      query: "count(syn)"
-    }
-    XmlRole {
-      name: "text1"
-      query: "text/string()"
-    }
-  }
-
-  XmlListModel {
-    id: idTrSynModel
-    XmlRole {
-      name: "syn"
-      query: "text/string()"
-    }
-  }
-
-  XmlListModel {
-    id: idTrMeanModel
-    XmlRole {
-      name: "mean"
-      query: "text/string()"
     }
   }
 }
