@@ -242,11 +242,7 @@ Item {
     anchors.bottom: parent.bottom
     anchors.bottomMargin: 20
     source: "image://theme/icon-m-speaker-on"
-    onClicked: {
-      var sL = bIsReverseHang ? sToLang : sFromLang
-      idDrawing.answerShown()
-      MyDownloader.playWord(sHangWord, sL)
-    }
+    onClicked: QuizLib.playHangWord()
   }
 
   Timer {

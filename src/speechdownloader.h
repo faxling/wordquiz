@@ -1,8 +1,8 @@
 #ifndef SPEECHDOWNLOADER_H
 #define SPEECHDOWNLOADER_H
 
-#include <QDomElement>
 #include <QDomDocument>
+#include <QDomElement>
 
 #include <QByteArray>
 #include <QEventLoop>
@@ -57,7 +57,7 @@ public:
   Q_INVOKABLE void listQuiz();
   Q_INVOKABLE void listQuizLang(QString sLang);
   Q_INVOKABLE void deleteQuiz(QString sName, QString sPwd, int nDbId);
-  Q_INVOKABLE void storeTransText(QObject* p, QObject* pErrorTextField,QObject* pTransTextList);
+  Q_INVOKABLE void storeTransText(QObject* p, QObject* pErrorTextField, QObject* pTransTextList);
   Q_INVOKABLE void storeTextInputField(int n, QObject* p);
   void AssignRoles();
   Q_INVOKABLE bool isSpecial(QString s);
@@ -92,13 +92,14 @@ public:
   Q_INVOKABLE QString dateStr();
   Q_INVOKABLE double rand();
   Q_INVOKABLE void showKey(bool b);
+  Q_INVOKABLE void requestPerm();
   void loadProgressSlot(qint64 bytesReceived, qint64 bytesTotal);
 
-  void downloadImageSlot(const QList<QUrl>& sImgUrl, QString sWord, QString sLang, QString sWord2,
-                         QString sLang2, bool bSignalDownloaded);
+  Q_INVOKABLE void downloadImageSlot(const QList<QUrl>& sImgUrl, QString sWord, QString sLang,
+                                     QString sWord2, QString sLang2, bool bSignalDownloaded);
 
-  QStringList ChildList(const QString& sElemName,QDomNode& oNode);
-  QStringList ChildList(const QString& sElemName,const QString& sSubElemName,QDomNode& oNode);
+  QStringList ChildList(const QString& sElemName, QDomNode& oNode);
+  QStringList ChildList(const QString& sElemName, const QString& sSubElemName, QDomNode& oNode);
   Q_INVOKABLE QString assignTranslateModelFromXml(QByteArray o);
   Q_INVOKABLE QStringList synListFromWord(QString sWord);
   Q_INVOKABLE QStringList meanListFromWord(QString sWord);
@@ -149,8 +150,8 @@ private:
   QObject* m_sTranslatedText;
   QObject* m_pErrorTextField;
   QObject* m_pTrTextList;
- // QObject* m_pTrSynModel;
- // QObject* m_pTrMeanModel;
+  // QObject* m_pTrSynModel;
+  // QObject* m_pTrMeanModel;
   QuizFilterModel* m_pSortFilterProxyModel = nullptr;
   QSortFilterProxyModel* m_pOLSortFilterProxyModel = nullptr;
   QByteArray m_oDownloadedData;
@@ -161,8 +162,8 @@ private:
   QUrl m_oImgUrl;
   QString m_sImgPath;
   Sound m_oSound;
-  QMap<QString,QStringList> m_ocSyn;
-  QMap<QString,QStringList> m_ocMean;
+  QMap<QString, QStringList> m_ocSyn;
+  QMap<QString, QStringList> m_ocMean;
   //  bool m_bHasImg = false;
 };
 

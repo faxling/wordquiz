@@ -22,6 +22,10 @@
 #include <QUrlQuery>
 #include <random>
 
+#ifdef Q_OS_ANDROID
+#include <QtCore/private/qandroidextras_p.h>
+#endif
+
 #include "filehelpers.h"
 
 // https://cloud.ibm.com/resources
@@ -157,8 +161,8 @@ QString Speechdownloader::ignoreAccentLC(QString str)
   static QString sssIn = QString::fromWCharArray(L"íîàáâãèéêëòóôõõùúûçёщąćęłńóśźż");
   static QString sssOut = QString::fromWCharArray(L"iiaaaaeeeeooooouuucешacelnoszz");
   static QRegularExpression oReg("[\\W]"); // Matches a non-word character.
-  str.replace(oReg, "");
 
+  str.replace(oReg, "");
   str = str.toLower();
 
   for (auto i = str.begin(); i != str.end(); i++)
@@ -1181,6 +1185,19 @@ int Speechdownloader::indexFromGlosNr(QVariant p, int nNr)
   }
 
   return -1;
+}
+
+void Speechdownloader::requestPerm()
+{
+
+  static const QString READ_PERMISSION{QStringLiteral("android.permission.READ_EXTERNAL_STORAGE")};
+
+
+  auto oRes = QtAndroidPrivate::requestPermission(READ_PERMISSION);
+
+  oRes.waitForFinished();
+  if (oRes.result() != QtAndroidPrivate::Authorized)
+    return;
 }
 
 void Speechdownloader::showKey(bool b)

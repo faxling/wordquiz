@@ -66,6 +66,22 @@ function initLangList() {
                      })
 }
 
+function playHangWord()
+{
+  let sL
+  if (idTTrans.visible)
+  {
+    sL = bIsReverseHang ? sFromLang : sToLang
+    MyDownloader.playWord(idTTrans.text, sL)
+  }
+  else
+  {
+    sL = bIsReverseHang ? sToLang : sFromLang
+    MyDownloader.playWord(sHangWord, sL)
+  }
+}
+
+
 function hangUpdateImage() {
   var n = idLangModel.count
   var sL = bIsReverseHang ? sToLang : sFromLang
@@ -81,7 +97,9 @@ function hangUpdateImage() {
 
 function destroyChildren(idOc) {
   for (var childIndex in idOc.children) {
-    idOc.children[childIndex].destroy()
+    if (typeof idOc.children[childIndex].destroy !== "undefined") {
+      idOc.children[childIndex].destroy()
+    }
   }
   idOc.children = null
 }
@@ -341,6 +359,11 @@ function setAnswerVisible() {
 function toggleAnswerVisible() {
   var i = nQuizIndex1_3
   idQuizModel.get(i).answerVisible = !idQuizModel.get(i).answerVisible
+  if (bTextMode && idQuizModel.get(i).answerVisible)
+  {
+    bTextAnswerOk = true
+  }
+
 }
 
 function resetTakeQuizTab() {
@@ -397,7 +420,7 @@ function reqTranslation(oBtnIn, bIsSecond) {
 
 function openWwwPage(sUrl, sTitle) {
   if (typeof pageStack === "undefined") {
-    MyDownloader.openUrl(sUrl)
+    idWindow.loadInView(sTitle,sUrl)
   } else
     pageStack.push("pages/WikiView.qml", {
                      "url": sUrl,
@@ -425,7 +448,9 @@ function lookUppInWiki() {
 
   var sUrl = "http://" + sLang + ".wiktionary.org/w/index.php?title=" + oInText.toLowerCase()
 
+  MyDownloader.toClipBoard(oInText)
   openWwwPage(sUrl, sLang + " Wiktionary on \"" + oInText + "\"")
+
 }
 
 function showUpploadDlg() {
@@ -465,7 +490,6 @@ function updateDesc1(sDesc) {
   })
 }
 
-
 function downloadDictOnWord(sUrl, sWord) {
   var doc = new XMLHttpRequest()
   doc.open("GET", sUrl + sWord)
@@ -476,7 +500,8 @@ function downloadDictOnWord(sUrl, sWord) {
 
       if (doc.status === 200) {
         idErrorText.visible = false
-        var sFirstWord = MyDownloader.assignTranslateModelFromXml(doc.responseText)
+        var sFirstWord = MyDownloader.assignTranslateModelFromXml(
+              doc.responseText)
         idSynListView.model = MyDownloader.synListFromWord(sFirstWord)
         idMeanListView.model = MyDownloader.meanListFromWord(sFirstWord)
         //idTrSynModel.xml = doc.responseText
@@ -540,6 +565,7 @@ function getAndInitDb() {
 
   db = Sql.LocalStorage.openDatabaseSync("GlosDB", "1.0",
                                          "Glos Databas!", 1000000)
+
 
   db.transaction(function (tx) {
 
@@ -634,9 +660,6 @@ function getAndInitDb() {
   })
   return db
 }
-
-
-
 
 function assignTextInputField(text) {
   text = MyDownloader.trim(text)
@@ -1472,6 +1495,9 @@ function assigNextQuizWord() {
 
   if (glosModelWorking.count === 0)
     return
+
+  if (bTextMode)
+    bTextAnswerOk = false
 
   var nLastNumber = idQuizModel.get(nLastQuizIndex1_3).numberDb
 
