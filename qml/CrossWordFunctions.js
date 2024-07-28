@@ -50,8 +50,7 @@ function handleCharInput(text) {
     oCursorSq = idCrossWordGrid.children[nNI]
     var chIn = text.charAt(i)
 
-    if (MyDownloader.ignoreAccent(chIn) === MyDownloader.ignoreAccent(
-          oCursorSq.textA)) {
+    if (MyDownloader.ignoreAccentCmp(chIn, oCursorSq.textA)) {
       oCursorSq.text = oCursorSq.textA
       oCursorSq.eSquareType = idCrossWordItem.cDone
     } else {
@@ -148,7 +147,6 @@ function popupOnPressJolla(charRect, textBox) {
     idInputBox.x = oP.x
     idInputBox.nIndex = charRect.nIndex
     idInputBox.visible = true
-    idInputBox.t.forceActiveFocus()
     Qt.inputMethod.show()
   } else {
     idInputBox.visible = false
@@ -188,9 +186,8 @@ function popupOnPress(charRect, textBox, fontMetrics) {
     idInputBox.nIndex = charRect.nIndex
     idInputBox.visible = true
     idInputBox.parent = charRect
-    idInputBox.t.forceActiveFocus()
   } else {
-    Qt.inputMethod.hide()
+     Qt.inputMethod.hide()
   }
 }
 

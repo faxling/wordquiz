@@ -66,21 +66,16 @@ function initLangList() {
                      })
 }
 
-function playHangWord()
-{
+function playHangWord() {
   let sL
-  if (idTTrans.visible)
-  {
+  if (idTTrans.visible) {
     sL = bIsReverseHang ? sFromLang : sToLang
     MyDownloader.playWord(idTTrans.text, sL)
-  }
-  else
-  {
+  } else {
     sL = bIsReverseHang ? sToLang : sFromLang
     MyDownloader.playWord(sHangWord, sL)
   }
 }
-
 
 function hangUpdateImage() {
   var n = idLangModel.count
@@ -177,8 +172,7 @@ function hangAddWord() {
 function hangCheckCharInColumn(sChar, oColumn) {
 
   for (var i in oColumn.children) {
-    if (MyDownloader.ignoreAccent(
-          oColumn.children[i].text) === MyDownloader.ignoreAccent(sChar))
+    if (MyDownloader.ignoreAccentCmp(oColumn.children[i].text, sChar))
       return true
   }
 
@@ -231,8 +225,7 @@ function hangEnterChar() {
 
     ++nValidCount
 
-    if (MyDownloader.ignoreAccent(sHangWord[i]) === MyDownloader.ignoreAccent(
-          idCharRect.text[0])) {
+    if (MyDownloader.ignoreAccentCmp(sHangWord[i], idCharRect.text[0])) {
       nC += 1
       idOrdRow.children[i].text = sHangWord[i]
       sCurrentRow[i] = sHangWord[i]
@@ -359,11 +352,9 @@ function setAnswerVisible() {
 function toggleAnswerVisible() {
   var i = nQuizIndex1_3
   idQuizModel.get(i).answerVisible = !idQuizModel.get(i).answerVisible
-  if (bTextMode && idQuizModel.get(i).answerVisible)
-  {
+  if (bTextMode && idQuizModel.get(i).answerVisible) {
     bTextAnswerOk = true
   }
-
 }
 
 function resetTakeQuizTab() {
@@ -420,7 +411,7 @@ function reqTranslation(oBtnIn, bIsSecond) {
 
 function openWwwPage(sUrl, sTitle) {
   if (typeof pageStack === "undefined") {
-    idWindow.loadInView(sTitle,sUrl)
+    idWindow.loadInView(sTitle, sUrl)
   } else
     pageStack.push("pages/WikiView.qml", {
                      "url": sUrl,
@@ -446,11 +437,10 @@ function lookUppInWiki() {
   if (oInText === "")
     return
 
-  var sUrl = "http://" + sLang + ".wiktionary.org/w/index.php?title=" + oInText.toLowerCase()
+  var sUrl = "https://" + sLang + ".wiktionary.org/w/index.php?title=" + oInText.toLowerCase()
 
   MyDownloader.toClipBoard(oInText)
   openWwwPage(sUrl, sLang + " Wiktionary on \"" + oInText + "\"")
-
 }
 
 function showUpploadDlg() {
@@ -565,7 +555,6 @@ function getAndInitDb() {
 
   db = Sql.LocalStorage.openDatabaseSync("GlosDB", "1.0",
                                          "Glos Databas!", 1000000)
-
 
   db.transaction(function (tx) {
 
@@ -1209,13 +1198,11 @@ function loadFromList(nCount, oDD, sLangLoaded) {
 }
 
 function isAnswerOk(sAnswerToCheck, sAnswerInDb) {
-  sAnswerInDb = MyDownloader.ignoreAccent(sAnswerInDb)
-  sAnswerToCheck = MyDownloader.ignoreAccent(sAnswerToCheck)
 
   if (sAnswerToCheck === "")
     return false
 
-  if (sAnswerInDb === sAnswerToCheck)
+  if (MyDownloader.ignoreAccentCmp(sAnswerInDb,sAnswerToCheck))
     return true
 
   return false

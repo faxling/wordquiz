@@ -156,13 +156,21 @@ void Speechdownloader::initUrls(QVariant p)
   pp->setProperty("sReqUrlBase", sReqUrlBase);
 }
 
+bool Speechdownloader::ignoreAccentCmp(QString s1, QString s2)
+{
+  if (s1.length() != s2.length())
+    return false;
+  bool b = ignoreAccent(s1) == ignoreAccent(s2);
+  return b;
+}
+
+static QRegularExpression oReg("[\\p{L}"); // Matches a non-word character.
+
 QString Speechdownloader::ignoreAccentLC(QString str)
 {
   static QString sssIn = QString::fromWCharArray(L"íîàáâãèéêëòóôõõùúûçёщąćęłńóśźż");
   static QString sssOut = QString::fromWCharArray(L"iiaaaaeeeeooooouuucешacelnoszz");
-  static QRegularExpression oReg("[\\W]"); // Matches a non-word character.
 
-  str.replace(oReg, "");
   str = str.toLower();
 
   for (auto i = str.begin(); i != str.end(); i++)
@@ -172,22 +180,20 @@ QString Speechdownloader::ignoreAccentLC(QString str)
     if (nI >= 0)
       *i = sssOut[nI];
   }
-
+  str.replace(oReg, "");
   return str;
 }
 
 bool Speechdownloader::isSpecial(QString str)
 {
-  static QString sssIn = QString::fromWCharArray(L"\".! '?");
-  return sssIn.indexOf(str) >= 0;
+  static QRegularExpression oReg("[\\Pd{L}");
+  return str.indexOf(oReg) >= 0;
 }
 
 QString Speechdownloader::ignoreAccent(QString str)
 {
   static QString sssIn = QString::fromWCharArray(L"ÍÎÀÁÂÃÈÉÊËÒÓÔÕÕÙÚÛÇЁЩĄĆĘŁŃÓŚŹŻ");
   static QString sssOut = QString::fromWCharArray(L"IIAAAAEEEEOOOOOUUUCЕШACELNOSZZ");
-  static QRegularExpression oReg("[\\W]"); // Matches a non-word character.
-  str.replace(oReg, "");
 
   str = str.toUpper();
 
@@ -198,7 +204,7 @@ QString Speechdownloader::ignoreAccent(QString str)
     if (nI >= 0)
       *i = sssOut[nI];
   }
-
+  str.replace(oReg, "");
   return str;
 }
 
@@ -271,12 +277,14 @@ QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
     bool bEx = QFile::exists(s);
     if (bEx == true)
     {
+      qDebug() << "exists " << s;
       oOut = QUrl::fromLocalFile(s);
       oOut.setQuery("abc=" + QString::number(rand()));
       return true;
     }
     else
     {
+      qDebug() << "gone " << s;
       oOut = QUrl(sDEFAULT_IMG);
       return false;
     }
@@ -349,6 +357,22 @@ QUrl Speechdownloader::urlImg()
   return m_oImgUrl;
 }
 */
+
+void Speechdownloader::imgByteArray(QString sWord, QString sLang, QString sWord2, QString sLang2)
+{
+  QString sFileName = ImgPath(sWord, sLang);
+  QBuffer oBuff(&m_oDownloadedData);
+  QImageReader oImageReader(&oBuff);
+  oImageReader.setAutoTransform(true);
+  QImage oImage = oImageReader.read();
+  QImage oImageScaled = oImage.scaledToHeight(160);
+  if (oImageScaled.height() < 100)
+    return;
+  oImageScaled.save(sFileName);
+  QString sImg2 = ImgPath(sWord2, sLang2);
+  QFile::copy(sFileName, sImg2);
+}
+
 void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
 {
   m_oDownloadedData = pReply->readAll();
@@ -369,19 +393,7 @@ void Speechdownloader::imgDownloaded(QNetworkReply* pReply)
   sLang = uQ.queryItemValue("lang");
   sWord2 = uQ.queryItemValue("text2");
   sLang2 = uQ.queryItemValue("lang2");
-  QString sFileName = ImgPath(sWord, sLang);
-  QBuffer oBuff(&m_oDownloadedData);
-  QImageReader oImageReader(&oBuff);
-  oImageReader.setAutoTransform(true);
-  QImage oImage = oImageReader.read();
-  QImage oImageScaled = oImage.scaledToHeight(160);
-  if (oImageScaled.height() < 100)
-    return;
-  oImageScaled.save(sFileName);
-  QString sImg2 = ImgPath(sWord2, sLang2);
-  QFile::copy(sFileName, sImg2);
-
-  //  checkAndEmit(sFileName, sImg2);
+  imgByteArray(sWord, sLang, sWord2, sLang2);
 
   if (uQ.queryItemValue("emit").toInt() == 1)
   {
@@ -687,6 +699,14 @@ void Speechdownloader::downloadImageSlot(const QList<QUrl>& vImgUrl, QString sWo
   if (vImgUrl.count() < 1)
     return;
   QUrl u = vImgUrl.first();
+  if (u.scheme() != "https" && u.scheme() != "http")
+  {
+    QFile oF(u.toString());
+    oF.open(QFile::OpenMode::enum_type::ReadOnly);
+    m_oDownloadedData = oF.readAll();
+    imgByteArray(sWord, sLang, sWord2, sLang2);
+    return;
+  }
   QUrlQuery oQuery(u.query());
   oQuery.addQueryItem("text", sWord);
   oQuery.addQueryItem("lang", sLang);
@@ -1191,7 +1211,6 @@ void Speechdownloader::requestPerm()
 {
 
   static const QString READ_PERMISSION{QStringLiteral("android.permission.READ_EXTERNAL_STORAGE")};
-
 
   auto oRes = QtAndroidPrivate::requestPermission(READ_PERMISSION);
 

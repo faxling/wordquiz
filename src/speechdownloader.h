@@ -76,6 +76,7 @@ public:
 
   Q_INVOKABLE void initUrls(QVariant p);
   Q_INVOKABLE int indexFromGlosNr(QVariant p, int nNr);
+  Q_INVOKABLE bool ignoreAccentCmp(QString s1, QString s2);
 
   Q_INVOKABLE QString ignoreAccent(QString s);
   QString ignoreAccentLC(QString s);
@@ -125,6 +126,9 @@ private:
   void quizDeleted(QNetworkReply* pReply);
   void wordDownloaded(QNetworkReply* pReply);
   void imgDownloaded(QNetworkReply* pReply);
+
+  // The byte array is in property m_oDownloadedData
+  void imgByteArray(QString  sWord, QString sLang, QString sWord2, QString sLang2);
   void transDownloaded();
   void errorSlot(QNetworkReply::NetworkError);
   void readyRead();
