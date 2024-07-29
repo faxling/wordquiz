@@ -164,7 +164,7 @@ bool Speechdownloader::ignoreAccentCmp(QString s1, QString s2)
   return b;
 }
 
-static QRegularExpression oReg("[\\p{L}"); // Matches a non-word character.
+static QRegularExpression oReg("\\P{L}"); // Matches a non-word character.
 
 QString Speechdownloader::ignoreAccentLC(QString str)
 {
@@ -186,7 +186,7 @@ QString Speechdownloader::ignoreAccentLC(QString str)
 
 bool Speechdownloader::isSpecial(QString str)
 {
-  static QRegularExpression oReg("[\\Pd{L}");
+  static QRegularExpression oReg("\\p{L}");
   return str.indexOf(oReg) >= 0;
 }
 
@@ -245,6 +245,7 @@ QString Speechdownloader::dateStr()
   wcsftime(szStr, 20, szFormat, localtime(&tNow));
   return QString::fromWCharArray(szStr);
 }
+
 /*
 void Speechdownloader::setImgWord(QString sWord, QString sLang)
 {
@@ -957,14 +958,10 @@ void Speechdownloader::loadProgressSlot(qint64 bytes, qint64 bytesTotal)
   QNetworkReply* pReply = static_cast<QNetworkReply*>(sender());
   QObject* pO = qvariant_cast<QObject*>(pReply->property("progressIndicator"));
   pO->setProperty("progress", bytes / (double)bytesTotal);
-  //  qDebug() << "progress " <<  bytesTotal;
 }
 
 void Speechdownloader::importQuiz(QString sName, QObject* pProgressIndicator)
 {
-  //  QString sUrl = QString::asprintf(GLOS_SERVER2 "/quizload.php?qname=%s", Enc()(sName +
-  //  ".txt"));
-
   url << GLOS_SERVER2 "quizload.php"
       << "qname=" << sName << ".txt";
 

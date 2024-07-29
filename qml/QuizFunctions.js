@@ -652,7 +652,7 @@ function getAndInitDb() {
 
 function assignTextInputField(text) {
   text = MyDownloader.trim(text)
-
+  MyDownloader.toClipBoard(text)
   if (nLastSearch !== 1)
     idTextInput2.text = text + " "
   else
@@ -1202,7 +1202,7 @@ function isAnswerOk(sAnswerToCheck, sAnswerInDb) {
   if (sAnswerToCheck === "")
     return false
 
-  if (MyDownloader.ignoreAccentCmp(sAnswerInDb,sAnswerToCheck))
+  if (MyDownloader.ignoreAccentCmp(sAnswerInDb, sAnswerToCheck))
     return true
 
   return false
