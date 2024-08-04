@@ -120,6 +120,7 @@ signals:
 private:
   // QUrl urlImg();
   // bool hasImg();
+  void quizDownloadedArray();
   void quizDownloaded(QNetworkReply* pReply);
   void listDownloaded(QNetworkReply* pReply);
   void quizExported(QNetworkReply* pReply);
@@ -128,7 +129,7 @@ private:
   void imgDownloaded(QNetworkReply* pReply);
 
   // The byte array is in property m_oDownloadedData
-  void imgByteArray(QString  sWord, QString sLang, QString sWord2, QString sLang2);
+  void imgByteArray(QString sWord, QString sLang, QString sWord2, QString sLang2);
   void transDownloaded();
   void errorSlot(QNetworkReply::NetworkError);
   void readyRead();
@@ -154,6 +155,7 @@ private:
   QObject* m_sTranslatedText;
   QObject* m_pErrorTextField;
   QObject* m_pTrTextList;
+  QObject* m_pGlobalWindowObject;
   // QObject* m_pTrSynModel;
   // QObject* m_pTrMeanModel;
   QuizFilterModel* m_pSortFilterProxyModel = nullptr;

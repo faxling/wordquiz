@@ -1052,8 +1052,8 @@ function loadFromServerList(nCount, oDD) {
     else
       idImport.nError = 2
 
-    idImport.sDescDate = ""
-    idImport.sDesc1 = ""
+    sImportDescDate = ""
+    sImportDesc1 = ""
     idImport.sSelectedQ = ""
     return
   }
@@ -1065,8 +1065,8 @@ function loadFromServerList(nCount, oDD) {
     var sDescAndDate = oDD[i + 1]
 
     if (nLastSelected === oDD[i + 4]) {
-      idImport.sDescDate = getDate(sDescAndDate)
-      idImport.sDesc1 = getDesc(sDescAndDate)
+      sImportDescDate = getDate(sDescAndDate)
+      sImportDesc1 = getDesc(sDescAndDate)
       idImport.sSelectedQ = oDD[i]
     }
 
@@ -1088,8 +1088,8 @@ function loadFromServerList(nCount, oDD) {
     idImport.positionViewAtIndex(idImport.currentIndex)
   } else {
     idImport.currentIndex = -1
-    idImport.sDescDate = "-"
-    idImport.sDesc1 = "-"
+    sImportDescDate = "-"
+    sImportDesc1 = "-"
     idImport.sSelectedQ = "-"
   }
 }
@@ -1101,8 +1101,7 @@ function quizDeleted(nResponce) {
     var nCI = MyDownloader.indexFromGlosNr(idServerQModel, nResponce)
     idServerQModel.remove(nCI)
     idImport.nSelectedQ = -1
-    idImport.sDesc1 = ""
-    idImport.sDescDate = ""
+    sImportDesc1 = ""
     idImport.sSelectedQ = ""
     idImport.sImportMsg = ""
     idImport.currentIndex = -1
@@ -1162,7 +1161,7 @@ function loadFromList(nCount, oDD, sLangLoaded) {
 
     var sState1 = nCount / 3 + "/" + nCount / 3
     tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)',
-                  [nDbNumber, idImport.sDesc1 + "###" + idImport.sDescDate])
+                  [nDbNumber, sImportDesc1 + "###" + sImportDescDate])
 
     tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',
                   [nDbNumber, sQuizName, sState1, sLangLoaded])
@@ -1172,8 +1171,8 @@ function loadFromList(nCount, oDD, sLangLoaded) {
                               "quizname": sQuizName,
                               "state1": sState1,
                               "langpair": sLangLoaded,
-                              "desc1": idImport.sDesc1,
-                              "descdate": idImport.sDescDate
+                              "desc1": sImportDesc1,
+                              "descdate": sImportDescDate
                             })
 
 

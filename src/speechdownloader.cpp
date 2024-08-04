@@ -148,6 +148,7 @@ static const QString sDEFAULT_IMG = "image://theme/icon-m-file-image";
 void Speechdownloader::initUrls(QVariant p)
 {
   QObject* pp = qvariant_cast<QObject*>(p);
+  m_pGlobalWindowObject = pp;
   pp->setProperty("sDEFAULT_IMG", sDEFAULT_IMG);
   pp->setProperty("sReqDictUrlBase", sReqDictUrlBase);
   pp->setProperty("sReqDictUrl", sReqDictUrl);
@@ -278,14 +279,12 @@ QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
     bool bEx = QFile::exists(s);
     if (bEx == true)
     {
-      qDebug() << "exists " << s;
       oOut = QUrl::fromLocalFile(s);
       oOut.setQuery("abc=" + QString::number(rand()));
       return true;
     }
     else
     {
-      qDebug() << "gone " << s;
       oOut = QUrl(sDEFAULT_IMG);
       return false;
     }
@@ -451,7 +450,15 @@ QString Speechdownloader::AudioPath(const QString& s, const QString& sLang)
 QString Speechdownloader::ImgPath(const QString& sIn, const QString& sLang)
 {
   if (sLang.isEmpty())
-    return (m_sStoragePath ^ sIn) + ".jpg";
+  {
+    auto sW = sIn.split("_");
+    QString sName = ignoreAccent(sW[0]);
+    QString sL;
+    if (sW.length() > 1)
+      sL = sW[1];
+
+    return (m_sStoragePath ^ sName) + "_" + sL + ".jpg";
+  }
 
   QString sRet = (m_sStoragePath ^ ignoreAccent(sIn)) + "_" + sLang + ".jpg";
   return sRet;
@@ -702,8 +709,19 @@ void Speechdownloader::downloadImageSlot(const QList<QUrl>& vImgUrl, QString sWo
   QUrl u = vImgUrl.first();
   if (u.scheme() != "https" && u.scheme() != "http")
   {
-    QFile oF(u.toString());
-    oF.open(QFile::OpenMode::enum_type::ReadOnly);
+    QFile oF;
+    if (u.isLocalFile())
+      oF.setFileName(u.toLocalFile());
+    else
+      oF.setFileName(u.toString());
+
+    bool bRet = oF.open(QIODevice::ReadOnly);
+    if (bRet == false)
+    {
+      qDebug() << "Can not open " << u;
+      return;
+    }
+
     m_oDownloadedData = oF.readAll();
     imgByteArray(sWord, sLang, sWord2, sLang2);
     return;
@@ -788,6 +806,19 @@ static int LANGPAIR = -1;
 
 void Speechdownloader::sortQuizModel(int nRole, int sortOrder)
 {
+
+  if (nRole == 0 && m_pOLSortFilterProxyModel->sourceModel()->rowCount() == 0)
+  {
+    QFile oDefQuiz(":/doc/Jul Franska.txt");
+    m_pGlobalWindowObject->setProperty("sQuizName", "Sample Set");
+    m_pGlobalWindowObject->setProperty("sImportDescDate", dateStr());
+    m_pGlobalWindowObject->setProperty("sImportDesc1", "A Sample Set for the App: Swedish-French");
+    oDefQuiz.open(QIODevice::ReadOnly);
+    m_oDownloadedData = oDefQuiz.readAll();
+    quizDownloadedArray();
+    return;
+  }
+
   if (nRole == 0)
     m_pOLSortFilterProxyModel->setSortRole(QUIZNAME);
   else if (nRole == 1)
@@ -820,7 +851,7 @@ void Speechdownloader::AssignRoles()
   auto* pp = m_pOLSortFilterProxyModel->sourceModel();
 
   auto oOC = pp->roleNames();
-
+  qDebug() << "AssignRoles key val index";
   if (oOC.isEmpty() == false)
     for (auto oJ : IterRange(oOC))
     {
@@ -869,7 +900,7 @@ QObject* Speechdownloader::setFilterProxy(QObject* pModel)
   m_pSortFilterProxyModel->setSourceModel(pp);
 
   auto oOC = pp->roleNames();
-
+  qDebug() << "setFilterProxy key val index";
   for (auto oJ : IterRange(oOC))
     qDebug() << oJ.key() << " " << oJ.val() << " " << oJ.index();
 
@@ -885,24 +916,15 @@ void Speechdownloader::listQuiz()
   m_oListQuizNetMgr.get(request);
 }
 
-void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
+void Speechdownloader::quizDownloadedArray()
 {
-  m_oDownloadedData = pReply->readAll();
-  QObject* p0 = qvariant_cast<QObject*>(pReply->property("progressIndicator"));
-  p0->setProperty("visible", false);
-
-  QVariantList oDataDownloaded;
-  pReply->deleteLater();
-  if (m_oDownloadedData.size() < 1000)
-  {
-    emit quizDownloadedSignal(-1, oDataDownloaded, "");
-    return;
-  }
   QDataStream ss(&m_oDownloadedData, QIODevice::ReadOnly);
   int nC;
   ss >> nC;
   QString sLang;
   ss >> sLang;
+
+  QVariantList oDataDownloaded;
   for (int i = 0; i < nC; i++)
   {
     for (int j = 0; j <= 2; ++j)
@@ -913,7 +935,6 @@ void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
     }
   }
   ss >> nC;
-
   for (int i = 0; i < nC; i++)
   {
     QString s;
@@ -935,14 +956,25 @@ void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
       ss >> s;
       QByteArray oc;
       ss >> oc;
-      QFile oImg(ImgPath(s, ""));
-      oImg.open(QIODevice::ReadWrite);
+      QString sImg = ImgPath(s, "");
+      QFile oImg(sImg);
+      oImg.open(QIODevice::WriteOnly);
       oImg.write(oc);
       oImg.close();
     }
   }
 
   emit quizDownloadedSignal(oDataDownloaded.size(), oDataDownloaded, sLang);
+}
+
+void Speechdownloader::quizDownloaded(QNetworkReply* pReply)
+{
+  m_oDownloadedData = pReply->readAll();
+  QObject* p0 = qvariant_cast<QObject*>(pReply->property("progressIndicator"));
+  p0->setProperty("visible", false);
+
+  pReply->deleteLater();
+  quizDownloadedArray();
 }
 
 void Speechdownloader::deleteQuiz(QString sName, QString sPwd, int nDbId)
@@ -1067,7 +1099,9 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
 
     sFilePath = ImgPath(sWord, ocLang[1]);
     if (QFile::exists(sFilePath))
+    {
       ocImg.append(JustFileNameNoExt(sFilePath));
+    }
 
     // Question
     sWord = pp->data(pp->index(i), 3).toString();
@@ -1077,10 +1111,12 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
 
     sFilePath = ImgPath(sWord, ocLang[0]);
     if (QFile::exists(sFilePath))
+    {
       ocImg.append(JustFileNameNoExt(sFilePath));
+    }
   }
 
-  ss << ocAudio.size();
+  ss << (int)ocAudio.size();
   for (auto& oI : ocAudio)
   {
     QFile oF(AudioPath(oI, ""));
@@ -1089,7 +1125,7 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
     ss << oF.readAll();
     oF.close();
   }
-  ss << ocImg.size();
+  ss << (int)ocImg.size();
   for (auto& oI : ocImg)
   {
     QFile oF(ImgPath(oI, ""));
@@ -1206,6 +1242,7 @@ int Speechdownloader::indexFromGlosNr(QVariant p, int nNr)
 
 void Speechdownloader::requestPerm()
 {
+#ifdef Q_OS_ANDROID
 
   static const QString READ_PERMISSION{QStringLiteral("android.permission.READ_EXTERNAL_STORAGE")};
 
@@ -1214,6 +1251,7 @@ void Speechdownloader::requestPerm()
   oRes.waitForFinished();
   if (oRes.result() != QtAndroidPrivate::Authorized)
     return;
+#endif
 }
 
 void Speechdownloader::showKey(bool b)
