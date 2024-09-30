@@ -196,16 +196,7 @@ Page {
           anchors.top: parent.top
           source: "image://theme/icon-m-search"
           onClicked: {
-            var sSearchQuery = MyDownloader.fromClipBoard()
-            if (sSearchQuery.length > 1)
-
-              QuizLib.openWwwPage(
-                    "https://www.google.com/search?q=" + sSearchQuery,
-                    "Search for " + "\"" + sSearchQuery + "\"")
-            else
-              QuizLib.openWwwPage(
-                    "https://www.google.com/search?q=Clipboard&num=2&pws=0&complete=0",
-                    "Search")
+            QuizLib.searchClipboard()
           }
         }
       }
