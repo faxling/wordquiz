@@ -66,9 +66,33 @@ function initLangList() {
                      })
 }
 
+// https://context.reverso.net/translation/german-english/bier
+
+function langCodeToName(sCode)
+{
+  var n = idLangModel.count
+
+  var i = 0
+  for (i = 0; i < n; ++i) {
+    if (idLangModel.get(i).code === sCode) {
+      return String(idLangModel.get(i).lang).toLowerCase()
+    }
+  }
+}
+
+function currentLangPair()
+{
+}
+
 
 function searchClipboard() {
-  var sSearchQuery = MyDownloader.fromClipBoard()
+  var oInText
+
+  oInText = getTextFromInput(idWindow.oEditTab)
+
+  MyDownloader.toClipBoard(oInText)
+
+  var sSearchQuery = oInText
   if (sSearchQuery.length > 1)
 
     QuizLib.openWwwPage("https://www.google.com/search?q=" + sSearchQuery,
@@ -449,12 +473,47 @@ function lookUppInWiki() {
 
   if (oInText === "")
     return
+  MyDownloader.toClipBoard(oInText)
 
   var sUrl = "https://" + sLang + ".wiktionary.org/w/index.php?title=" + oInText.toLowerCase()
 
-  MyDownloader.toClipBoard(oInText)
   openWwwPage(sUrl, sLang + " Wiktionary on \"" + oInText + "\"")
 }
+
+function lookUppInReverso() {
+  var oInText
+
+  var sFLang
+  var sTLang
+
+  sFLang = bDoLookUppText1 ? sFromLang : sToLang
+  sTLang = bDoLookUppText1 ?  sToLang : sFromLang
+
+  if (bDoLookUppText1)
+    oInText = getTextFromInput(idTextInput)
+  else
+    oInText = getTextFromInput(idTextInput2)
+
+  if (oInText === "")
+    return
+
+  MyDownloader.toClipBoard(oInText)
+
+  oInText = oInText.trim().toLowerCase()
+
+  let sLang
+  if (sFLang === "en")
+    sLang =  "english-" + langCodeToName(sTLang).toLowerCase();
+  else
+    sLang = langCodeToName(sFLang).toLowerCase() + "-english"
+
+  let sUrl = "http://mss7000.com/glosquiz/revcontext.html?lang=" + sLang + "&word=" + encodeURI(oInText)
+
+  openWwwPage(sUrl, sLang +" Examples on \"" + oInText + "\"")
+
+}
+
+
 
 function showUpploadDlg() {
   idExport.visible = true
@@ -665,7 +724,6 @@ function getAndInitDb() {
 
 function assignTextInputField(text) {
   text = MyDownloader.trim(text)
-  MyDownloader.toClipBoard(text)
   if (nLastSearch !== 1)
     idTextInput2.text = text + " "
   else
