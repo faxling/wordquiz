@@ -247,26 +247,7 @@ QString Speechdownloader::dateStr()
   return QString::fromWCharArray(szStr);
 }
 
-/*
-void Speechdownloader::setImgWord(QString sWord, QString sLang)
-{
-  m_sImgPath = ImgPath(sWord, sLang);
-  bool bEx = QFile::exists(m_sImgPath);
 
-  if (bEx == true)
-    m_oImgUrl = QUrl::fromLocalFile(m_sImgPath);
-  else
-    m_oImgUrl = QUrl();
-
-  if (bEx != m_bHasImg)
-  {
-    m_bHasImg = bEx;
-    emit hasImgChanged();
-  }
-
-  emit urlImgChanged();
-}
-*/
 // Try Select image from both languages in a pair
 QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
 {
@@ -345,18 +326,6 @@ bool Speechdownloader::hasImage(QString sWord, QString sLang)
   return QFile::exists(s);
 }
 
-/*
-bool Speechdownloader::hasImg()
-{
-  return m_bHasImg;
-}
-*/
-/*
-QUrl Speechdownloader::urlImg()
-{
-  return m_oImgUrl;
-}
-*/
 
 void Speechdownloader::imgByteArray(QString sWord, QString sLang, QString sWord2, QString sLang2)
 {

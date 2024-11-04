@@ -1,0 +1,164 @@
+
+{
+  "ok": true,
+  "text": "pig",
+  "source": "english",
+  "target": "russian",
+  "translations": [
+    "свинтус",
+    "",
+    "",
+    "",
+    "",
+    "обжираться",
+    "",
+    "",
+    "",
+    "толпиться",
+    "",
+    "",
+    "",
+    "тесниться",
+    "",
+    "",
+    "",
+    "",
+    "мусор m",
+    "боров",
+    "",
+    "",
+    "",
+    "болванка f",
+    "",
+    "",
+    "",
+    "обжора m",
+    "порося",
+    "",
+    "",
+    "",
+    "чушка f",
+    "",
+    "",
+    "",
+    "генератор пассивной прибыли",
+    "",
+    "",
+    "",
+    "жадина m",
+    "",
+    "",
+    "",
+    "инструмент для очистки трубопровода",
+    "",
+    "",
+    "",
+    "инструмент для инспекции трубопровода",
+    "",
+    "",
+    "",
+    "грязнуля m"
+  ],
+  "examples": [
+    {
+      "id": 0,
+      "source": "This was to be no ordinary pig.",
+      "target": "Но это должна быть не обыкновенная свинья."
+    },
+    {
+      "id": 1,
+      "source": "That undercover pig never worked for me.",
+      "target": "Эта свинья под прикрытием никогда не работала на меня."
+    },
+    {
+      "id": 2,
+      "source": "The first pig built a house of straw.",
+      "target": "Первый поросенок построил себе дом из соломы."
+    },
+    {
+      "id": 3,
+      "source": "Maybe stuffed inside a crisply roasted suckling pig.",
+      "target": "Разве что внутри хорошо прожаренного молочного поросенка."
+    },
+    {
+      "id": 4,
+      "source": "Hunting for a giant forest pig is forbidden at night.",
+      "target": "Охота на исполинскую лесную свинью ночью запрещена."
+    },
+    {
+      "id": 5,
+      "source": "Plant-based meat doesn't come from a cow or a pig.",
+      "target": "Мясо на растительной основе не происходит от коровы или свиньи."
+    },
+    {
+      "id": 6,
+      "source": "A pig is actually the closest in nature to human physiology.",
+      "target": "Свиньи на самом деле близки по природе к физиологии человека."
+    },
+    {
+      "id": 7,
+      "source": "China has the world's largest pig herd.",
+      "target": "Китай владеет самым большим в мире поголовьем свиней."
+    },
+    {
+      "id": 8,
+      "source": "I never turned anyone into a pig.",
+      "target": "Я никогда никого не превращала в свинью."
+    },
+    {
+      "id": 9,
+      "source": "Never get into a fight with a pig.",
+      "target": "Никогда не вступайте в борьбу со свиньей."
+    },
+    {
+      "id": 10,
+      "source": "I can't show up at home with a pig.",
+      "target": "Я не могу показаться дома со свиньёй."
+    },
+    {
+      "id": 11,
+      "source": "Because I've seen that pig, in a dollhouse.",
+      "target": "Потому что я видел эту свинью в кукольном домике."
+    },
+    {
+      "id": 12,
+      "source": "They also trap small animals and wild pig.",
+      "target": "Он также охотится на молодых оленей и маленьких диких свиней."
+    },
+    {
+      "id": 13,
+      "source": "Under this tree he saw a pig and a cow.",
+      "target": "Под этим деревом он увидел корову и свинью."
+    },
+    {
+      "id": 14,
+      "source": "Sometimes, a blind pig finds an acorn.",
+      "target": "Иногда и слепой свинье удается найти желудь."
+    },
+    {
+      "id": 15,
+      "source": "All refer to the back of a pig.",
+      "target": "Все они ссылаются на заднюю часть свиньи."
+    },
+    {
+      "id": 16,
+      "source": "There's a butcher for every pig.",
+      "target": "Для каждой свиньи однажды найдется свой мясник."
+    },
+    {
+      "id": 17,
+      "source": "I can't hurt my favorite pig.",
+      "target": "Я не могу задавить мою любимую свинью."
+    },
+    {
+      "id": 18,
+      "source": "They look different than the domestic pig in several ways.",
+      "target": "Отличается он от домашней свиньи несколько иными пропорциями."
+    },
+    {
+      "id": 19,
+      "source": "Those guys didn't have pig deals.",
+      "target": "Эти ребята не имели дел со свиньями."
+    }
+  ]
+}

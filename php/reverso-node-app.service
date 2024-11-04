@@ -1,0 +1,12 @@
+[Unit]
+Description=Reverso
+After=network.target
+[Service]
+ExecStart=/usr/bin/node /var/www/html/glosquiz/revsvr.js
+WorkingDirectory=/var/www/html/glosquiz
+Restart=always
+User=stabs
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+[Install]
+WantedBy=multi-user.target

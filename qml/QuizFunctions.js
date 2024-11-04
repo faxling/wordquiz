@@ -507,7 +507,7 @@ function lookUppInReverso() {
   else
     sLang = langCodeToName(sFLang).toLowerCase() + "-english"
 
-  let sUrl = "http://mss7000.com/glosquiz/revcontext.html?lang=" + sLang + "&word=" + encodeURI(oInText)
+  let sUrl = "http://mss7000.com/glosquiz/revcontext.html?lang=" + sLang + "&word=" + encodeURI(oInText) + "&tlang=" + sTLang + "&slang=" + sFLang
 
   openWwwPage(sUrl, sLang +" Examples on \"" + oInText + "\"")
 
