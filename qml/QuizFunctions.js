@@ -67,9 +67,7 @@ function initLangList() {
 }
 
 // https://context.reverso.net/translation/german-english/bier
-
-function langCodeToName(sCode)
-{
+function langCodeToName(sCode) {
   var n = idLangModel.count
 
   var i = 0
@@ -80,10 +78,7 @@ function langCodeToName(sCode)
   }
 }
 
-function currentLangPair()
-{
-}
-
+function currentLangPair() {}
 
 function searchClipboard() {
   var oInText
@@ -104,7 +99,7 @@ function searchClipboard() {
 }
 
 function playHangWord() {
-  let sL
+  var sL
   if (idTTrans.visible) {
     sL = bIsReverseHang ? sFromLang : sToLang
     MyDownloader.playWord(idTTrans.text, sL)
@@ -487,7 +482,7 @@ function lookUppInReverso() {
   var sTLang
 
   sFLang = bDoLookUppText1 ? sFromLang : sToLang
-  sTLang = bDoLookUppText1 ?  sToLang : sFromLang
+  sTLang = bDoLookUppText1 ? sToLang : sFromLang
 
   if (bDoLookUppText1)
     oInText = getTextFromInput(idTextInput)
@@ -501,19 +496,17 @@ function lookUppInReverso() {
 
   oInText = oInText.trim().toLowerCase()
 
-  let sLang
+  var sLang
   if (sFLang === "en")
-    sLang =  "english-" + langCodeToName(sTLang).toLowerCase();
+    sLang = "english-" + langCodeToName(sTLang).toLowerCase()
   else
     sLang = langCodeToName(sFLang).toLowerCase() + "-english"
 
-  let sUrl = "http://mss7000.com/glosquiz/revcontext.html?lang=" + sLang + "&word=" + encodeURI(oInText) + "&tlang=" + sTLang + "&slang=" + sFLang
+  var sUrl = "http://mss7000.com/glosquiz/revcontext.html?lang=" + sLang + "&word=" + encodeURI(
+        oInText) + "&tlang=" + sTLang + "&slang=" + sFLang
 
-  openWwwPage(sUrl, sLang +" Examples on \"" + oInText + "\"")
-
+  openWwwPage(sUrl, sLang + " Examples on \"" + oInText + "\"")
 }
-
-
 
 function showUpploadDlg() {
   idExport.visible = true

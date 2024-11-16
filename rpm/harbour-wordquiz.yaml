@@ -36,7 +36,7 @@ Requires:
   - sailfishsilica-qt5 >= 0.10.9 
   - qt5-qtdeclarative-import-xmllistmodel
   - sailfish-components-webview-qt5 >= 0.0.1
-  - sailfish-components-webview-qt5-devel >= 0.0.1
+#  - sailfish-components-webview-qt5-devel >= 0.0.1
   - sailfish-components-webview-qt5-pickers >= 0.0.1
   - sailfish-components-webview-qt5-popups >= 0.0.1
 

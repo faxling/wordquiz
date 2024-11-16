@@ -19,7 +19,6 @@ Source100:  harbour-wordquiz.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
 Requires:   qt5-qtdeclarative-import-xmllistmodel
 Requires:   sailfish-components-webview-qt5 >= 0.0.1
-Requires:   sailfish-components-webview-qt5-devel >= 0.0.1
 Requires:   sailfish-components-webview-qt5-pickers >= 0.0.1
 Requires:   sailfish-components-webview-qt5-popups >= 0.0.1
 BuildRequires:  pkgconfig(sailfishapp) >= 1.0.2

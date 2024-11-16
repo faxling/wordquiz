@@ -5,6 +5,7 @@ import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0 as Sql
 import "../QuizFunctions.js" as QuizLib
 import Sailfish.Pickers 1.0
+import QtQuick.Layouts 1.1
 
 Item {
   id: idEditQuiz
@@ -51,9 +52,8 @@ Item {
         id: idTextTrans
         Component.onCompleted: MyDownloader.storeTransText(idTextTrans,
                                                            idErrorText,
-                                                           idTrTextModel,
-                                                           idTrSynModel,
-                                                           idTrMeanModel)
+                                                           idDicList)
+
         text: "-"
         onTextChanged: QuizLib.assignTextInputField(idTextTrans.text)
         onClick: {
@@ -114,14 +114,17 @@ Item {
       }
     }
 
-    Row {
-      id: idBtnRow
-      spacing: 10
+    RowLayout {
+      id: idDictBtnRow
+      spacing: 9
       height: idBtn1.height
+      width: parent.width
 
       ButtonQuiz {
         id: idBtn1
-        width: n4BtnWidth
+        Layout.fillWidth: true
+        Layout.minimumHeight: Theme.itemSizeExtraSmall
+        Layout.minimumWidth: Theme.itemSizeExtraSmall
         text: sLangLang
         onClicked: {
           QuizLib.reqTranslation(idBtn1, false)
@@ -130,7 +133,9 @@ Item {
 
       ButtonQuiz {
         id: idBtn2
-        width: n4BtnWidth
+        Layout.fillWidth: true
+        Layout.minimumHeight: Theme.itemSizeExtraSmall
+        Layout.minimumWidth: Theme.itemSizeExtraSmall
         text: sLangLangRev
         onClicked: {
           QuizLib.reqTranslation(idBtn2, true)
@@ -139,17 +144,29 @@ Item {
 
       ButtonQuiz {
         id: idBtn3
-        width: n4BtnWidth
+        Layout.fillWidth: true
+        Layout.minimumHeight: Theme.itemSizeExtraSmall
+        Layout.minimumWidth: Theme.itemSizeExtraSmall
         text: (bDoLookUppText1 ? sFromLang : sToLang) + " Wiki"
         onClicked: {
           QuizLib.lookUppInWiki()
         }
       }
-
+      ButtonQuiz {
+        text: "Examples"
+        Layout.fillWidth: true
+        Layout.minimumWidth: Theme.itemSizeExtraSmall
+        Layout.minimumHeight: Theme.itemSizeExtraSmall
+        onClicked: {
+          QuizLib.lookUppInReverso()
+        }
+      }
       ButtonQuiz {
         id: idAddBtn
         text: "Add"
-        width: n4BtnWidth
+        Layout.fillWidth: true
+        Layout.minimumWidth: Theme.itemSizeExtraSmall
+        Layout.minimumHeight: Theme.itemSizeExtraSmall
         onClicked: QuizLib.getTextInputAndAdd()
       }
     }
@@ -251,10 +268,8 @@ Item {
     }
     ListViewHi {
       id: idGlosList
-      property double nScreenQuote: Screen.height === idWindow.height ? 4 : 2.5
       height: idEditQuiz.height - idDictRow.height - idTextInput.height
-              - idHeader1Text.height - idBtnRow.height * nScreenQuote
-
+              - idHeader1Text.height - Theme.itemSizeSmall * 4
       width: parent.width
       spacing: 3
       Component.onCompleted: {
@@ -323,13 +338,18 @@ Item {
     }
   }
 
-  Row {
+  RowLayout {
     id: idLowerButtonRow
-    y: Screen.height - 450
+    width: parent.width
+    anchors.bottom: idEditQuiz.bottom
+    anchors.bottomMargin: 20
     spacing: 10
+
     ButtonQuiz {
       id: idResetBtn
       text: "Reset"
+      Layout.fillWidth: true
+      Layout.minimumWidth: Theme.itemSizeExtraSmall
       onClicked: {
         idGlosState.checked = false
         QuizLib.resetQuiz()
@@ -338,6 +358,9 @@ Item {
 
     ButtonQuiz {
       id: idReverseBtn
+      Layout.fillWidth: true
+      Layout.minimumWidth: Theme.itemSizeExtraSmall
+
       text: "Reverse"
       onClicked: {
         QuizLib.reverseQuiz()
