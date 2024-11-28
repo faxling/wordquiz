@@ -9,7 +9,7 @@ Name:       harbour-wordquiz
 # << macros
 
 Summary:    Word quiz studio
-Version:    4.2
+Version:    4.3
 Release:    0
 Group:      Qt/Qt
 License:    LICENSE

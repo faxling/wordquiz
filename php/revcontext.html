@@ -31,28 +31,31 @@
       th {
         border-bottom: 1px solid #364043;
         color: #E2B842;
-        font-size: 0.85em;
+        font-size: 2.5em;
         font-weight: 600;
-        padding: 0.5em 1em;
+        padding: 0.1em 1em;
         text-align: left;
       }
 
       td {
         color: #fff;
+        font-size: 2.5em;
         font-weight: 400;
-        padding: 0.65em 1em;
+        padding: 1em 0.5em;
       }
 
-      .trans {
-        td {
+      td.tdTrans {
         color: #fff;
+        font-size: 2.5em;
         font-weight: 400;
-        padding: 0.1em 1em;
+        padding: 0.0em 0.5em; 
       }
 
     </style>
     <script>
-
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}
       // document.addEventListener("contextmenu", (event) => { console.log("cos") });
 
      
@@ -83,8 +86,10 @@
         const urlParams = new URLSearchParams(queryString);
         sTargetLang = urlParams.get('tlang')
         sSourceLang = urlParams.get('slang')
-        const word = urlParams.get('word')
-        const lang = urlParams.get('lang')
+        let word = urlParams.get('word')
+        let lang = urlParams.get('lang')
+       // word = "gris"
+       //  lang = "swedish-english"
         console.log(word);
         var xhr = new XMLHttpRequest();
         xhr.open('GET', 'http://mss7000.com/reverso/' + lang + '?' + encodeURI(word), true);
@@ -98,6 +103,7 @@
           }
         };
         xhr.send();
+
       };
 
 
@@ -118,7 +124,7 @@
         const tableData2 = oc.map(value => {
           
           if (value.length > 2) {
-            return `<tr><td>${value}</td></tr>`;
+            return `<tr><td class=tdTrans>${value}</td></tr>`;
           }
           return "";
 
@@ -140,8 +146,8 @@
 
         const tableBody = document.querySelector("#tableBody");
         tableBody.innerHTML = tableData;
-        document.getElementById("idSource").innerText = sSource
-        document.getElementById("idSource2").innerText = sSource
+        document.getElementById("idSource").innerText = capitalizeFirstLetter(sSource)
+        document.getElementById("idSource2").innerText = capitalizeFirstLetter(sSource)
 
       }
     </script>
@@ -151,11 +157,11 @@
 
     <table>
       <thead>
-        <tr>
+        <tr >
           <th id="idSource2"></th>
         </tr>
       </thead>
-      <tbody id="tableBody2" class="trans">
+      <tbody id="tableBody2" class=tdTrans>
 
       </tbody>
     </table>

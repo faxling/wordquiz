@@ -153,7 +153,7 @@ Item {
         }
       }
       ButtonQuiz {
-        text: "Examples"
+        text: "Context"
         Layout.fillWidth: true
         Layout.minimumWidth: Theme.itemSizeExtraSmall
         Layout.minimumHeight: Theme.itemSizeExtraSmall

@@ -12,6 +12,11 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Thu Nov 28 2024 Fredrik Axling <faxling11@gmail.com> 4.3-0
+- Context examples generation from a word
+- Adopt for Jolla C2
+- Buggfixes
+
 * Tue Feb 6 2024 Fredrik Axling <faxling11@gmail.com> 4.2-0
 - Flashcard flip
 - Use WebView with custom popup

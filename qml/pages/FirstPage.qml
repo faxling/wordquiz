@@ -31,6 +31,8 @@ Page {
   property string sQuizName: "-"
   property string sQuizDate: "-"
   property string sQuizDesc: "-"
+  property string sImportDesc1: "-"
+  property string sImportDescDate: "-"
   property string sScoreText: "-"
   property int nDbNumber: 0
   property int nQuizIndex1_3: 1
