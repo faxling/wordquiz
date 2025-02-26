@@ -18,6 +18,21 @@
 // c:\Users\fraxl\Documents\qt\sfosicons
 // ssh-keygen -t ed25519 -C faxling11@gmail.com
 
+// for reverso impersonate proxy to avoid
+//  CloudFlare, and attempts to scrape the site will be faced with a JavaScript challenge, a form of CAPTCHA.
+// https://github.com/lwthiker/curl-impersonate/
+
+// Interfacing reversos
+// https://github.com/s0ftik3/reverso-api
+// npm i reverso-api
+// service config
+// /etc/systemd/system/reverso-node-app.service
+//
+// systemctl start reverso-node-app.service
+//
+// nginx /etc/nginx/sites-enabled
+
+//
 
 //  eval "$(ssh-agent -s)"
 // git remote add origin git@github.com:faxling/tripometer.git

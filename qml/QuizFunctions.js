@@ -81,11 +81,13 @@ function langCodeToName(sCode) {
 function currentLangPair() {}
 
 function searchClipboard() {
-  var oInText
-
-  oInText = getTextFromInput(idWindow.oEditTab)
-
-  MyDownloader.toClipBoard(oInText)
+  var oInText = "*"
+  if (typeof idWindow.oEditTab !== "undefined") {
+    oInText = getTextFromInput(idWindow.oEditTab)
+    MyDownloader.toClipBoard(oInText)
+  } else {
+    oInText = MyDownloader.fromClipBoard()
+  }
 
   var sSearchQuery = oInText
   if (sSearchQuery.length > 1)
@@ -475,6 +477,7 @@ function lookUppInWiki() {
   openWwwPage(sUrl, sLang + " Wiktionary on \"" + oInText + "\"")
 }
 
+// Uses https://github.com/s0ftik3/reverso-api
 function lookUppInReverso() {
   var oInText
 
