@@ -187,7 +187,6 @@ QString Speechdownloader::ignoreAccentLC(QString str)
 
 bool Speechdownloader::isSpecial(QString str)
 {
-  static QRegularExpression oReg("\\p{L}");
   return str.indexOf(oReg) >= 0;
 }
 

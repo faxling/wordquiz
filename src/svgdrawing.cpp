@@ -4,7 +4,7 @@
 #include "QImage"
 #include "QMutex"
 #include "QPainter"
-#include "filehelpers.h"
+
 #include <QDomDocument>
 #include <QDomElement>
 #include <QFile>
