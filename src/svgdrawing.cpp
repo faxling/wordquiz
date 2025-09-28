@@ -154,13 +154,11 @@ bool SvgDrawing::renderId(int sId)
 }
 
 
-void SvgDrawing::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
-{
-  geometryChange(newGeometry,oldGeometry);
-}
-
-
-void SvgDrawing::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
+#if QT_VERSION >= 0x060000
+  void SvgDrawing::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
+#else
+  void SvgDrawing::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
+#endif
 {
   if (newGeometry.size() == oldGeometry.size())
     return;

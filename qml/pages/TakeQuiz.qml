@@ -8,10 +8,39 @@ Item {
   property bool bTextMode: false
   property bool bImageMode: false
   property bool bVoiceMode: false
+  property bool bCarMode: false
   property bool bTextAnswerOk: false
 
   Component.onCompleted: {
     idWindow.oTakeQuiz = idRectTakeQuiz
+  }
+
+  Timer {
+    id: idMoveTimer
+    interval: 800
+    repeat: false
+    onTriggered: idTakeQuizView.movementEnded()
+  }
+
+  Timer {
+    id: idCarTimer
+    interval: 10000
+    repeat: true
+    onTriggered: QuizLib.exeCarMode()
+  }
+
+  Timer {
+    id: idCarTimerPlayQuestion
+    interval: 1000
+    repeat: false
+    onTriggered: QuizLib.playQuestion()
+  }
+
+  Timer {
+    id: idCarTimerPlayAnswer
+    interval: 8000
+    repeat: false
+    onTriggered: QuizLib.playAnswer()
   }
 
   PathView {

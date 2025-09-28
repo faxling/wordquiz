@@ -15,13 +15,15 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
+#include <memory>
 class StopWatch;
 class QuizFilterModel;
 
-class Sound : public QSoundEffect
+class Sound
 {
 public:
   void Play(const QString& sUrl);
+  QMap<QString, std::shared_ptr<QSoundEffect>> oc;
 };
 
 // Maybe more that just downloading audio

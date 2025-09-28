@@ -246,7 +246,6 @@ QString Speechdownloader::dateStr()
   return QString::fromWCharArray(szStr);
 }
 
-
 // Try Select image from both languages in a pair
 QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
 {
@@ -324,7 +323,6 @@ bool Speechdownloader::hasImage(QString sWord, QString sLang)
   QString s = ImgPath(sWord, sLang);
   return QFile::exists(s);
 }
-
 
 void Speechdownloader::imgByteArray(QString sWord, QString sLang, QString sWord2, QString sLang2)
 {
@@ -565,15 +563,24 @@ QString sVoicetechKo(QStringLiteral("http://"
 
 void Sound::Play(const QString& sUrl)
 {
-  setSource(QUrl::fromLocalFile(sUrl));
-  play();
+  if (oc.contains(sUrl))
+  {
+    oc[sUrl]->play();
+  }
+  else
+  {
+    oc[sUrl].reset(new QSoundEffect());
+    oc[sUrl]->setSource(QUrl::fromLocalFile(sUrl));
+    oc[sUrl]->play();
+  }
+
 }
 
 void Speechdownloader::playWord(QString sWord, QString sLang)
 {
   QString sFileName = AudioPath(sWord, sLang);
   QFileInfo oWavFile(sFileName);
-  if (oWavFile.size() > 10000)
+  if (oWavFile.size() > 5000)
   {
     m_oSound.Play(sFileName);
   }

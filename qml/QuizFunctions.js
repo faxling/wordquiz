@@ -92,9 +92,12 @@ function searchClipboard() {
   var sSearchQuery = oInText
   if (sSearchQuery.length > 1)
 
-    QuizLib.openWwwPage("https://www.google.com/search?q=" + sSearchQuery, "Search for " + "\"" + sSearchQuery + "\"")
+    QuizLib.openWwwPage("https://www.google.com/search?q=" + sSearchQuery,
+                        "Search for " + "\"" + sSearchQuery + "\"")
   else
-    QuizLib.openWwwPage("https://www.google.com/search?q=Clipboard&num=2&pws=0&complete=0", "Search")
+    QuizLib.openWwwPage(
+          "https://www.google.com/search?q=Clipboard&num=2&pws=0&complete=0",
+          "Search")
 }
 
 function playHangWord() {
@@ -428,11 +431,13 @@ function reqTranslation(oBtnIn, bIsSecond) {
   oBtnIn.bProgVisible = true
 
   if (bIsSecond) {
-    MyDownloader.translateWord(oInText, idWindow.sToLang, idWindow.sFromLang, oBtnIn)
+    MyDownloader.translateWord(oInText, idWindow.sToLang,
+                               idWindow.sFromLang, oBtnIn)
     if (bHasDictFrom)
       downloadDictOnWord(sReqDictUrlRev, oInText)
   } else {
-    MyDownloader.translateWord(oInText, idWindow.sFromLang, idWindow.sToLang, oBtnIn)
+    MyDownloader.translateWord(oInText, idWindow.sFromLang,
+                               idWindow.sToLang, oBtnIn)
     if (bHasDictTo)
       downloadDictOnWord(sReqDictUrl, oInText)
   }
@@ -532,12 +537,15 @@ function updateDesc1(sDesc) {
   idWindow.sQuizDate = sDateStr
 
   db.transaction(function (tx) {
-    var rs = tx.executeSql("SELECT dbnumber FROM GlosaDbDesc WHERE dbnumber=?", [nDbId])
+    var rs = tx.executeSql("SELECT dbnumber FROM GlosaDbDesc WHERE dbnumber=?",
+                           [nDbId])
 
     if (rs.rows.length > 0) {
-      tx.executeSql("UPDATE GlosaDbDesc SET desc1=? WHERE dbnumber=?", [sDescAndDate, nDbId])
+      tx.executeSql("UPDATE GlosaDbDesc SET desc1=? WHERE dbnumber=?",
+                    [sDescAndDate, nDbId])
     } else {
-      tx.executeSql("INSERT INTO GlosaDbDesc (desc1 , dbnumber) VALUES(?,?)", [sDescAndDate, nDbId])
+      tx.executeSql("INSERT INTO GlosaDbDesc (desc1 , dbnumber) VALUES(?,?)",
+                    [sDescAndDate, nDbId])
     }
   })
 }
@@ -552,7 +560,8 @@ function downloadDictOnWord(sUrl, sWord) {
 
       if (doc.status === 200) {
         idErrorText.visible = false
-        var sFirstWord = MyDownloader.assignTranslateModelFromXml(doc.responseText)
+        var sFirstWord = MyDownloader.assignTranslateModelFromXml(
+              doc.responseText)
         idSynListView.model = MyDownloader.synListFromWord(sFirstWord)
         idMeanListView.model = MyDownloader.meanListFromWord(sFirstWord)
         //idTrSynModel.xml = doc.responseText
@@ -579,8 +588,8 @@ function getTextInputAndAdd() {
     return
   var i
   for (i = 0; i < glosModel.count; i++) {
-    if (sNewWordFrom.equalIgnoreCase(glosModel.get(i).question) && sNewWordTo.equalIgnoreCase(glosModel.get(
-                                                                                                i).answer)) {
+    if (sNewWordFrom.equalIgnoreCase(glosModel.get(i).question)
+        && sNewWordTo.equalIgnoreCase(glosModel.get(i).answer)) {
       idErrorText2.visible = true
       idErrorText2.text = idTextInput.text + " Already in quiz!"
       return
@@ -615,7 +624,8 @@ function getAndInitDb() {
 
   MyDownloader.initUrls(idWindow)
 
-  db = Sql.LocalStorage.openDatabaseSync("GlosDB", "1.0", "Glos Databas!", 1000000)
+  db = Sql.LocalStorage.openDatabaseSync("GlosDB", "1.0",
+                                         "Glos Databas!", 1000000)
 
   db.transaction(function (tx) {
 
@@ -629,8 +639,10 @@ function getAndInitDb() {
       nGlosaDbLastIndex = rs.rows.item(0).dbindex
     }
 
-    tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbDesc( dbnumber INT , desc1 TEXT)')
-    tx.executeSql('CREATE TABLE IF NOT EXISTS GlosaDbIndex( dbnumber INT , quizname TEXT, state1 TEXT, langpair TEXT )')
+    tx.executeSql(
+          'CREATE TABLE IF NOT EXISTS GlosaDbDesc( dbnumber INT , desc1 TEXT)')
+    tx.executeSql(
+          'CREATE TABLE IF NOT EXISTS GlosaDbIndex( dbnumber INT , quizname TEXT, state1 TEXT, langpair TEXT )')
 
     rs = tx.executeSql('SELECT * FROM GlosaDbDesc')
 
@@ -660,7 +672,8 @@ function getAndInitDb() {
 
       idGlosModelIndex.append({
                                 "number": nDbnumber,
-                                "quizname": capitalizeStr(rs.rows.item(j).quizname),
+                                "quizname": capitalizeStr(rs.rows.item(
+                                                            j).quizname),
                                 "state1": rs.rows.item(j).state1,
                                 "langpair": rs.rows.item(j).langpair,
                                 "desc1": getDesc(vDescDate),
@@ -697,7 +710,8 @@ function getAndInitDb() {
     // Set to last assigned Quiz
     if (idWindow.quizListView !== undefined) {
       var nC = idWindow.quizListView.currentIndex
-      idWindow.quizListView.currentIndex = MyDownloader.indexFromGlosNr(glosModelIndex, nGlosaDbLastIndex)
+      idWindow.quizListView.currentIndex = MyDownloader.indexFromGlosNr(
+            glosModelIndex, nGlosaDbLastIndex)
 
       if (nC === idWindow.quizListView.currentIndex) {
         idWindow.quizListView.currentItemChanged()
@@ -728,7 +742,8 @@ function insertGlosa(dbnumber, nC, question, answer) {
   var sA = capitalizeStr(answer)
 
   db.transaction(function (tx) {
-    tx.executeSql('INSERT INTO Glosa' + dbnumber + ' VALUES(?, ?, ?, ?)', [nC, sQ, sA, 0])
+    tx.executeSql('INSERT INTO Glosa' + dbnumber + ' VALUES(?, ?, ?, ?)',
+                  [nC, sQ, sA, 0])
   })
 
   glosModel.insert(0, {
@@ -869,7 +884,8 @@ function loadFromDb(tx, nSelectFromCurrentIndex) {
 
   glosModel.clear()
 
-  var rs = tx.executeSql("SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + sQSort + sDESCASC)
+  var rs = tx.executeSql(
+        "SELECT * FROM Glosa" + nDbNumber + " ORDER BY " + sQSort + sDESCASC)
 
   var hasNonInt = false
   for (var i = 0; i < rs.rows.length; i++) {
@@ -907,9 +923,11 @@ function loadFromDb(tx, nSelectFromCurrentIndex) {
 
   // Select highlight after  sort
   if (nCurrentNumber > 0) {
-    idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(glosModel, nCurrentNumber)
+    idWindow.glosListView.currentIndex = MyDownloader.indexFromGlosNr(
+          glosModel, nCurrentNumber)
     idWindow.nGlosaTakeQuizIndex = idWindow.glosListView.currentIndex
-    idWindow.glosListView.positionViewAtIndex(idWindow.nGlosaTakeQuizIndex, ListView.Center)
+    idWindow.glosListView.positionViewAtIndex(idWindow.nGlosaTakeQuizIndex,
+                                              ListView.Center)
   } else {
     idWindow.nGlosaTakeQuizIndex = -1
     idWindow.glosListView.currentIndex = -1
@@ -932,21 +950,24 @@ function renameQuiz(sQuizName) {
     var o = quizFromCurrentItem()
     o.quizname = sQuizName
     var nId = o.number
-    tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?', [sQuizName, nId])
+    tx.executeSql('UPDATE GlosaDbIndex SET quizname=? WHERE dbnumber=?',
+                  [sQuizName, nId])
     idTextSelected.text = sQuizName
     idQuizList.currentIndex = MyDownloader.indexFromGlosNr(glosModelIndex, nId)
   })
 }
 
 function indexQuizFromCurrentItem() {
-  return MyDownloader.indexFromGlosNr(idGlosModelIndex, idQuizList.currentItem.nNumber)
+  return MyDownloader.indexFromGlosNr(idGlosModelIndex,
+                                      idQuizList.currentItem.nNumber)
 }
 
 function quizFromCurrentItem() {
 
   if (idWindow.quizListView.currentItem === null)
     return
-  var j = MyDownloader.indexFromGlosNr(idGlosModelIndex, idWindow.quizListView.currentItem.nNumber)
+  var j = MyDownloader.indexFromGlosNr(
+        idGlosModelIndex, idWindow.quizListView.currentItem.nNumber)
   return idGlosModelIndex.get(j)
 }
 
@@ -986,8 +1007,8 @@ function loadFromQuizList() {
 
   db.transaction(function (tx) {
 
-    tx.executeSql(
-          'CREATE TABLE IF NOT EXISTS Glosa' + nDbNumber + '( number INT , quizword TEXT, answer TEXT, state INT)')
+    tx.executeSql('CREATE TABLE IF NOT EXISTS Glosa' + nDbNumber
+                  + '( number INT , quizword TEXT, answer TEXT, state INT)')
 
     loadFromDb(tx, 0)
     loadQuiz()
@@ -1000,8 +1021,10 @@ function loadFromQuizList() {
 
 function newQuiz() {
 
-  if (idLangModel.get(idLangList1.currentIndex).code === idLangModel.get(idLangList2.currentIndex).code) {
-    idErrorDialog.text = "WordQuiz with same language " + idLangModel.get(idLangList2.currentIndex).lang + "!"
+  if (idLangModel.get(idLangList1.currentIndex).code === idLangModel.get(
+        idLangList2.currentIndex).code) {
+    idErrorDialog.text = "WordQuiz with same language " + idLangModel.get(
+          idLangList2.currentIndex).lang + "!"
     idErrorDialog.visible = true
   }
 
@@ -1018,7 +1041,8 @@ function newQuiz() {
     if (sQuizName.length < 3)
       sQuizName = "New Quiz " + sLangLangSelected
 
-    tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)', [nNr, sQuizName, "0/0", sLangLangSelected])
+    tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',
+                  [nNr, sQuizName, "0/0", sLangLangSelected])
     tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)', [nNr, "-"])
 
     idGlosModelIndex.append({
@@ -1032,7 +1056,8 @@ function newQuiz() {
 
     idQuizList.positionViewAtEnd()
 
-    idQuizList.currentIndex = MyDownloader.indexFromGlosNr(idWindow.glosModelIndex, nNr)
+    idQuizList.currentIndex = MyDownloader.indexFromGlosNr(
+          idWindow.glosModelIndex, nNr)
   })
 }
 
@@ -1128,7 +1153,8 @@ function loadFromServerList(nCount, oDD) {
   }
 
   if (nLastSelected >= 0) {
-    idImport.currentIndex = MyDownloader.indexFromGlosNr(oFilteredQListModel, nLastSelected)
+    idImport.currentIndex = MyDownloader.indexFromGlosNr(oFilteredQListModel,
+                                                         nLastSelected)
     idImport.positionViewAtIndex(idImport.currentIndex)
   } else {
     idImport.currentIndex = -1
@@ -1201,12 +1227,15 @@ function loadFromList(nCount, oDD, sLangLoaded) {
 
     nDbNumber = nNr
 
-    tx.executeSql('CREATE TABLE IF NOT EXISTS Glosa' + nNr + '( number INT , quizword TEXT, answer TEXT, state INT )')
+    tx.executeSql('CREATE TABLE IF NOT EXISTS Glosa' + nNr
+                  + '( number INT , quizword TEXT, answer TEXT, state INT )')
 
     var sState1 = nCount / 3 + "/" + nCount / 3
-    tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)', [nDbNumber, sImportDesc1 + "###" + sImportDescDate])
+    tx.executeSql('INSERT INTO GlosaDbDesc VALUES(?,?)',
+                  [nDbNumber, sImportDesc1 + "###" + sImportDescDate])
 
-    tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)', [nDbNumber, sQuizName, sState1, sLangLoaded])
+    tx.executeSql('INSERT INTO GlosaDbIndex VALUES(?,?,?,?)',
+                  [nDbNumber, sQuizName, sState1, sLangLoaded])
 
     idGlosModelIndex.append({
                               "number": nNr,
@@ -1227,7 +1256,8 @@ function loadFromList(nCount, oDD, sLangLoaded) {
     for (var i = 0; i < nCount; i += 3) {
       var sAnswString = oDD[i] + "###" + oDD[i + 1]
       nNumber = nNumber + 1
-      tx.executeSql('INSERT INTO Glosa' + nNr + ' VALUES(?, ?, ?, ?)', [nNumber, oDD[i + 2], sAnswString, 0])
+      tx.executeSql('INSERT INTO Glosa' + nNr + ' VALUES(?, ?, ?, ?)',
+                    [nNumber, oDD[i + 2], sAnswString, 0])
     }
 
     idImport.bIsDownloading = false
@@ -1322,8 +1352,9 @@ function updateQuiz() {
       sA = sA + "###" + sE
     }
 
-    tx.executeSql('UPDATE Glosa' + nDbNumber + ' SET quizword=?, answer=?, state=? WHERE number = ?',
-                  [sQ, sA, nState, nNumber])
+    tx.executeSql(
+          'UPDATE Glosa' + nDbNumber + ' SET quizword=?, answer=?, state=? WHERE number = ?',
+          [sQ, sA, nState, nNumber])
 
     // Assign The updated values
 
@@ -1400,11 +1431,14 @@ function updateQuiz() {
 
   sScoreText = glosModelWorking.count + "/" + glosModel.count
 
-  MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).answer, sToLang)
-  MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).question, sFromLang)
+  MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).answer,
+                          sToLang)
+  MyDownloader.deleteWord(glosModel.get(idGlosList.currentIndex).question,
+                          sFromLang)
 
-  if (glosModel.get(idGlosList.currentIndex).question !== sQ || glosModel.get(idGlosList.currentIndex).answer !== sA_Org
-      || glosModel.get(idGlosList.currentIndex).extra !== sE) {
+  if (glosModel.get(idGlosList.currentIndex).question !== sQ || glosModel.get(
+        idGlosList.currentIndex).answer !== sA_Org || glosModel.get(
+        idGlosList.currentIndex).extra !== sE) {
     glosModel.get(idGlosList.currentIndex).question = sQ
     glosModel.get(idGlosList.currentIndex).answer = sA_Org
     glosModel.get(idGlosList.currentIndex).extra = sE
@@ -1418,7 +1452,8 @@ function deleteWordInQuiz() {
   idEditDlg.visible = false
   var nNumber = glosModel.get(idGlosList.currentIndex).number
   db.transaction(function (tx) {
-    tx.executeSql('DELETE FROM Glosa' + nDbNumber + ' WHERE number = ?', [nNumber])
+    tx.executeSql('DELETE FROM Glosa' + nDbNumber + ' WHERE number = ?',
+                  [nNumber])
   })
 
   var sQuestion = glosModel.get(idGlosList.currentIndex).question
@@ -1444,7 +1479,8 @@ function deleteWordInQuiz() {
 function updateDbWithWordState(nLastNumber) {
 
   db.transaction(function (tx) {
-    tx.executeSql("UPDATE Glosa" + nDbNumber + " SET state=1 WHERE number=?", nLastNumber)
+    tx.executeSql("UPDATE Glosa" + nDbNumber + " SET state=1 WHERE number=?",
+                  nLastNumber)
   })
 }
 
@@ -1528,8 +1564,8 @@ function assigNextQuizWord() {
     if (ii >= 0) {
       glosModelWorking.remove(ii)
     } else {
-      console.log("not found in working model " + nLastNumber + " " + glosModelWorking.count + " " + idQuizModel.get(
-                    i).question)
+      console.log("not found in working model " + nLastNumber + " "
+                  + glosModelWorking.count + " " + idQuizModel.get(i).question)
     }
 
     if (glosModelWorking.count === 0) {
@@ -1558,8 +1594,10 @@ function assigNextQuizWord() {
 
   if (glosModelWorking.count > 3) {
     for (; ; ) {
-      var nIndexNewWordInModelWorking = Math.floor(Math.random() * glosModelWorking.count)
-      var nNumberOfNewWord = glosModelWorking.get(nIndexNewWordInModelWorking).number
+      var nIndexNewWordInModelWorking = Math.floor(Math.random(
+                                                     ) * glosModelWorking.count)
+      var nNumberOfNewWord = glosModelWorking.get(
+            nIndexNewWordInModelWorking).number
       var Found = 0
 
       for (i = 0; i < 3; ++i) {
@@ -1579,7 +1617,8 @@ function assigNextQuizWord() {
   else
     assignOneWorkingItem()
 
-  idWindow.nGlosaTakeQuizIndex = MyDownloader.indexFromGlosNr(glosModel, idQuizModel.get(nQuizIndex1_3).numberDb)
+  idWindow.nGlosaTakeQuizIndex = MyDownloader.indexFromGlosNr(
+        glosModel, idQuizModel.get(nQuizIndex1_3).numberDb)
 
   if (bTextMode)
     MyDownloader.focusOnQuizText(nQuizIndex1_3)
@@ -1614,24 +1653,41 @@ function calcSwipeDirection(currentIndex) {
     idQuizModel.bDir = -1
 }
 
-
-function playQuestion()
-{
-  MyDownloader.playWord(idQuizModel.get(nQuizIndex1_3).question,
-                        sQuestionLang)
-
-  console.log("q " + idQuizModel.get(nQuizIndex1_3).question)
+function playQuestion() {
+  MyDownloader.playWord(idQuizModel.get(nQuizIndex1_3).question, sQuestionLang)
   idCarTimerPlayAnswer.start()
 }
 
-function playAnswer()
-{
+function playAnswer() {
   MyDownloader.playWord(idQuizModel.get(nQuizIndex1_3).answer, sAnswerLang)
-  console.log("a " + idQuizModel.get(nQuizIndex1_3).answer)
 }
 
-
 function exeCarMode() {
-  idTakeQuizView.incIndex()
+
+  QuizLib.incIndex()
   idCarTimerPlayQuestion.start()
+}
+
+function handleClickCarMode() {
+  bCarMode = !bCarMode
+  if (bCarMode) {
+    QuizLib.playQuestion()
+    idCarTimer.start()
+  } else {
+    idCarTimerPlayAnswer.stop()
+    idCarTimerPlayQuestion.stop()
+    idCarTimer.stop()
+  }
+}
+
+function incIndex() {
+  idMoveTimer.start()
+  idTakeQuizView.incrementCurrentIndex()
+}
+
+function decIndex() {
+  idMoveTimer.start()
+  idTakeQuizView.decrementCurrentIndex()
+  idCarTimerPlayQuestion.stop()
+  idCarTimerPlayAnswer.stop()
 }

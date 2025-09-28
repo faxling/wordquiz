@@ -69,6 +69,16 @@ Flipable {
         onClicked: bImageMode = !bImageMode
       }
 
+      ButtonQuizImg {
+        id: idCarBtn
+        anchors.right: parent.right
+        anchors.rightMargin: 20
+        anchors.top: idImgBtn.bottom
+        anchors.topMargin: 20
+        source: "image://theme/icon-m-car?" + (bCarMode ? Theme.highlightColor : Theme.primaryColor)
+        onClicked: QuizLib.handleClickCarMode()
+      }
+
       Text {
         id: idTextExtra
         anchors.left: idInfoBtn.right

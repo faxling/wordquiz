@@ -21,8 +21,12 @@ public:
 
 private:
   void setOpacityOnId(const QString& id, const QString& op);
-  void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
-  void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) ;
+  #if QT_VERSION >= 0x060000
+    void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+  #else
+    void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+  #endif
+
   QSvgRenderer m_oSvg;
   QVector<QString> m_oSvgIds;
   QVector<QString> m_oSvgHIds;
