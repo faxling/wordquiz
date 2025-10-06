@@ -78,8 +78,6 @@ function langCodeToName(sCode) {
   }
 }
 
-function currentLangPair() {}
-
 function searchClipboard() {
   var oInText = "*"
   if (typeof idWindow.oEditTab !== "undefined") {
@@ -1562,6 +1560,8 @@ function assigNextQuizWord() {
     var i = nLastQuizIndex1_3
     var ii = MyDownloader.indexFromGlosNr(glosModelWorking, nLastNumber)
     if (ii >= 0) {
+      if (bCarMode)
+        MyDownloader.playWord(glosModelWorking.get(ii).answer, sAnswerLang)
       glosModelWorking.remove(ii)
     } else {
       console.log("not found in working model " + nLastNumber + " "
@@ -1576,6 +1576,7 @@ function assigNextQuizWord() {
       idQuizModel.get(i).question = ""
       idQuizModel.get(i).extra = ""
       idQuizModel.get(i).numberDb = -1
+      stopCarMode()
     }
 
     sScoreText = glosModelWorking.count + "/" + glosModel.count
@@ -1653,9 +1654,57 @@ function calcSwipeDirection(currentIndex) {
     idQuizModel.bDir = -1
 }
 
+function handleMovmentEnded() {
+  if (idTakeQuizView.nLastIndex === idTakeQuizView.currentIndex)
+    return
+
+  idTakeQuizView.nLastIndex = idTakeQuizView.currentIndex
+  QuizLib.calcSwipeDirection(idTakeQuizView.currentIndex)
+  QuizLib.assigNextQuizWord()
+
+  if (bCarMode) {
+    playQuestion()
+    idCarTimer.start()
+  }
+}
+
+function pauseCarTimers(bPause) {
+  if (bPause) {
+    idCarTimer.stop()
+    idMoveTimer.stop()
+    //idCarTimerPlayQuestion.stop()
+    //idCarTimerPlayAnswer.stop()
+  } else {
+    playQuestion()
+    idCarTimer.start()
+  }
+}
+
+function startCarMode() {
+  bCarMode = true
+
+  incIndex()
+  //  idCarTimerPlayQuestion.stop()
+  //  idCarTimerPlayAnswer.stop()
+}
+function stopCarMode() {
+  bCarMode = false
+  idCarTimer.stop()
+  idMoveTimer.stop()
+  //  idCarTimerPlayQuestion.stop()
+  //  idCarTimerPlayAnswer.stop()
+}
+
+function resetCarTimers() {
+  if (!bCarMode)
+    return
+  //  idCarTimerPlayAnswer.stop()
+  //  idCarTimerPlayQuestion.stop()
+  idCarTimer.restart()
+}
+
 function playQuestion() {
   MyDownloader.playWord(idQuizModel.get(nQuizIndex1_3).question, sQuestionLang)
-  idCarTimerPlayAnswer.start()
 }
 
 function playAnswer() {
@@ -1663,20 +1712,18 @@ function playAnswer() {
 }
 
 function exeCarMode() {
-
-  QuizLib.incIndex()
-  idCarTimerPlayQuestion.start()
+  // Maybe delay here
+  if (!bCarMode)
+    return
+  playAnswer()
+  incIndex()
 }
 
 function handleClickCarMode() {
-  bCarMode = !bCarMode
   if (bCarMode) {
-    QuizLib.playQuestion()
-    idCarTimer.start()
+    stopCarMode()
   } else {
-    idCarTimerPlayAnswer.stop()
-    idCarTimerPlayQuestion.stop()
-    idCarTimer.stop()
+    startCarMode()
   }
 }
 
@@ -1684,10 +1731,12 @@ function incIndex() {
   idMoveTimer.start()
   idTakeQuizView.incrementCurrentIndex()
 }
-
+/*
 function decIndex() {
   idMoveTimer.start()
   idTakeQuizView.decrementCurrentIndex()
-  idCarTimerPlayQuestion.stop()
-  idCarTimerPlayAnswer.stop()
+  //idCarTimerPlayQuestion.stop()
+  // idCarTimerPlayAnswer.stop()
 }
+*/
+

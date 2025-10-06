@@ -9,6 +9,7 @@ Item {
   property bool bImageMode: false
   property bool bVoiceMode: false
   property bool bCarMode: false
+  property int nCarModeSpeed: 10
   property bool bTextAnswerOk: false
 
   Component.onCompleted: {
@@ -17,18 +18,20 @@ Item {
 
   Timer {
     id: idMoveTimer
-    interval: 800
+    interval: 500
     repeat: false
-    onTriggered: idTakeQuizView.movementEnded()
+    onTriggered: QuizLib.handleMovmentEnded()
   }
 
   Timer {
     id: idCarTimer
-    interval: 10000
+    interval: (20 - nCarModeSpeed) * 1000
     repeat: true
     onTriggered: QuizLib.exeCarMode()
   }
 
+
+  /*
   Timer {
     id: idCarTimerPlayQuestion
     interval: 1000
@@ -38,27 +41,31 @@ Item {
 
   Timer {
     id: idCarTimerPlayAnswer
-    interval: 8000
+    interval: idCarTimer.interval - 2000
     repeat: false
     onTriggered: QuizLib.playAnswer()
   }
 
+  */
   PathView {
     id: idTakeQuizView
     clip: true
 
+    // onMovementEnded: QuizLib.handleMovmentEnded()
+    onMovingChanged: console.log("movingchanged")
     // Making it lock if bTextMode and not correct answer
     interactive: (!bTextMode || bTextAnswerOk || moving)
     width: idRectTakeQuiz.width
     height: idRectTakeQuiz.height
 
+    onFlickEnded: console.log("onFlic Ended")
     property int nLastIndex
     onMovementEnded: {
-      if (nLastIndex === currentIndex)
-        return
-      nLastIndex = currentIndex
-      QuizLib.calcSwipeDirection(currentIndex)
-      QuizLib.assigNextQuizWord()
+      console.log("onMovementEnded")
+
+      // Manual movement
+      idCarTimer.stop()
+      QuizLib.handleMovmentEnded()
     }
 
     model: idQuizModel

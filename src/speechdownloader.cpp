@@ -573,7 +573,11 @@ void Sound::Play(const QString& sUrl)
     oc[sUrl]->setSource(QUrl::fromLocalFile(sUrl));
     oc[sUrl]->play();
   }
+  // Syncronize
+  QEventLoop o;
 
+  while (oc[sUrl]->isPlaying())
+    o.processEvents();
 }
 
 void Speechdownloader::playWord(QString sWord, QString sLang)

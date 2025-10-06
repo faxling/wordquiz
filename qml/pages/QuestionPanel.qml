@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../QuizFunctions.js" as QuizLib
 
+// QuestionPanel
 Flipable {
   id: flipable
 
@@ -77,6 +78,27 @@ Flipable {
         anchors.topMargin: 20
         source: "image://theme/icon-m-car?" + (bCarMode ? Theme.highlightColor : Theme.primaryColor)
         onClicked: QuizLib.handleClickCarMode()
+      }
+
+      Slider {
+        stepSize: 1
+        id: idCarSpeedSlider
+        visible: bCarMode
+        label: "Car mode speed"
+        anchors.top: idImgBtn.bottom
+        anchors.topMargin: 20
+        anchors.right: idCarBtn.left
+        anchors.left: parent.left
+        onDownChanged: QuizLib.pauseCarTimers(down)
+        minimumValue: 3
+        maximumValue: 17
+        onValueChanged: {
+          if (nCarModeSpeed == Math.round(value))
+            return
+          nCarModeSpeed = Math.round(value)
+        }
+        property int nCarModeSpeed2: nCarModeSpeed
+        onNCarModeSpeed2Changed: value = nCarModeSpeed
       }
 
       Text {
