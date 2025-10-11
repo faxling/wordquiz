@@ -97,6 +97,7 @@ Flipable {
             return
           nCarModeSpeed = Math.round(value)
         }
+        // Trick to update 3 sliders from one value
         property int nCarModeSpeed2: nCarModeSpeed
         onNCarModeSpeed2Changed: value = nCarModeSpeed
       }

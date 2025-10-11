@@ -125,7 +125,6 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject* pParent
   // Seems like the first play fails
   m_oSound.Play("qrc:welcome_en.wav");
 
-  m_pStopWatch = nullptr;
 }
 
 static const QString sReqDictUrlBase = "https://dictionary.yandex.net/api/v1/dicservice/"
@@ -544,6 +543,7 @@ QString sVoicetechKo(QStringLiteral("http://"
 
 void Sound::Play(const QString& sUrl)
 {
+  // StopWatch oStopWatch("Play word %1 " + JustFileNameNoExt(sUrl));
   if (oc.contains(sUrl))
   {
     oc[sUrl]->play();
@@ -554,11 +554,12 @@ void Sound::Play(const QString& sUrl)
     oc[sUrl]->setSource(QUrl::fromLocalFile(sUrl));
     oc[sUrl]->play();
   }
-  // Syncronize
-  QEventLoop o;
 
+  // Syncronize
   while (oc[sUrl]->isPlaying())
-    o.processEvents();
+  {
+    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+  }
 }
 
 void Speechdownloader::playWord(QString sWord, QString sLang)

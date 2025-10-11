@@ -20,13 +20,13 @@ Item {
     id: idMoveTimer
     interval: 500
     repeat: false
-    onTriggered: QuizLib.handleMovmentEnded()
+    onTriggered: QuizLib.handleMovmentEnded(false)
   }
 
   Timer {
     id: idCarTimer
-    interval: (20 - nCarModeSpeed) * 1000
-    repeat: true
+    interval: (18 - nCarModeSpeed) * 1000
+    repeat: false
     onTriggered: QuizLib.exeCarMode()
   }
 
@@ -37,13 +37,10 @@ Item {
     interactive: (!bTextMode || bTextAnswerOk || moving)
     width: idRectTakeQuiz.width
     height: idRectTakeQuiz.height
-
     property int nLastIndex
     onMovementEnded: {
-
-      // Manual movement
-      idCarTimer.stop()
-      QuizLib.handleMovmentEnded()
+      // Manual movement = true
+      QuizLib.handleMovmentEnded(true)
     }
 
     model: idQuizModel

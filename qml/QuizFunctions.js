@@ -1654,9 +1654,13 @@ function calcSwipeDirection(currentIndex) {
     idQuizModel.bDir = -1
 }
 
-function handleMovmentEnded() {
+function handleMovmentEnded(bManual) {
+
   if (idTakeQuizView.nLastIndex === idTakeQuizView.currentIndex)
     return
+
+  if (bManual)
+    idCarTimer.stop()
 
   idTakeQuizView.nLastIndex = idTakeQuizView.currentIndex
   QuizLib.calcSwipeDirection(idTakeQuizView.currentIndex)
@@ -1688,12 +1692,6 @@ function stopCarMode() {
   idMoveTimer.stop()
 }
 
-function resetCarTimers() {
-  if (!bCarMode)
-    return
-  idCarTimer.restart()
-}
-
 function playQuestion() {
   MyDownloader.playWord(idQuizModel.get(nQuizIndex1_3).question, sQuestionLang)
 }
@@ -1719,6 +1717,6 @@ function handleClickCarMode() {
 }
 
 function incIndex() {
-  idMoveTimer.start()
+  idMoveTimer.restart()
   idTakeQuizView.incrementCurrentIndex()
 }

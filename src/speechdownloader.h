@@ -166,7 +166,6 @@ private:
 
   bool m_bPlayAfterDownload = false;
   int NumberRole(QAbstractItemModel* pp);
-  StopWatch* m_pStopWatch;
   QUrl m_oImgUrl;
   QString m_sImgPath;
   Sound m_oSound;
