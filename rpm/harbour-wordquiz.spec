@@ -9,7 +9,7 @@ Name:       harbour-wordquiz
 # << macros
 
 Summary:    Word quiz studio
-Version:    4.3
+Version:    4.4
 Release:    0
 Group:      Qt/Qt
 License:    LICENSE
@@ -29,7 +29,7 @@ BuildRequires:  pkgconfig(qt5embedwidget)
 BuildRequires:  desktop-file-utils
 
 %description
-An language study application for creating and taking word quizs in different languages.
+An language study application for creating and taking word quizs and games in different languages.
 
 
 %prep

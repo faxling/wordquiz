@@ -12,6 +12,11 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Sat Oct 11 2025 Fredrik Axling <faxling11@gmail.com> 4.4-0
+- Add Carmode
+- Play of words more dependable sound is now cashed
+- Buggfixes
+
 * Thu Nov 28 2024 Fredrik Axling <faxling11@gmail.com> 4.3-0
 - Context examples generation from a word
 - Adopt for Jolla C2

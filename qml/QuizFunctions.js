@@ -1672,8 +1672,6 @@ function pauseCarTimers(bPause) {
   if (bPause) {
     idCarTimer.stop()
     idMoveTimer.stop()
-    //idCarTimerPlayQuestion.stop()
-    //idCarTimerPlayAnswer.stop()
   } else {
     playQuestion()
     idCarTimer.start()
@@ -1682,24 +1680,17 @@ function pauseCarTimers(bPause) {
 
 function startCarMode() {
   bCarMode = true
-
   incIndex()
-  //  idCarTimerPlayQuestion.stop()
-  //  idCarTimerPlayAnswer.stop()
 }
 function stopCarMode() {
   bCarMode = false
   idCarTimer.stop()
   idMoveTimer.stop()
-  //  idCarTimerPlayQuestion.stop()
-  //  idCarTimerPlayAnswer.stop()
 }
 
 function resetCarTimers() {
   if (!bCarMode)
     return
-  //  idCarTimerPlayAnswer.stop()
-  //  idCarTimerPlayQuestion.stop()
   idCarTimer.restart()
 }
 
@@ -1712,7 +1703,7 @@ function playAnswer() {
 }
 
 function exeCarMode() {
-  // Maybe delay here
+
   if (!bCarMode)
     return
   playAnswer()
@@ -1731,12 +1722,3 @@ function incIndex() {
   idMoveTimer.start()
   idTakeQuizView.incrementCurrentIndex()
 }
-/*
-function decIndex() {
-  idMoveTimer.start()
-  idTakeQuizView.decrementCurrentIndex()
-  //idCarTimerPlayQuestion.stop()
-  // idCarTimerPlayAnswer.stop()
-}
-*/
-

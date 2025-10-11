@@ -122,6 +122,7 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject* pParent
 
   qDebug() << "WordQuiz StoragePath: " << m_sStoragePath;
 
+  // Seems like the first play fails
   m_oSound.Play("qrc:welcome_en.wav");
 
   m_pStopWatch = nullptr;
@@ -278,26 +279,6 @@ QUrl Speechdownloader::imageSrc(QString sWord, QString sLang)
   GetImg(sWord, oc[1], oRet);
   return oRet;
 }
-/*
-void Speechdownloader::checkAndEmit(QString sPath1, QString sPath2)
-{
-  if (m_sImgPath == sPath1 || m_sImgPath == sPath2)
-  {
-    if (m_bHasImg == true)
-    {
-      m_oImgUrl = QUrl();
-      emit urlImgChanged();
-    }
-    else
-    {
-      m_bHasImg = true;
-      emit hasImgChanged();
-    }
-    m_oImgUrl = QUrl::fromLocalFile(m_sImgPath);
-    emit urlImgChanged();
-  }
-}
-*/
 
 void Speechdownloader::setImgFile(QString sWord, QString sLang, QString sWord2, QString sLang2,
                                   QString sImgFilePath)

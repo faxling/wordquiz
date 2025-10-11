@@ -30,38 +30,16 @@ Item {
     onTriggered: QuizLib.exeCarMode()
   }
 
-
-  /*
-  Timer {
-    id: idCarTimerPlayQuestion
-    interval: 1000
-    repeat: false
-    onTriggered: QuizLib.playQuestion()
-  }
-
-  Timer {
-    id: idCarTimerPlayAnswer
-    interval: idCarTimer.interval - 2000
-    repeat: false
-    onTriggered: QuizLib.playAnswer()
-  }
-
-  */
   PathView {
     id: idTakeQuizView
     clip: true
-
-    // onMovementEnded: QuizLib.handleMovmentEnded()
-    onMovingChanged: console.log("movingchanged")
     // Making it lock if bTextMode and not correct answer
     interactive: (!bTextMode || bTextAnswerOk || moving)
     width: idRectTakeQuiz.width
     height: idRectTakeQuiz.height
 
-    onFlickEnded: console.log("onFlic Ended")
     property int nLastIndex
     onMovementEnded: {
-      console.log("onMovementEnded")
 
       // Manual movement
       idCarTimer.stop()

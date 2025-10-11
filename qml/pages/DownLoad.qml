@@ -17,7 +17,6 @@ RectRounded {
   property string sDesc1: ""
   property string sDescDate: ""
   property int nError
-
   property alias currentIndex: idServerListView.currentIndex
   property alias currentItem: idServerListView.currentItem
   function positionViewAtIndex(nIndex) {
@@ -149,15 +148,6 @@ RectRounded {
       MouseArea {
         anchors.fill: idServerRow
         onClicked: {
-
-
-          /*
-          nSelectedQ = number
-          idContainer.sImportMsg = ""
-          idContainer.sDesc1 = desc1
-          idContainer.sDescDate = date1
-          idContainer.sSelectedQ = qname
-          */
           idServerListView.currentIndex = index
         }
       }

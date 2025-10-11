@@ -172,15 +172,6 @@ Item {
       CWLib.sluggCW()
     }
 
-
-    /*
-    TextList {
-      anchors.bottom: parent.bottom
-      text: "New"
-      horizontalAlignment: Text.AlignHCenter
-      anchors.horizontalCenter: parent.horizontalCenter
-    }
-*/
     BusyIndicator {
       running: bCWBusy
       id: idBusyIndicator

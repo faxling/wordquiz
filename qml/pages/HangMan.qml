@@ -71,20 +71,6 @@ Item {
     spacing: 10
   }
 
-
-  /*
-  ButtonQuiz {
-    id: idHangBtn
-    width: n25BtnWidth
-    anchors.centerIn: parent
-    text: "Start"
-    onClicked: {
-      idDrawing.renderId(1)
-      QuizLib.hangAddWord()
-      visible = !visible
-    }
-  }
-  */
   Image {
     id: idFlagImg
     anchors.centerIn: parent
@@ -196,7 +182,7 @@ Item {
       idTTrans.visible = !idTTrans.visible
     }
   }
-  // @disable-check M301
+
   ButtonQuiz {
     id: idHangBtn3
     width: n4BtnWidth / nBtnWidthQuote
