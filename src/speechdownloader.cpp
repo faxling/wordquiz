@@ -1,6 +1,7 @@
 ﻿#include "speechdownloader.h"
 
 #include <QAbstractListModel>
+#include <QAudioOutput>
 #include <QBuffer>
 #include <QClipboard>
 #include <QDataStream>
@@ -14,16 +15,22 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonValue>
+//#include <QMediaDevices>
 #include <QRegularExpression>
 #include <QSoundEffect>
+#include <QStandardPaths>
 #include <QTextDocument>
 #include <QTextDocumentFragment>
+#include <QThread>
 #include <QUrl>
 #include <QUrlQuery>
 #include <random>
+// c:\Qt\6.10.1\android_arm64_v8a\include\QtCore\6.10.1\QtCore\
 
 #ifdef Q_OS_ANDROID
+
 #include <QtCore/private/qandroidextras_p.h>
+
 #endif
 
 #include "filehelpers.h"
@@ -123,8 +130,7 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject* pParent
   qDebug() << "WordQuiz StoragePath: " << m_sStoragePath;
 
   // Seems like the first play fails
-  m_oSound.Play("qrc:welcome_en.wav");
-
+  m_oSound.Play("qrc:welcome_en.wav", false);
 }
 
 static const QString sReqDictUrlBase = "https://dictionary.yandex.net/api/v1/dicservice/"
@@ -374,14 +380,15 @@ void Speechdownloader::wordDownloaded(QNetworkReply* pReply)
   QString sFileName = AudioPath(sWord, sLang);
 
   QFile oWav(sFileName);
-  oWav.open(QIODevice::WriteOnly);
-  oWav.write(m_oDownloadedData);
-  oWav.close();
+  if (oWav.open(QIODevice::WriteOnly)) {
+    oWav.write(m_oDownloadedData);
+    oWav.close();
+  }
 
   emit downloadedSignal();
   if (uQ.hasQueryItem("PlayAfterDownload") == true)
   {
-    m_oSound.Play(sFileName);
+    m_oSound.Play(sFileName, false);
   }
 }
 
@@ -499,7 +506,7 @@ void Speechdownloader::listDownloaded(QNetworkReply* pReply)
                         "slang"
                         "qcount
                         "number"
-                        */
+    */
   }
   pReply->deleteLater();
   emit quizListDownloadedSignal(ocL.size(), ocL);
@@ -541,40 +548,96 @@ QString sVoicetechKo(QStringLiteral("http://"
                                     "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
                                     "44khz_16bit_mono&hl=ko-kr&src="));
 
-void Sound::Play(const QString& sUrl)
+QString sVoicetechJa(QStringLiteral("http://"
+                                    "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
+                                    "44khz_16bit_mono&hl=ja-jp&src="));
+
+Sound::Sound()
 {
+  //auto audioOutput = new QAudioOutput;
+  // m_oPlayer.setAudioOutput(audioOutput);
+}
+void Sound::Play(const QString& sUrl, bool bSync)
+{
+
   // StopWatch oStopWatch("Play word %1 " + JustFileNameNoExt(sUrl));
+
   if (oc.contains(sUrl))
   {
+    qDebug() << JustFileNameNoExt(sUrl);
+    oc[sUrl]->setMuted(false);
     oc[sUrl]->play();
   }
   else
   {
     oc[sUrl].reset(new QSoundEffect());
     oc[sUrl]->setSource(QUrl::fromLocalFile(sUrl));
+    oc[sUrl]->setLoopCount(2);
+    auto pS = oc[sUrl].get();
+    QObject::connect(pS, &QSoundEffect::loopsRemainingChanged,  [=]()                 {
+      if (pS->loopsRemaining() == 1)
+        pS->setMuted(true);
+    });
     oc[sUrl]->play();
   }
 
+  /*
+    m_oPlayer.setSource(QUrl::fromLocalFile(sUrl));
+    m_oPlayer.play();
+  */
   // Syncronize
-  while (oc[sUrl]->isPlaying())
+
+  if (bSync)
   {
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    QEventLoop o;
+    while (oc[sUrl]->isPlaying())
+    {
+      o.processEvents();
+      QThread::msleep(1);
+    }
   }
 }
 
-void Speechdownloader::playWord(QString sWord, QString sLang)
+void Speechdownloader::playWordSync(QString sWord, QString sLang)
 {
   QString sFileName = AudioPath(sWord, sLang);
   QFileInfo oWavFile(sFileName);
-  if (oWavFile.size() > 5000)
+  int nSize = oWavFile.size();
+  if (nSize > 5000)
   {
-    m_oSound.Play(sFileName);
+    m_oSound.Play(sFileName, true);
   }
   else
   {
     m_bPlayAfterDownload = true;
     downloadWord(sWord, sLang);
   }
+}
+
+int Speechdownloader::playWord(QString sWord, QString sLang)
+{
+  QString sFileName = AudioPath(sWord, sLang);
+  QFileInfo oWavFile(sFileName);
+  int nSize = oWavFile.size();
+
+  // qDebug() << sFileName << " size " << nSize;
+
+  // QString s = QStandardPaths::writableLocation(QStandardPaths::StandardLocation::MusicLocation);
+
+  // QFile::copy(sFileName, s ^ JustFileName(sFileName));
+  // qDebug() << "Copy to " << (s ^ JustFileName(sFileName));
+  // 705 * 1024 / 8    b/s 128*705 B/s
+  if (nSize > 5000)
+  {
+    m_oSound.Play(sFileName, false);
+  }
+  else
+  {
+    m_bPlayAfterDownload = true;
+    downloadWord(sWord, sLang);
+    return 0;
+  }
+  return nSize / 90.240;
 }
 
 void Speechdownloader::deleteWord(QString sWord, QString sLang)
@@ -701,10 +764,18 @@ void Speechdownloader::downloadImageSlot(const QList<QUrl>& vImgUrl, QString sWo
 
 void Speechdownloader::downloadWord(QString sWord, QString sLang)
 {
-  static QMap<QString, QString> ocUrlMap{
-      {"no", sVoicetechNo}, {"ru", sVoicetechRu}, {"en", sVoicetechEn}, {"sv", sVoicetechSe},
-      {"fr", sVoicetechFr}, {"pl", sVoicetechPl}, {"de", sVoicetechDe}, {"it", sVoicetechIt},
-      {"es", sVoicetechEs}, {"hu", sVoicetechHu}, {"ko", sVoicetechKo}};
+  static QMap<QString, QString> ocUrlMap{{"no", sVoicetechNo},
+                                         {"ru", sVoicetechRu},
+                                         {"en", sVoicetechEn},
+                                         {"sv", sVoicetechSe},
+                                         {"fr", sVoicetechFr},
+                                         {"pl", sVoicetechPl},
+                                         {"de", sVoicetechDe},
+                                         {"it", sVoicetechIt},
+                                         {"es", sVoicetechEs},
+                                         {"hu", sVoicetechHu},
+                                         {"ko", sVoicetechKo},
+                                         {"jp", sVoicetechJa}};
 
   QString sUrl = ocUrlMap[sLang] + sWord;
   if (m_bPlayAfterDownload == true)
@@ -774,7 +845,8 @@ void Speechdownloader::sortQuizModel(int nRole, int sortOrder)
     m_pGlobalWindowObject->setProperty("sQuizName", "Sample Set");
     m_pGlobalWindowObject->setProperty("sImportDescDate", dateStr());
     m_pGlobalWindowObject->setProperty("sImportDesc1", "A Sample Set for the App: Swedish-French");
-    oDefQuiz.open(QIODevice::ReadOnly);
+    if (oDefQuiz.open(QIODevice::ReadOnly) == false)
+      qDebug() << "can not open default quiz";
     m_oDownloadedData = oDefQuiz.readAll();
     quizDownloadedArray();
     return;
@@ -903,7 +975,8 @@ void Speechdownloader::quizDownloadedArray()
     QByteArray oc;
     ss >> oc;
     QFile oWav(AudioPath(s, ""));
-    oWav.open(QIODevice::ReadWrite);
+    if (oWav.open(QIODevice::WriteOnly) == false)
+      qDebug() << "Can not write wav";
     oWav.write(oc);
     oWav.close();
   }
@@ -919,7 +992,8 @@ void Speechdownloader::quizDownloadedArray()
       ss >> oc;
       QString sImg = ImgPath(s, "");
       QFile oImg(sImg);
-      oImg.open(QIODevice::WriteOnly);
+      if (oImg.open(QIODevice::WriteOnly) == false)
+        qDebug() << "Can not write img";
       oImg.write(oc);
       oImg.close();
     }
@@ -1082,7 +1156,9 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
   {
     QFile oF(AudioPath(oI, ""));
     ss << oI;
-    oF.open(QIODevice::ReadOnly);
+    if (oF.open(QIODevice::ReadOnly) == false)
+      continue;
+
     ss << oF.readAll();
     oF.close();
   }
@@ -1091,7 +1167,8 @@ void Speechdownloader::currentQuizCmd(QVariant p, QString sName, QString sLang, 
   {
     QFile oF(ImgPath(oI, ""));
     ss << oI;
-    oF.open(QIODevice::ReadOnly);
+    if (oF.open(QIODevice::ReadOnly) == false)
+      continue;
     ss << oF.readAll();
     oF.close();
   };

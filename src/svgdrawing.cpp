@@ -1,4 +1,4 @@
-
+﻿
 #include "svgdrawing.h"
 #include "QDebug"
 #include "QImage"
@@ -12,7 +12,8 @@
 SvgDrawing::SvgDrawing()
 {
   QFile file(":/gubbe.svg");
-  file.open(QIODevice::ReadOnly);
+  if (file.open(QIODevice::ReadOnly) == false)
+    return;
   QByteArray oSvgXml = file.readAll();
   // "path839", "path839-4"  path893
   m_oSvgIds = {"path817",     "path946", "path946-6", "path946-3", "path946-0",

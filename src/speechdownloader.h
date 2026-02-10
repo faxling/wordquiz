@@ -1,13 +1,14 @@
 #ifndef SPEECHDOWNLOADER_H
 #define SPEECHDOWNLOADER_H
 
+//#include <QAudioDevice>
+#include <QByteArray>
 #include <QDomDocument>
 #include <QDomElement>
-
-#include <QByteArray>
 #include <QEventLoop>
 #include <QJSValue>
 #include <QMap>
+#include <QMediaPlayer>
 #include <QObject>
 #include <QSortFilterProxyModel>
 #include <QSoundEffect>
@@ -22,8 +23,11 @@ class QuizFilterModel;
 class Sound
 {
 public:
-  void Play(const QString& sUrl);
+  Sound();
+  // QAudioDevice info;
+  void Play(const QString& sUrl, bool bSync);
   QMap<QString, std::shared_ptr<QSoundEffect>> oc;
+  QMediaPlayer m_oPlayer;
 };
 
 // Maybe more that just downloading audio
@@ -39,7 +43,9 @@ public:
   Q_INVOKABLE void downloadWord(QString sWord, QString sLang);
   Q_INVOKABLE void translateWord(QString sWord, QString sFromLang, QString sToLang,
                                  QObject* oButton);
-  Q_INVOKABLE void playWord(QString sWord, QString sLang);
+  // Returns ms duration
+  Q_INVOKABLE int playWord(QString sWord, QString sLang);
+  Q_INVOKABLE void playWordSync(QString sWord, QString sLang);
   Q_INVOKABLE void exportCurrentQuiz(QVariant p, QString sName, QString sLang, QString sPwd,
                                      QString sDesc, QObject* pProgressIndicator);
   Q_INVOKABLE void updateCurrentQuiz(QVariant p, QString sName, QString sLang, QString sPwd,
@@ -171,6 +177,7 @@ private:
   Sound m_oSound;
   QMap<QString, QStringList> m_ocSyn;
   QMap<QString, QStringList> m_ocMean;
+
   //  bool m_bHasImg = false;
 };
 

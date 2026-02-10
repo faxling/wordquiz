@@ -553,5 +553,9 @@ Item {
       lang: "German"
       code: "de"
     }
+    ListElement {
+      lang: "Japanese"
+      code: "jp"
+    }
   }
 } // Item

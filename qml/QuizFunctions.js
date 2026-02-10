@@ -1561,7 +1561,7 @@ function assigNextQuizWord() {
     var ii = MyDownloader.indexFromGlosNr(glosModelWorking, nLastNumber)
     if (ii >= 0) {
       if (bCarMode)
-        MyDownloader.playWord(glosModelWorking.get(ii).answer, sAnswerLang)
+        MyDownloader.playWordSync(glosModelWorking.get(ii).answer, sAnswerLang)
       glosModelWorking.remove(ii)
     } else {
       console.log("not found in working model " + nLastNumber + " "
@@ -1654,8 +1654,17 @@ function calcSwipeDirection(currentIndex) {
     idQuizModel.bDir = -1
 }
 
-function handleMovmentEnded(bManual) {
+function handleCarSlider(fV) {
+  console.log("handleCarSlider " + fV)
+  if (idRectTakeQuiz.nCarModeSpeed == Math.round(fV))
+    return
 
+  idRectTakeQuiz.nCarModeSpeed = Math.round(fV)
+      console.log("handleCarSlider set " + nCarModeSpeed)
+}
+
+function handleMovmentEnded(bManual) {
+ console.log("handleMovmentEnded " + bManual + " " + idTakeQuizView.nLastIndex)
   if (idTakeQuizView.nLastIndex === idTakeQuizView.currentIndex)
     return
 
@@ -1663,21 +1672,24 @@ function handleMovmentEnded(bManual) {
     idCarTimer.stop()
 
   idTakeQuizView.nLastIndex = idTakeQuizView.currentIndex
-  QuizLib.calcSwipeDirection(idTakeQuizView.currentIndex)
-  QuizLib.assigNextQuizWord()
+  calcSwipeDirection(idTakeQuizView.currentIndex)
+  assigNextQuizWord()
 
   if (bCarMode) {
     playQuestion()
+    console.log("nDurationPlayedWord " + idRectTakeQuiz.nDurationPlayedWord)
     idCarTimer.start()
   }
 }
 
 function pauseCarTimers(bPause) {
+  console.log("pauseCarTimers " + pauseCarTimers)
   if (bPause) {
     idCarTimer.stop()
     idMoveTimer.stop()
   } else {
-    playQuestion()
+     playQuestion()
+console.log("nDurationPlayedWord " + idRectTakeQuiz.nDurationPlayedWord)
     idCarTimer.start()
   }
 }
@@ -1686,6 +1698,7 @@ function startCarMode() {
   bCarMode = true
   incIndex()
 }
+
 function stopCarMode() {
   bCarMode = false
   idCarTimer.stop()
@@ -1693,11 +1706,11 @@ function stopCarMode() {
 }
 
 function playQuestion() {
-  MyDownloader.playWord(idQuizModel.get(nQuizIndex1_3).question, sQuestionLang)
+  idRectTakeQuiz.nDurationPlayedWord = MyDownloader.playWord(idQuizModel.get(nQuizIndex1_3).question, sQuestionLang)
 }
 
 function playAnswer() {
-  MyDownloader.playWord(idQuizModel.get(nQuizIndex1_3).answer, sAnswerLang)
+  idRectTakeQuiz.nDurationPlayedWord = MyDownloader.playWord(idQuizModel.get(nQuizIndex1_3).answer, sAnswerLang)
 }
 
 function exeCarMode() {
@@ -1717,6 +1730,12 @@ function handleClickCarMode() {
 }
 
 function incIndex() {
-  idMoveTimer.restart()
+  console.log("incIndex")
+  idMoveTimer.start()
   idTakeQuizView.incrementCurrentIndex()
+}
+
+function decIndex() {
+  idMoveTimer.start()
+  idTakeQuizView.decrementCurrentIndex()
 }

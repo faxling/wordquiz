@@ -92,11 +92,7 @@ Flipable {
         onDownChanged: QuizLib.pauseCarTimers(down)
         minimumValue: 3
         maximumValue: 17
-        onValueChanged: {
-          if (nCarModeSpeed == Math.round(value))
-            return
-          nCarModeSpeed = Math.round(value)
-        }
+        onValueChanged: QuizLib.handleCarSlider(value)
         // Trick to update 3 sliders from one value
         property int nCarModeSpeed2: nCarModeSpeed
         onNCarModeSpeed2Changed: value = nCarModeSpeed

@@ -183,5 +183,6 @@ private:
   QElapsedTimer* m_oTimer;
 };
 
+QString JustFileName(const QString& sFileName);
 QString JustFileNameNoExt(const QString& sFileName);
 #endif  // FILEHELPERS_H
