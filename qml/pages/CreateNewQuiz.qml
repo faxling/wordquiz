@@ -555,7 +555,7 @@ Item {
     }
     ListElement {
       lang: "Japanese"
-      code: "jp"
+      code: "ja"
     }
   }
 } // Item

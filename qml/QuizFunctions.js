@@ -60,6 +60,12 @@ function initLangList() {
                      })
 
   idLangModel.append({
+                       "lang": "Japanese",
+                       "imgsource": "qrc:japan-flag-3d-round-icon-128.png",
+                       "code": "ja"
+                     })
+
+  idLangModel.append({
                        "lang": "Korean",
                        "imgsource": "qrc:flags/south-korea-flag-button-round-icon-128.png",
                        "code": "ko"
@@ -510,7 +516,7 @@ function lookUppInReverso() {
 
   openWwwPage(sUrl, sLang + " Examples on \"" + oInText + "\"")
 }
-
+// http://mss7000.com/reverso/swedish-english?hej;
 function showUpploadDlg() {
   idExport.visible = true
   idTextInputQuizDesc.text = idWindow.sQuizDesc
@@ -1556,12 +1562,19 @@ function assigNextQuizWord() {
 
   var nLastNumber = idQuizModel.get(nLastQuizIndex1_3).numberDb
 
+  console.log("bCarmode " + bCarMode + " " + idQuizModel.bDir)
+
+  // Right swipe
   if (idQuizModel.bDir === -1) {
     var i = nLastQuizIndex1_3
     var ii = MyDownloader.indexFromGlosNr(glosModelWorking, nLastNumber)
+
+    console.log("indexFromGlosNr " + ii)
     if (ii >= 0) {
-      if (bCarMode)
+      if (bCarMode) {
+        console.log("call playWordSync ")
         MyDownloader.playWordSync(glosModelWorking.get(ii).answer, sAnswerLang)
+      }
       glosModelWorking.remove(ii)
     } else {
       console.log("not found in working model " + nLastNumber + " "
@@ -1652,6 +1665,8 @@ function calcSwipeDirection(currentIndex) {
     idQuizModel.bDir = 1
   if (nLastIndex === 2 && nI === 1)
     idQuizModel.bDir = -1
+
+  console.log("idQuizModel.bDir " + idQuizModel.bDir)
 }
 
 function handleCarSlider(fV) {
@@ -1660,11 +1675,11 @@ function handleCarSlider(fV) {
     return
 
   idRectTakeQuiz.nCarModeSpeed = Math.round(fV)
-      console.log("handleCarSlider set " + nCarModeSpeed)
+  console.log("handleCarSlider set " + nCarModeSpeed)
 }
 
 function handleMovmentEnded(bManual) {
- console.log("handleMovmentEnded " + bManual + " " + idTakeQuizView.nLastIndex)
+  console.log("handleMovmentEnded " + bManual + " " + idTakeQuizView.nLastIndex)
   if (idTakeQuizView.nLastIndex === idTakeQuizView.currentIndex)
     return
 
@@ -1677,19 +1692,16 @@ function handleMovmentEnded(bManual) {
 
   if (bCarMode) {
     playQuestion()
-    console.log("nDurationPlayedWord " + idRectTakeQuiz.nDurationPlayedWord)
     idCarTimer.start()
   }
 }
 
 function pauseCarTimers(bPause) {
-  console.log("pauseCarTimers " + pauseCarTimers)
   if (bPause) {
     idCarTimer.stop()
     idMoveTimer.stop()
   } else {
-     playQuestion()
-console.log("nDurationPlayedWord " + idRectTakeQuiz.nDurationPlayedWord)
+    playQuestion()
     idCarTimer.start()
   }
 }
@@ -1706,11 +1718,12 @@ function stopCarMode() {
 }
 
 function playQuestion() {
-  idRectTakeQuiz.nDurationPlayedWord = MyDownloader.playWord(idQuizModel.get(nQuizIndex1_3).question, sQuestionLang)
+  MyDownloader.playWord(
+        idQuizModel.get(nQuizIndex1_3).question, sQuestionLang)
 }
 
 function playAnswer() {
-  idRectTakeQuiz.nDurationPlayedWord = MyDownloader.playWord(idQuizModel.get(nQuizIndex1_3).answer, sAnswerLang)
+  MyDownloader.playWordSync(idQuizModel.get(nQuizIndex1_3).answer, sAnswerLang)
 }
 
 function exeCarMode() {

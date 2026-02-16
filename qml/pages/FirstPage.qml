@@ -92,7 +92,7 @@ Page {
   ListModel {
     id: idQuizModel
     property int bDir
-
+// -1 right swipe answer ok,  1 = left swipe
     ListElement {
       number: 0
       numberDb: 0

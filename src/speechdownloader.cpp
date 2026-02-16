@@ -559,8 +559,7 @@ Sound::Sound()
 }
 void Sound::Play(const QString& sUrl, bool bSync)
 {
-
-  // StopWatch oStopWatch("Play word %1 " + JustFileNameNoExt(sUrl));
+  StopWatch oStopWatch("Play word %1 " + JustFileNameNoExt(sUrl));
 
   if (oc.contains(sUrl))
   {
@@ -600,6 +599,7 @@ void Sound::Play(const QString& sUrl, bool bSync)
 
 void Speechdownloader::playWordSync(QString sWord, QString sLang)
 {
+  qDebug() << "playWordSync";
   QString sFileName = AudioPath(sWord, sLang);
   QFileInfo oWavFile(sFileName);
   int nSize = oWavFile.size();
@@ -775,7 +775,7 @@ void Speechdownloader::downloadWord(QString sWord, QString sLang)
                                          {"es", sVoicetechEs},
                                          {"hu", sVoicetechHu},
                                          {"ko", sVoicetechKo},
-                                         {"jp", sVoicetechJa}};
+                                         {"ja", sVoicetechJa}};
 
   QString sUrl = ocUrlMap[sLang] + sWord;
   if (m_bPlayAfterDownload == true)

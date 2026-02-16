@@ -11,7 +11,6 @@ Item {
   property bool bCarMode: false
   property int nCarModeSpeed: 10
   property bool bTextAnswerOk: false
-
   Component.onCompleted: {
     idWindow.oTakeQuiz = idRectTakeQuiz
   }
