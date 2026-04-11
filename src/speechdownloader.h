@@ -1,4 +1,4 @@
-#ifndef SPEECHDOWNLOADER_H
+﻿#ifndef SPEECHDOWNLOADER_H
 #define SPEECHDOWNLOADER_H
 
 //#include <QAudioDevice>
@@ -26,8 +26,8 @@ public:
   Sound();
   // QAudioDevice info;
   void Play(const QString& sUrl, bool bSync);
-  QMap<QString, std::shared_ptr<QSoundEffect>> oc;
-  QMediaPlayer m_oPlayer;
+  // QMap<QString, std::shared_ptr<QSoundEffect>> oc;
+  //  QMediaPlayer m_oPlayer;
 };
 
 // Maybe more that just downloading audio
