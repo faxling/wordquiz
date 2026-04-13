@@ -12,20 +12,30 @@
 #include <QObject>
 #include <QSortFilterProxyModel>
 #include <QSoundEffect>
+#include <QThread>
 #include <QVector>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
-#include <memory>
+// #include <memory>
 class StopWatch;
 class QuizFilterModel;
 
-class Sound
+class Sound : public QObject
 {
+  Q_OBJECT
 public:
   Sound();
+  ~Sound();
   // QAudioDevice info;
+  void PlayChanged(bool);
   void Play(const QString& sUrl, bool bSync);
+
+  QThread workerThread;
+  //public slots:
+  //   void handleResults(const QString&);
+signals:
+  void operate(const QString&);
   // QMap<QString, std::shared_ptr<QSoundEffect>> oc;
   //  QMediaPlayer m_oPlayer;
 };

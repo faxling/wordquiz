@@ -541,22 +541,66 @@ QString sVoicetechJa(QStringLiteral("http://"
                                     "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
                                     "44khz_16bit_mono&hl=ja-jp&src="));
 
+class Worker : public QObject
+{
+public:
+  Worker() { player.setAudioOutput(new QAudioOutput()); }
+public slots:
+
+  void doWork(const QString& parameter)
+  {
+    //QString result;
+    qDebug() << "Thread " << parameter;
+    while (player.isPlaying())
+      QThread::msleep(1);
+    player.setSource(QUrl::fromLocalFile(parameter));
+    player.play();
+    //  emit resultReady(result);
+  }
+  QMediaPlayer player;
+  //
+  //signals:
+  //   void resultReady(const QString& result);
+};
+Sound::~Sound()
+{
+  workerThread.quit();
+  workerThread.wait();
+}
 Sound::Sound()
 {
   //auto audioOutput = new QAudioOutput;
   // m_oPlayer.setAudioOutput(audioOutput);
+
+  Worker* worker = new Worker;
+  worker->moveToThread(&workerThread);
+  connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
+  connect(this, &Sound::operate, worker, &Worker::doWork);
+  // connect(worker, &Worker::resultReady, this, &Sound::handleResults);
+  workerThread.start();
 }
+
+void Sound::PlayChanged(bool b)
+{
+  qDebug() << "PlayingChanged " << b;
+}
+
 void Sound::Play(const QString& sUrl, bool bSync)
 {
-  StopWatch oStopWatch("Play word %1 " + JustFileNameNoExt(sUrl));
+  StopWatch oStopWatch("Play word %1 " + sUrl);
 
+  emit operate(sUrl);
+
+  /*
   static QMediaPlayer* player = nullptr;
   if (player == nullptr) {
     player = new QMediaPlayer;
-    player->setAudioOutput(new QAudioOutput());
+    
+    QObject::connect(player, &QMediaPlayer::playingChanged, this, &Sound::PlayChanged);
   }
-  player->setSource(QUrl::fromLocalFile(sUrl));
-  player->play();
+*/
+  //player->setSource(QUrl::fromLocalFile(sUrl));
+  // player->play();
   /*
   if (oc.contains(sUrl)) {
     qDebug() << JustFileNameNoExt(sUrl);
@@ -568,7 +612,7 @@ void Sound::Play(const QString& sUrl, bool bSync)
     oc[sUrl]->setSource(QUrl::fromLocalFile(sUrl));
     //  oc[sUrl]->setLoopCount(2);
     //  auto pS = oc[sUrl].get();
-    /*
+   
     QObject::connect(pS, &QSoundEffect::loopsRemainingChanged, [=]() {
       if (pS->loopsRemaining() == 1)
         pS->setMuted(true);
@@ -584,21 +628,41 @@ void Sound::Play(const QString& sUrl, bool bSync)
 
   // Syncronize
 
+  // QSoundEffect* o = new QSoundEffect;
+  // o->setSource(QUrl::fromLocalFile(sUrl));
+  //  o->play();
+
+  /*
+  QObject::connect(o, &QSoundEffect::playingChanged, [=]() {
+    if (o->isPlaying() == false)
+      o->deleteLater();
+  });
+*/
+  /*
+  QObject::connect(o, &QSoundEffect::playingChanged, [=](bool b) {
+    if (b == false)
+      o->deleteLater();
+  });
+*/
+  /*
   if (bSync) {
     QEventLoop o;
     while (player->isPlaying()) {
       o.processEvents();
+      qDebug() << "p";
+
       QThread::msleep(1);
     }
   }
+*/
 }
 
 void Speechdownloader::playWordSync(QString sWord, QString sLang)
 {
-  qDebug() << "playWordSync";
   QString sFileName = AudioPath(sWord, sLang);
   QFileInfo oWavFile(sFileName);
   int nSize = oWavFile.size();
+  qDebug() << "playWordSync " << nSize << " " << sFileName;
   if (nSize > 5000) {
     m_oSound.Play(sFileName, true);
   } else {
@@ -613,7 +677,7 @@ int Speechdownloader::playWord(QString sWord, QString sLang)
   QFileInfo oWavFile(sFileName);
   int nSize = oWavFile.size();
 
-  // qDebug() << sFileName << " size " << nSize;
+  qDebug() << sFileName << " size " << nSize;
 
   // QString s = QStandardPaths::writableLocation(QStandardPaths::StandardLocation::MusicLocation);
 
@@ -621,7 +685,7 @@ int Speechdownloader::playWord(QString sWord, QString sLang)
   // qDebug() << "Copy to " << (s ^ JustFileName(sFileName));
   // 705 * 1024 / 8    b/s 128*705 B/s
   if (nSize > 5000) {
-    m_oSound.Play(sFileName, false);
+    m_oSound.Play(sFileName, true);
   } else {
     m_bPlayAfterDownload = true;
     downloadWord(sWord, sLang);
