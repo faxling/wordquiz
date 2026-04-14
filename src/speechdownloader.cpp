@@ -543,18 +543,43 @@ QString sVoicetechJa(QStringLiteral("http://"
 
 class Worker : public QObject
 {
-public:
-  Worker() { player.setAudioOutput(new QAudioOutput()); }
-public slots:
+  public:
+  QList<QString> ocQ;
+  Worker()
+  {
+#if QT_VERSION >= 0x060000
+    player.setAudioOutput(new QAudioOutput());
+#endif
+  }
+  public slots:
 
   void doWork(const QString& parameter)
   {
     //QString result;
-    qDebug() << "Thread " << parameter;
+    // qDebug() << "Thread " << parameter << " state " << player.state() << " mediaStatus " << player.mediaStatus();
+
+#if QT_VERSION >= 0x060000
     while (player.isPlaying())
       QThread::msleep(1);
     player.setSource(QUrl::fromLocalFile(parameter));
+#else
+    while (player.state() != QMediaPlayer::State::StoppedState
+           && player.mediaStatus() != QMediaPlayer::InvalidMedia) {
+      QThread::msleep(1);
+    }
+    player.setMedia(QUrl::fromLocalFile(parameter));
+#endif
+
     player.play();
+    /*
+    if (player.state() == QMediaPlayer::State::StoppedState || player.mediaStatus() == QMediaPlayer::InvalidMedia) {
+      player.setMedia(QUrl::fromLocalFile(parameter));
+      player.play();
+    } else {
+      ocQ.append(parameter);
+    }
+  */
+
     //  emit resultReady(result);
   }
   QMediaPlayer player;
@@ -587,7 +612,7 @@ void Sound::PlayChanged(bool b)
 
 void Sound::Play(const QString& sUrl, bool bSync)
 {
-  StopWatch oStopWatch("Play word %1 " + sUrl);
+  //  StopWatch oStopWatch("Play word %1 " + sUrl);
 
   emit operate(sUrl);
 
