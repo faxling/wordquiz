@@ -27,17 +27,13 @@ class Sound : public QObject
 public:
   Sound();
   ~Sound();
-  // QAudioDevice info;
-  void PlayChanged(bool);
-  void Play(const QString& sUrl, bool bSync);
+
+  void Play(const QString &sUrl);
 
   QThread workerThread;
-  //public slots:
-  //   void handleResults(const QString&);
+
 signals:
-  void operate(const QString&);
-  // QMap<QString, std::shared_ptr<QSoundEffect>> oc;
-  //  QMediaPlayer m_oPlayer;
+  void QueAudio(QString);
 };
 
 // Maybe more that just downloading audio
@@ -53,8 +49,8 @@ public:
   Q_INVOKABLE void downloadWord(QString sWord, QString sLang);
   Q_INVOKABLE void translateWord(QString sWord, QString sFromLang, QString sToLang,
                                  QObject* oButton);
-  // Returns ms duration
-  Q_INVOKABLE int playWord(QString sWord, QString sLang);
+
+  Q_INVOKABLE void playWord(QString sWord, QString sLang);
   Q_INVOKABLE void playWordSync(QString sWord, QString sLang);
   Q_INVOKABLE void exportCurrentQuiz(QVariant p, QString sName, QString sLang, QString sPwd,
                                      QString sDesc, QObject* pProgressIndicator);

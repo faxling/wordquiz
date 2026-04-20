@@ -597,11 +597,11 @@ function getTextInputAndAdd() {
 }
 
 function getAndInitDb() {
-  console.log("init Word Quiz 0");
+  console.log("Check Init");
   if (idWindow.db !== undefined)
     return idWindow.db;
 
-  console.log("init Word Quiz");
+  console.log("init Word Quiz Database!");
 
   MyDownloader.initUrls(idWindow);
 
@@ -1489,17 +1489,13 @@ function assigNextQuizWord() {
 
   var nLastNumber = idQuizModel.get(nLastQuizIndex1_3).numberDb;
 
-  console.log("bCarmode " + bCarMode + " " + idQuizModel.bDir);
-
   // Right swipe
   if (idQuizModel.bDir === -1) {
     var i = nLastQuizIndex1_3;
     var ii = MyDownloader.indexFromGlosNr(glosModelWorking, nLastNumber);
 
-    console.log("indexFromGlosNr " + ii);
     if (ii >= 0) {
       if (bCarMode) {
-        console.log("call playWordSync ");
         MyDownloader.playWordSync(glosModelWorking.get(ii).answer, sAnswerLang);
       }
       glosModelWorking.remove(ii);
@@ -1588,48 +1584,52 @@ function calcSwipeDirection(currentIndex) {
     idQuizModel.bDir = 1;
   if (nLastIndex === 2 && nI === 1)
     idQuizModel.bDir = -1;
-
-  console.log("idQuizModel.bDir " + idQuizModel.bDir);
 }
 
 function handleCarSlider(fV) {
-  console.log("handleCarSlider " + fV);
   if (idRectTakeQuiz.nCarModeSpeed == Math.round(fV))
     return;
   idRectTakeQuiz.nCarModeSpeed = Math.round(fV);
-  console.log("handleCarSlider set " + nCarModeSpeed);
+}
+
+function handleMovmentStarted() {
+  if (bCarMode) {
+    idCarTimer.stop();
+  }
 }
 
 function handleMovmentEnded(bManual) {
-  console.log("handleMovmentEnded " + bManual + " " + idTakeQuizView.nLastIndex);
+  if (idRectTakeQuiz.bCarModeSlider)
+    return;
+
   if (idTakeQuizView.nLastIndex === idTakeQuizView.currentIndex)
     return;
-  if (bManual)
-    idCarTimer.stop();
 
   idTakeQuizView.nLastIndex = idTakeQuizView.currentIndex;
   calcSwipeDirection(idTakeQuizView.currentIndex);
   assigNextQuizWord();
 
-  if (bCarMode) {
-    playQuestion();
+  if (bManual && bCarMode) {
     idCarTimer.start();
+    playQuestion();
+    return;
   }
-}
 
-function pauseCarTimers(bPause) {
-  if (bPause) {
-    idCarTimer.stop();
-    idMoveTimer.stop();
-  } else {
-    playQuestion();
-    idCarTimer.start();
+  if (bCarMode) {
+    if (bManual) {
+      bPlayOther = true;
+      playAnswer();
+    } else
+      playQuestion();
+    //idCarTimer.start();
   }
 }
 
 function startCarMode() {
   bCarMode = true;
-  incIndex();
+  playQuestion();
+  idCarTimer.start();
+//incIndex();
 }
 
 function stopCarMode() {
@@ -1643,14 +1643,17 @@ function playQuestion() {
 }
 
 function playAnswer() {
-  console.log("playAnswer");
-  MyDownloader.playWordSync(idQuizModel.get(nQuizIndex1_3).answer, sAnswerLang);
+  MyDownloader.playWord(idQuizModel.get(nQuizIndex1_3).answer, sAnswerLang);
 }
 
 function exeCarMode() {
-  if (!bCarMode)
+
+  if (idTakeQuizView.flicking || idTakeQuizView.dragging)
     return;
-  playAnswer();
+
+  if (idRectTakeQuiz.bCarModeSlider)
+    return;
+
   incIndex();
 }
 
@@ -1663,7 +1666,10 @@ function handleClickCarMode() {
 }
 
 function incIndex() {
-  console.log("incIndex");
+  if (bCarMode) {
+    playAnswer();
+  }
+
   idMoveTimer.start();
   idTakeQuizView.incrementCurrentIndex();
 }
