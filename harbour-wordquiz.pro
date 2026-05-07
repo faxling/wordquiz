@@ -11,7 +11,7 @@
 
 # The name of your application
 TARGET = harbour-wordquiz
-
+CONFIG += c++17
 QT += qml quick multimedia core svg xml
 
 PKGCONFIG += qt5embedwidget

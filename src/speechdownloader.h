@@ -1,7 +1,6 @@
 ﻿#ifndef SPEECHDOWNLOADER_H
 #define SPEECHDOWNLOADER_H
 
-//#include <QAudioDevice>
 #include <QByteArray>
 #include <QDomDocument>
 #include <QDomElement>
@@ -9,6 +8,7 @@
 #include <QJSValue>
 #include <QMap>
 #include <QMediaPlayer>
+#include <QMutex>
 #include <QObject>
 #include <QSortFilterProxyModel>
 #include <QSoundEffect>
@@ -30,12 +30,34 @@ public:
 
   void Play(const QString &sUrl);
 
-  QThread workerThread;
+  //   QThread workerThread;
+  void exePlay(QString parameter);
+  void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
 
-signals:
   void QueAudio(QString);
+  QMediaPlayer m_player;
+  QStringList m_ocMediaPlayList;
 };
+/*
+class Worker : public QObject
+{
+  Q_OBJECT
+  public:
+  QMutex m_Mutex;
+  QList<QString> ocQ;
+  Worker();
 
+  signals:
+  void signalPlay(QString parameter);
+
+  public slots:
+
+  void doWork(QString parameter);
+
+  private:
+  bool handleStatus();
+};
+*/
 // Maybe more that just downloading audio
 // Handles network connections and some utility functions eg for sorting
 // and calculating file names

@@ -9,6 +9,7 @@ Item {
   property bool bImageMode: false
   property bool bVoiceMode: false
   property bool bCarMode: false
+  property bool bCarModeSlider: false
   property int nCarModeSpeed: 10
   property bool bTextAnswerOk: false
   Component.onCompleted: {
@@ -41,6 +42,7 @@ Item {
       // Manual movement = true
       QuizLib.handleMovmentEnded(true)
     }
+    onMovementStarted: QuizLib.handleMovmentStarted()
 
     model: idQuizModel
     delegate: QuestionPanel {}

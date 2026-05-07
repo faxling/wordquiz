@@ -89,7 +89,7 @@ Flipable {
         anchors.topMargin: 20
         anchors.right: idCarBtn.left
         anchors.left: parent.left
-        onDownChanged: QuizLib.pauseCarTimers(down)
+        onDownChanged:  {bCarModeSlider = down}
         minimumValue: 3
         maximumValue: 17
         onValueChanged: QuizLib.handleCarSlider(value)

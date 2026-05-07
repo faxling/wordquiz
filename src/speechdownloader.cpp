@@ -19,6 +19,8 @@
 #include <QAudioDevice>
 #include <QMediaDevices>
 #endif
+#include <random>
+#include <QMessageLogContext>
 #include <QMutexLocker>
 #include <QRegularExpression>
 #include <QSoundEffect>
@@ -28,9 +30,6 @@
 #include <QThread>
 #include <QUrl>
 #include <QUrlQuery>
-#include <random>
-
-#include <QMessageLogContext>
 // c:\Qt\6.10.1\android_arm64_v8a\include\QtCore\6.10.1\QtCore
 
 #ifdef Q_OS_ANDROID
@@ -461,11 +460,11 @@ void Speechdownloader::listDownloaded(QNetworkReply* pReply)
   QByteArray oc = pReply->readAll();
   QJsonDocument oJ = QJsonDocument::fromJson(oc);
 
-  QJsonArray ocJson = oJ.array();
+  const QJsonArray ocJson = oJ.array();
 
   QVector<QuizInfo> ocQuizInfo;
 
-  for (auto oI : ocJson) {
+  for (const auto &oI : ocJson) {
     //   id, desc1, slang, qcount,qname
     QJsonArray oJJ = oI.toArray();
     QuizInfo t;
@@ -544,80 +543,126 @@ QString sVoicetechKo(QStringLiteral("http://"
 QString sVoicetechJa(QStringLiteral("http://"
                                     "api.voicerss.org?key=0f8ca674a1914587918727ad03cd0aaf&f="
                                     "44khz_16bit_mono&hl=ja-jp&src="));
-
-class Worker : public QObject
+/*
+Worker::Worker()
 {
-  public:
-    QMutex m_Mutex;
-    QList<QString> ocQ;
-    Worker()
-    {
 #if QT_VERSION >= 0x060000
-      m_player.setAudioOutput(new QAudioOutput());
+  m_player->setAudioOutput(new QAudioOutput());
 #endif
-    }
-
-  public slots:
-
-    void doWork(QString parameter)
-    {
-      // Maybe not needed
-      QMutexLocker o(&m_Mutex);
-      while (handleStatus())
-        QThread::msleep(10);
-#if QT_VERSION >= 0x060000
-      m_player.audioOutput()->setDevice(QMediaDevices::defaultAudioOutput());
-      m_player.setSource(QUrl::fromLocalFile(parameter));
-#else
-      m_player.setMedia(QUrl::fromLocalFile(parameter));
-#endif
-      m_player.play();
-
-      while (handleStatus())
-        QThread::msleep(10);
-    }
-
-  private:
-    bool handleStatus()
-    {
-      switch (m_player.mediaStatus()) {
-      case QMediaPlayer::LoadingMedia:
-      case QMediaPlayer::BufferingMedia:
-      case QMediaPlayer::BufferedMedia:
-      case QMediaPlayer::LoadedMedia:
-
-        break;
-      case QMediaPlayer::InvalidMedia:
-      case QMediaPlayer::EndOfMedia:
-      case QMediaPlayer::NoMedia:
-      case QMediaPlayer::StalledMedia:
-      case QMediaPlayer::UnknownMediaStatus:
-        return false;
-      }
-
-      return true;
-    }
-    QMediaPlayer m_player;
-};
-
-Sound::~Sound()
-{
-  workerThread.quit();
-  workerThread.wait();
 }
+
+
+void Worker::exePlay(QString parameter)
+{
+  m_player.setMedia(QUrl::fromLocalFile(parameter));
+  m_player.play();
+}
+void Worker::doWork(QString parameter)
+{
+  // Maybe not needed
+  QMutexLocker o(&m_Mutex);
+
+  while (handleStatus())
+    QThread::msleep(10);
+#if QT_VERSION >= 0x060000
+      m_player->audioOutput()->setDevice(QMediaDevices::defaultAudioOutput());
+      m_player->setSource(QUrl::fromLocalFile(parameter));
+#else
+
+#endif
+      emit signalPlay(parameter);
+
+      while (handleStatus())
+        QThread::msleep(10);
+}
+
+bool Worker::handleStatus()
+{
+  switch (m_player.mediaStatus()) {
+  case QMediaPlayer::LoadingMedia:
+  case QMediaPlayer::BufferingMedia:
+  case QMediaPlayer::BufferedMedia:
+  case QMediaPlayer::LoadedMedia:
+
+    break;
+  case QMediaPlayer::InvalidMedia:
+  case QMediaPlayer::EndOfMedia:
+  case QMediaPlayer::NoMedia:
+  case QMediaPlayer::StalledMedia:
+    return false;
+  default:
+    return false;
+  }
+
+  return true;
+}
+*/
+
+void Sound::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
+{
+  switch (status) {
+  case QMediaPlayer::LoadingMedia:
+  case QMediaPlayer::BufferingMedia:
+  case QMediaPlayer::BufferedMedia:
+  case QMediaPlayer::LoadedMedia:
+    break;
+  case QMediaPlayer::InvalidMedia:
+  case QMediaPlayer::EndOfMedia:
+  case QMediaPlayer::NoMedia:
+  case QMediaPlayer::StalledMedia:
+  default:
+    if (m_ocMediaPlayList.size() > 0) {
+      exePlay(m_ocMediaPlayList.takeFirst());
+    };
+    return;
+  }
+
+  return;
+}
+
+Sound::~Sound() {}
 
 Sound::Sound()
 {
-  Worker* worker = new Worker;
-  worker->moveToThread(&workerThread);
+#if QT_VERSION >= 0x060000
+  m_player->setAudioOutput(new QAudioOutput());
+#endif
+  connect(&m_player, &QMediaPlayer::mediaStatusChanged, this, &Sound::onMediaStatusChanged);
+  /*
+  Worker *worker = new Worker;
+  connect(worker, &Worker::signalPlay, worker, &Worker::exePlay, Qt::ConnectionType::QueuedConnection);
   connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
   connect(this, &Sound::QueAudio, worker, &Worker::doWork, Qt::ConnectionType::QueuedConnection);
+  worker->moveToThread(&workerThread);
+
   workerThread.start();
+  */
 }
 
 void Sound::Play(const QString &sUrl)
 {
-  emit QueAudio(sUrl);
+  qDebug() << "play " << JustFileName(sUrl);
+  switch (m_player.mediaStatus()) {
+  case QMediaPlayer::LoadingMedia:
+  case QMediaPlayer::BufferingMedia:
+  case QMediaPlayer::BufferedMedia:
+  case QMediaPlayer::LoadedMedia:
+    m_ocMediaPlayList.push_back(sUrl);
+    break;
+  case QMediaPlayer::InvalidMedia:
+  case QMediaPlayer::EndOfMedia:
+  case QMediaPlayer::NoMedia:
+  case QMediaPlayer::StalledMedia:
+
+  default:
+    exePlay(sUrl);
+  }
+}
+
+void Sound::exePlay(QString parameter)
+{
+  m_player.setMedia(QUrl::fromLocalFile(parameter));
+  m_player.play();
 }
 
 void Speechdownloader::playWordSync(QString sWord, QString sLang)
@@ -652,7 +697,7 @@ void Speechdownloader::deleteWord(QString sWord, QString sLang)
     QFile::remove(AudioPath(sWord, sLang));
 }
 
-QStringList Speechdownloader::ChildList(const QString& sNodeName, QDomNode& oNode)
+QStringList Speechdownloader::ChildList(const QString &sNodeName, QDomNode &oNode)
 {
   QDomNode n = oNode.firstChildElement(sNodeName);
   QStringList ocRet;
@@ -664,9 +709,7 @@ QStringList Speechdownloader::ChildList(const QString& sNodeName, QDomNode& oNod
   return ocRet;
 }
 
-QStringList Speechdownloader::ChildList(const QString& sNodeName,
-                                        const QString& sSubNodeName,
-                                        QDomNode& oNode)
+QStringList Speechdownloader::ChildList(const QString &sNodeName, const QString &sSubNodeName, QDomNode &oNode)
 {
   QDomNode n = oNode.firstChildElement(sNodeName);
 
@@ -702,7 +745,8 @@ QString Speechdownloader::assignTranslateModelFromXml(QByteArray o)
   QDomNode nn = oDicNodes.firstChildElement("def");
 
   for (QDomNode oI = nn.firstChildElement("tr"); oI.isElement(); oI = oI.nextSiblingElement("tr")) {
-    QString sKey = ChildList("text", oI).first();
+    auto ocL = ChildList("text", oI);
+    QString sKey = ocL.first();
     auto oc1 = ChildList("syn", "text", oI);
     auto oc2 = ChildList("mean", "text", oI);
     if ((oc1.count() + oc2.count()) > 0)
@@ -722,12 +766,8 @@ QString Speechdownloader::assignTranslateModelFromXml(QByteArray o)
   return ocRet.first();
 }
 
-void Speechdownloader::downloadImageSlot(const QList<QUrl>& vImgUrl,
-                                         QString sWord,
-                                         QString sLang,
-                                         QString sWord2,
-                                         QString sLang2,
-                                         bool bEmitlDownloaded)
+void Speechdownloader::downloadImageSlot(
+  const QList<QUrl> &vImgUrl, QString sWord, QString sLang, QString sWord2, QString sLang2, bool bEmitlDownloaded)
 {
   // Must use a signal slot for shifting threads
 
@@ -788,7 +828,8 @@ void Speechdownloader::downloadWord(QString sWord, QString sLang)
 
 void Speechdownloader::listQuizLang(QString sLang)
 {
-  url << GLOS_SERVER2 "quizlist_lang.php" << "qlang=" << sLang;
+  url << GLOS_SERVER2 "quizlist_lang.php"
+      << "qlang=" << sLang;
   QNetworkRequest request(url);
   m_oListQuizNetMgr.get(request);
 }
@@ -804,7 +845,7 @@ void Speechdownloader::listQuizLang(QString sLang)
 
 class QuizFilterModel : public QSortFilterProxyModel
 {
-public:
+  public:
   QStringList FilterStr;
   bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override
   {
@@ -1195,7 +1236,8 @@ void Speechdownloader::transDownloaded()
   } else {
     m_pErrorTextField->setProperty("visible", false);
     QTextDocument text;
-    text.setHtml(js.toObject()["translatedText"].toString());
+    auto o = js.toObject();
+    text.setHtml(o["translatedText"].toString());
     m_sTranslatedText->setProperty("text", text.toPlainText());
   }
 
@@ -1204,12 +1246,12 @@ void Speechdownloader::transDownloaded()
   QString sLang = pReply->property("tolang").toString();
 
   if (sLang != "ru" && sLang != "en") {
-    QJsonArray jsMatches = ocJson["matches"].toArray();
+    const QJsonArray jsMatches = ocJson["matches"].toArray();
     QStringList sDictList;
-    for (const auto& oI : jsMatches)
-      sDictList.append(
-          QTextDocumentFragment::fromHtml(oI.toObject()["translation"].toString()).toPlainText());
-
+    for (const auto &oI : jsMatches) {
+      auto o = oI.toObject();
+      sDictList.append(QTextDocumentFragment::fromHtml(o["translation"].toString()).toPlainText());
+    }
     m_pTrTextList->setProperty("model", sDictList);
   }
 
@@ -1342,7 +1384,8 @@ void Speechdownloader::focusOnQuizText(int n)
   if (i == m_ocTextInputElem.end())
     return;
 
-  for (auto oI : m_ocTextInputElem)
+  const auto &tt = m_ocTextInputElem;
+  for (auto oI : tt)
     oI->setProperty("text", "");
 
   QObject* pTI = i.value(); // TextInput
