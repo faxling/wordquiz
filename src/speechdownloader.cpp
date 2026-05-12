@@ -138,7 +138,7 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject* pParent
                    this,
                    &Speechdownloader::quizDeleted);
   m_sStoragePath = sStoragePath;
-  qputenv("QT_LOGGING_RULES", "*.ffmpeg.*=false");
+  //  qputenv("QT_LOGGING_RULES", "*.ffmpeg.*=false");
   qDebug() << "WordQuiz StoragePath: " << m_sStoragePath;
 
   // Seems like the first play fails
@@ -605,6 +605,9 @@ void Sound::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
   case QMediaPlayer::BufferingMedia:
   case QMediaPlayer::BufferedMedia:
   case QMediaPlayer::LoadedMedia:
+
+    //if (status == QMediaPlayer::BufferedMedia)
+    //   m_player.setPlaybackRate(1.25);
     break;
   case QMediaPlayer::InvalidMedia:
   case QMediaPlayer::EndOfMedia:
@@ -625,9 +628,10 @@ Sound::~Sound() {}
 Sound::Sound()
 {
 #if QT_VERSION >= 0x060000
-  m_player->setAudioOutput(new QAudioOutput());
+  m_player.setAudioOutput(new QAudioOutput());
 #endif
   connect(&m_player, &QMediaPlayer::mediaStatusChanged, this, &Sound::onMediaStatusChanged);
+
   /*
   Worker *worker = new Worker;
   connect(worker, &Worker::signalPlay, worker, &Worker::exePlay, Qt::ConnectionType::QueuedConnection);
@@ -637,6 +641,7 @@ Sound::Sound()
 
   workerThread.start();
   */
+  //   m_player.setPlaybackRate(0.97);
 }
 
 void Sound::Play(const QString &sUrl)
@@ -661,8 +666,17 @@ void Sound::Play(const QString &sUrl)
 
 void Sound::exePlay(QString parameter)
 {
+#if QT_VERSION >= 0x060000
+  m_player.setSource(QUrl::fromLocalFile(parameter));
+#else
   m_player.setMedia(QUrl::fromLocalFile(parameter));
+#endif
   m_player.play();
+}
+
+void Sound::setPlaybackRate(double f)
+{
+  m_player.setPlaybackRate(f);
 }
 
 void Speechdownloader::playWordSync(QString sWord, QString sLang)
@@ -676,6 +690,11 @@ void Speechdownloader::playWordSync(QString sWord, QString sLang)
     m_bPlayAfterDownload = true;
     downloadWord(sWord, sLang);
   }
+}
+
+void Speechdownloader::setAudioSpeed(double fSpeed)
+{
+  m_oSound.setPlaybackRate(fSpeed);
 }
 
 void Speechdownloader::playWord(QString sWord, QString sLang)
@@ -921,7 +940,7 @@ void Speechdownloader::AssignRoles()
   auto oOC = pp->roleNames();
 
   if (oOC.isEmpty() == false) {
-    qDebug() << "AssignRoles key val index";
+    qDebug() << "Key Value Index for idGlosModelIndex";
     for (auto oJ : IterRange(oOC)) {
       qDebug() << oJ.key() << " " << oJ.val() << " " << oJ.index();
       if (oJ.val() == "langpair")
@@ -949,13 +968,6 @@ void Speechdownloader::setFilterQList(QString regExp)
 {
   regExp = regExp.trimmed();
   m_pSortFilterProxyModel->FilterStr = regExp.split(" ");
-  //  auto& rFilterStr = m_pSortFilterProxyModel->FilterStr;
-
-  // auto pE = std::remove_if(rFilterStr.begin(), rFilterStr.end(), [](const
-  // QString& s) {return s.isEmpty();}); rFilterStr.erase(pE, rFilterStr.end());
-  // for (auto oJ : IterRange(rFilterStr))
-  //   qDebug() << oJ.val() << " " << oJ.index();
-
   m_pSortFilterProxyModel->invalidate();
 }
 
