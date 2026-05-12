@@ -23,12 +23,11 @@ class QuizFilterModel;
 
 class Sound : public QObject
 {
-  Q_OBJECT
 public:
   Sound();
   ~Sound();
 
-  void Play(const QString &sUrl);
+  void Play(const QString& sUrl);
 
   //   QThread workerThread;
   void exePlay(QString parameter);
@@ -40,26 +39,7 @@ private:
   QMediaPlayer m_player;
   QStringList m_ocMediaPlayList;
 };
-/*
-class Worker : public QObject
-{
-  Q_OBJECT
-  public:
-  QMutex m_Mutex;
-  QList<QString> ocQ;
-  Worker();
 
-  signals:
-  void signalPlay(QString parameter);
-
-  public slots:
-
-  void doWork(QString parameter);
-
-  private:
-  bool handleStatus();
-};
-*/
 // Maybe more that just downloading audio
 // Handles network connections and some utility functions eg for sorting
 // and calculating file names
@@ -75,7 +55,7 @@ public:
                                  QObject* oButton);
 
   Q_INVOKABLE void playWord(QString sWord, QString sLang);
-  Q_INVOKABLE void playWordSync(QString sWord, QString sLang);
+
   // 1.0 is normal
   Q_INVOKABLE void setAudioSpeed(double);
 

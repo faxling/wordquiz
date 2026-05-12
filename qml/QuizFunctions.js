@@ -1496,7 +1496,7 @@ function assigNextQuizWord() {
 
     if (ii >= 0) {
       if (bCarMode) {
-        MyDownloader.playWordSync(glosModelWorking.get(ii).answer, sAnswerLang);
+        MyDownloader.playWord(glosModelWorking.get(ii).answer, sAnswerLang);
       }
       glosModelWorking.remove(ii);
     } else {

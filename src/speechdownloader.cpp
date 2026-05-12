@@ -631,17 +631,6 @@ Sound::Sound()
   m_player.setAudioOutput(new QAudioOutput());
 #endif
   connect(&m_player, &QMediaPlayer::mediaStatusChanged, this, &Sound::onMediaStatusChanged);
-
-  /*
-  Worker *worker = new Worker;
-  connect(worker, &Worker::signalPlay, worker, &Worker::exePlay, Qt::ConnectionType::QueuedConnection);
-  connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
-  connect(this, &Sound::QueAudio, worker, &Worker::doWork, Qt::ConnectionType::QueuedConnection);
-  worker->moveToThread(&workerThread);
-
-  workerThread.start();
-  */
-  //   m_player.setPlaybackRate(0.97);
 }
 
 void Sound::Play(const QString &sUrl)
@@ -679,18 +668,6 @@ void Sound::setPlaybackRate(double f)
   m_player.setPlaybackRate(f);
 }
 
-void Speechdownloader::playWordSync(QString sWord, QString sLang)
-{
-  QString sFileName = AudioPath(sWord, sLang);
-  QFileInfo oWavFile(sFileName);
-  int nSize = oWavFile.size();
-  if (nSize > 5000) {
-    m_oSound.Play(sFileName);
-  } else {
-    m_bPlayAfterDownload = true;
-    downloadWord(sWord, sLang);
-  }
-}
 
 void Speechdownloader::setAudioSpeed(double fSpeed)
 {
