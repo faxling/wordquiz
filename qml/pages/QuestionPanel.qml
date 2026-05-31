@@ -90,12 +90,12 @@ Flipable {
         anchors.right: idCarBtn.left
         anchors.left: parent.left
         onDownChanged:  {bCarModeSlider = down}
-        minimumValue: 3
-        maximumValue: 17
+        minimumValue: 1
+        maximumValue: 10
         onValueChanged: QuizLib.handleCarSlider(value)
         // Trick to update 3 sliders from one value
-        property int nCarModeSpeed2: nCarModeSpeed
-        onNCarModeSpeed2Changed: value = nCarModeSpeed
+        property real nCarModeSpeed2: fCarModeSpeed1_10
+        onNCarModeSpeed2Changed: value = nCarModeSpeed2
       }
 
       Text {

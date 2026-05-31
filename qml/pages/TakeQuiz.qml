@@ -10,7 +10,7 @@ Item {
   property bool bVoiceMode: false
   property bool bCarMode: false
   property bool bCarModeSlider: false
-  property int nCarModeSpeed: 10
+  property real fCarModeSpeed1_10: 5.5
   property bool bTextAnswerOk: false
   Component.onCompleted: {
     idWindow.oTakeQuiz = idRectTakeQuiz
@@ -25,7 +25,7 @@ Item {
 
   Timer {
     id: idCarTimer
-    interval: (18 - nCarModeSpeed) * 1000
+    interval: (10 - fCarModeSpeed1_10) * 900 + 2000
     repeat: false
     onTriggered: QuizLib.exeCarMode()
   }

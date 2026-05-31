@@ -138,11 +138,11 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject* pParent
                    this,
                    &Speechdownloader::quizDeleted);
   m_sStoragePath = sStoragePath;
-  qputenv("QT_LOGGING_RULES", "*.ffmpeg.*=false");
+ //  qputenv("QT_LOGGING_RULES", "*.ffmpeg.*=false");
   qDebug() << "WordQuiz StoragePath: " << m_sStoragePath;
 
   // Seems like the first play fails
-  m_oSound.Play("qrc:welcome_en.wav");
+  // m_oSound.Play("qrc:welcome_en.wav");
 }
 
 static const QString sReqDictUrlBase = "https://dictionary.yandex.net/api/v1/dicservice/"
@@ -677,7 +677,9 @@ void Sound::setPlaybackRate(double f)
 
 void Speechdownloader::setAudioSpeed(double fSpeed)
 {
+#ifndef Q_OS_LINUX
   m_oSound.setPlaybackRate(fSpeed);
+#endif
 }
 
 void Speechdownloader::playWord(QString sWord, QString sLang)
