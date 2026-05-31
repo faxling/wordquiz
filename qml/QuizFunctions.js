@@ -1495,7 +1495,8 @@ function assigNextQuizWord() {
     var ii = MyDownloader.indexFromGlosNr(glosModelWorking, nLastNumber);
 
     if (ii >= 0) {
-      if (bCarMode) {
+      if (bCarMode && glosModelWorking.count > 1) {
+        // :) playing on count 0
         MyDownloader.playWord(glosModelWorking.get(ii).answer, sAnswerLang);
       }
       glosModelWorking.remove(ii);
@@ -1505,6 +1506,7 @@ function assigNextQuizWord() {
 
     if (glosModelWorking.count === 0) {
       setAllok(true);
+      MyDownloader.playWord(":)", "lang");
       idQuizModel.get(i).imgUrl = idWindow.sDEFAULT_IMG;
       idQuizModel.get(i).answerVisible = false;
       idQuizModel.get(i).answer = "";
@@ -1605,7 +1607,7 @@ function handleMovmentStarted() {
   }
 }
 
-function handleMovmentEnded(bManual) {
+function handleMovmentEnded() {
   if (bCarMode)
     idCarTimer.start();
 
@@ -1617,13 +1619,6 @@ function handleMovmentEnded(bManual) {
   calcSwipeDirection(idTakeQuizView.currentIndex);
   assigNextQuizWord();
 
-  /*
-  if (bManual && bCarMode) {
-    idCarTimer.start()
-    playQuestion()
-    return
-  }
-*/
   if (bCarMode) {
     playQuestion();
   }

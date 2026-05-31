@@ -30,7 +30,7 @@ public:
   void Play(const QString& sUrl);
 
   //   QThread workerThread;
-  void exePlay(QString parameter);
+  void exePlay(QString sSound);
   void setPlaybackRate(double rate);
   void QueAudio(QString);
   void onMediaStatusChanged(QMediaPlayer::MediaStatus status);

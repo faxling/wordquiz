@@ -138,7 +138,7 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject* pParent
                    this,
                    &Speechdownloader::quizDeleted);
   m_sStoragePath = sStoragePath;
-  //  qputenv("QT_LOGGING_RULES", "*.ffmpeg.*=false");
+  qputenv("QT_LOGGING_RULES", "*.ffmpeg.*=false");
   qDebug() << "WordQuiz StoragePath: " << m_sStoragePath;
 
   // Seems like the first play fails
@@ -653,12 +653,18 @@ void Sound::Play(const QString &sUrl)
   }
 }
 
-void Sound::exePlay(QString parameter)
+void Sound::exePlay(QString sSound)
 {
+  QUrl url;
+  if (sSound.startsWith("qrc:"))
+    url = sSound;
+  else
+    url = QUrl::fromLocalFile(sSound);
+
 #if QT_VERSION >= 0x060000
-  m_player.setSource(QUrl::fromLocalFile(parameter));
+  m_player.setSource(url);
 #else
-  m_player.setMedia(QUrl::fromLocalFile(parameter));
+  m_player.setMedia(url);
 #endif
   m_player.play();
 }
@@ -676,6 +682,10 @@ void Speechdownloader::setAudioSpeed(double fSpeed)
 
 void Speechdownloader::playWord(QString sWord, QString sLang)
 {
+  if (sWord == ":)") {
+    m_oSound.Play("qrc:///kids_cheering_short.mp3");
+    return;
+  }
   QString sFileName = AudioPath(sWord, sLang);
   QFileInfo oWavFile(sFileName);
   int nSize = oWavFile.size();
