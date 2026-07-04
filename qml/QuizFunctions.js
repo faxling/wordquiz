@@ -96,8 +96,6 @@ function searchClipboard() {
   var sSearchQuery = oInText;
   if (sSearchQuery.length > 1)
     QuizLib.openWwwPage("https://www.google.com/search?q=" + sSearchQuery, "Search for " + "\"" + sSearchQuery + "\"");
-  else
-    QuizLib.openWwwPage("https://www.google.com/search?q=Clipboard&num=2&pws=0&complete=0", "Search");
 }
 
 function playHangWord() {
@@ -399,9 +397,16 @@ function resetTakeQuizTab() {
 function getTextFromInput(oTextInput) {
   var oInText = capitalizeStr(oTextInput.displayText);
   if (oInText.length < 1) {
-    idErrorText.visible = true;
-    idErrorText.text = "No input to lookup in dictionary";
+    if (typeof idErrorText !== "undefined") {
+      idErrorText.visible = true;
+      idErrorText.text = "No input to lookup in dictionary";
+    } else {
+      idErrorTextGlobal.visible = true;
+      idErrorTextGlobal.text = "No input!";
+    }
     return "";
+  } else {
+    idErrorTextGlobal.visible = false;
   }
   return oInText;
 }
