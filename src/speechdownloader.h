@@ -7,6 +7,7 @@
 #include <QEventLoop>
 #include <QJSValue>
 #include <QMap>
+#include <QMediaDevices>
 #include <QMediaPlayer>
 #include <QMutex>
 #include <QObject>
@@ -28,14 +29,15 @@ public:
   ~Sound();
 
   void Play(const QString& sUrl);
-
-  //   QThread workerThread;
   void exePlay(QString sSound);
   void setPlaybackRate(double rate);
   void QueAudio(QString);
   void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
+  void onAudioOutputsChanged();
 
 private:
+  QByteArray m_ocDefaultAudio;
+  QMediaDevices m_QMediaDevices;
   QMediaPlayer m_player;
   QStringList m_ocMediaPlayList;
 };
