@@ -15,6 +15,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonValue>
+
 #if QT_VERSION >= 0x060000
 #include <QAudioDevice>
 #include <QMediaDevices>
@@ -36,6 +37,10 @@
 
 #include <QtCore/private/qandroidextras_p.h>
 
+#endif
+
+#if QT_VERSION >= 0x060000
+QMediaDevices m_QMediaDevices;
 #endif
 
 #include "filehelpers.h"
@@ -111,7 +116,7 @@ EncUrl url;
 }
 
 Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject* pParent)
-    : QObject(pParent)
+  : QObject(pParent)
 {
   QObject::connect(&m_oImgNetMgr, &QNetworkAccessManager::finished, this, &Speechdownloader::imgDownloaded);
   QObject::connect(&m_oWordNetMgr, &QNetworkAccessManager::finished, this, &Speechdownloader::wordDownloaded);
@@ -127,21 +132,21 @@ Speechdownloader::Speechdownloader(const QString& sStoragePath, QObject* pParent
   // m_oSound.Play("qrc:welcome_en.wav");
 }
 
-static const QString sReqDictUrlBase = "https://dictionary.yandex.net/api/v1/dicservice/"
+QString sReqDictUrlBase("https://dictionary.yandex.net/api/v1/dicservice/"
                                        "lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478."
-                                       "20679d5d18a62fa88bd53b643af2dee64416b739&lang=";
-static const QString sReqDictUrl = "https://dictionary.yandex.net/api/v1/dicservice/"
-                                   "lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478."
-                                   "20679d5d18a62fa88bd53b643af2dee64416b739&lang=sv-ru&text=";
-static const QString sReqDictUrlRev = "https://dictionary.yandex.net/api/v1/dicservice/"
-                                      "lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478."
-                                      "20679d5d18a62fa88bd53b643af2dee64416b739&lang=ru-sv&text=";
-static const QString sReqDictUrlEn = "https://dictionary.yandex.net/api/v1/dicservice/"
-                                     "lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478."
-                                     "20679d5d18a62fa88bd53b643af2dee64416b739&lang=en-ru&text=";
-static const QString sReqUrlBase = "https://translate.yandex.net/api/v1.5/tr/"
-                                   "translate?key=trnsl.1.1.20190526T164138Z.e99d5807bb2acb8d."
-                                   "d11f94738ea722cfaddf111d2e8f756cb3b71f4f&lang=";
+                                       "20679d5d18a62fa88bd53b643af2dee64416b739&lang=");
+QString sReqDictUrl("https://dictionary.yandex.net/api/v1/dicservice/"
+                             "lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478."
+                             "20679d5d18a62fa88bd53b643af2dee64416b739&lang=sv-ru&text=");
+QString sReqDictUrlRev("https://dictionary.yandex.net/api/v1/dicservice/"
+                         "lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478."
+                         "20679d5d18a62fa88bd53b643af2dee64416b739&lang=ru-sv&text=");
+QString sReqDictUrlEn("https://dictionary.yandex.net/api/v1/dicservice/"
+                        "lookup?key=dict.1.1.20190526T201825Z.ad1b7fb5407a1478."
+                        "20679d5d18a62fa88bd53b643af2dee64416b739&lang=en-ru&text=");
+QString sReqUrlBase("https://translate.yandex.net/api/v1.5/tr/"
+                      "translate?key=trnsl.1.1.20190526T164138Z.e99d5807bb2acb8d."
+                                   "d11f94738ea722cfaddf111d2e8f756cb3b71f4f&lang=");
 
 static const QString sDEFAULT_IMG = "image://theme/icon-m-file-image";
 
@@ -165,7 +170,7 @@ bool Speechdownloader::ignoreAccentCmp(QString s1, QString s2)
   return b;
 }
 
-static QRegularExpression oReg("\\P{L}"); // Matches a non-word character.
+QRegularExpression oReg("\\P{L}"); // Matches a non-word character.
 
 QString Speechdownloader::ignoreAccentLC(QString str)
 {
@@ -526,34 +531,46 @@ QString sVoicetechJa("http://"
 
 void Sound::onAudioOutputsChanged()
 {
+#if QT_VERSION >= 0x060000
   auto oDefAudio = m_QMediaDevices.defaultAudioOutput().id();
   if (m_ocDefaultAudio == oDefAudio)
     return;
 
+
+  m_player.setMedia(audioOutput);
   m_ocDefaultAudio = oDefAudio;
   m_player.audioOutput()->setDevice(m_QMediaDevices.defaultAudioOutput());
+#endif
 }
+
+
+void Sound::onStateChanged(QMediaPlayer::State newState)
+{
+  // qDebug() << newState;
+}
+
 
 void Sound::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
 {
+  // qDebug() << "Media state " << status;
   switch (status) {
-  case QMediaPlayer::LoadingMedia:
-  case QMediaPlayer::BufferingMedia:
-  case QMediaPlayer::BufferedMedia:
-  case QMediaPlayer::LoadedMedia:
+    case QMediaPlayer::LoadingMedia:
+    case QMediaPlayer::BufferingMedia:
+    case QMediaPlayer::BufferedMedia:
+    case QMediaPlayer::LoadedMedia:
 
-    //if (status == QMediaPlayer::BufferedMedia)
-    //   m_player.setPlaybackRate(1.25);
-    break;
-  case QMediaPlayer::InvalidMedia:
-  case QMediaPlayer::EndOfMedia:
-  case QMediaPlayer::NoMedia:
-  case QMediaPlayer::StalledMedia:
-  default:
-    if (m_ocMediaPlayList.size() > 0) {
-      exePlay(m_ocMediaPlayList.takeFirst());
-    };
-    return;
+      //if (status == QMediaPlayer::BufferedMedia)
+      //   m_player.setPlaybackRate(1.25);
+      break;
+    case QMediaPlayer::InvalidMedia:
+    case QMediaPlayer::EndOfMedia:
+    case QMediaPlayer::NoMedia:
+    case QMediaPlayer::StalledMedia:
+    default:
+      if (m_ocMediaPlayList.size() > 0) {
+        exePlay(m_ocMediaPlayList.takeFirst());
+      };
+      return;
   }
 
   return;
@@ -564,29 +581,41 @@ Sound::~Sound() { }
 Sound::Sound()
 {
 #if QT_VERSION >= 0x060000
+  connect(&m_QMediaDevices, &QMediaDevices::audioOutputsChanged, this, &Sound::onAudioOutputsChanged);
   m_player.setAudioOutput(new QAudioOutput());
 #endif
+  connect(&m_player, &QMediaPlayer::stateChanged, this, &Sound::onStateChanged);
   connect(&m_player, &QMediaPlayer::mediaStatusChanged, this, &Sound::onMediaStatusChanged);
-  connect(&m_QMediaDevices, &QMediaDevices::audioOutputsChanged, this, &Sound::onAudioOutputsChanged);
+  connect(&m_player,  static_cast<void (QMediaPlayer::*)(QMediaPlayer::Error)>(&QMediaPlayer::error), this, &Sound::onError);
+}
+
+
+
+void Sound::onError(QMediaPlayer::Error error)
+{
+  qDebug() << "Audio error " << error;
 }
 
 void Sound::Play(const QString& sUrl)
 {
+  // m_player.
   qDebug() << "play " << JustFileName(sUrl);
+  if (m_player.state() == QMediaPlayer::State::PausedState)
+    m_player.play();
   switch (m_player.mediaStatus()) {
-  case QMediaPlayer::LoadingMedia:
-  case QMediaPlayer::BufferingMedia:
-  case QMediaPlayer::BufferedMedia:
-  case QMediaPlayer::LoadedMedia:
-    m_ocMediaPlayList.push_back(sUrl);
-    break;
-  case QMediaPlayer::InvalidMedia:
-  case QMediaPlayer::EndOfMedia:
-  case QMediaPlayer::NoMedia:
-  case QMediaPlayer::StalledMedia:
+    case QMediaPlayer::LoadingMedia:
+    case QMediaPlayer::BufferingMedia:
+    case QMediaPlayer::BufferedMedia:
+    case QMediaPlayer::LoadedMedia:
+      m_ocMediaPlayList.push_back(sUrl);
+      break;
+    case QMediaPlayer::InvalidMedia:
+    case QMediaPlayer::EndOfMedia:
+    case QMediaPlayer::NoMedia:
+    case QMediaPlayer::StalledMedia:
 
-  default:
-    exePlay(sUrl);
+    default:
+      exePlay(sUrl);
   }
 }
 

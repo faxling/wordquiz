@@ -7,7 +7,7 @@
 #include <QEventLoop>
 #include <QJSValue>
 #include <QMap>
-#include <QMediaDevices>
+
 #include <QMediaPlayer>
 #include <QMutex>
 #include <QObject>
@@ -33,11 +33,11 @@ public:
   void setPlaybackRate(double rate);
   void QueAudio(QString);
   void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
+  void onStateChanged(QMediaPlayer::State newState);
   void onAudioOutputsChanged();
-
+  void onError(QMediaPlayer::Error error);
 private:
   QByteArray m_ocDefaultAudio;
-  QMediaDevices m_QMediaDevices;
   QMediaPlayer m_player;
   QStringList m_ocMediaPlayList;
 };
@@ -132,7 +132,7 @@ signals:
   void exportedSignal(int nResponce);
   void deletedSignal(int nResponce);
 
-  private:
+private:
   void quizDownloadedArray();
   void quizDownloaded(QNetworkReply* pReply);
   void listDownloaded(QNetworkReply* pReply);
