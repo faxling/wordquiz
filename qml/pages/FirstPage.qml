@@ -137,6 +137,7 @@ Page {
   }
 
   Rectangle {
+    // this is for the combbox button to look like a button
     height: idTab2Btn.height
     x: idTab2Btn.x + nMargin + idTab2Btn.width + idTabMain.spacing
     y: idTabRow.y + idTabMain.y
@@ -177,6 +178,7 @@ Page {
           onTextChanged: sAppTitle = sQuizName
         }
 
+
         ButtonQuizImg {
           id: idBtnHelp
           anchors.right: parent.right
@@ -201,6 +203,8 @@ Page {
             QuizLib.searchClipboard()
           }
         }
+
+
       }
 
       Row {
@@ -256,6 +260,22 @@ Page {
           }
         }
       }
+
+      RectRounded {
+        id: idErrorTextGlobal
+        property alias text: idTextListError.text
+        height: Theme.itemSizeLarge
+        width: parent.width
+        visible: false
+        TextList {
+          id:idTextListError
+          anchors.horizontalCenter: parent.horizontalCenter
+          font.pointSize: 16
+          color: "red"
+        }
+        onCloseClicked: visible = false
+      }
+
 
       CreateNewQuiz {
         id: idTab1

@@ -91,11 +91,15 @@ function searchClipboard() {
     MyDownloader.toClipBoard(oInText);
   } else {
     oInText = MyDownloader.fromClipBoard();
+    if (oInText.length <= 1) {
+      idErrorTextGlobal.visible = true;
+      idErrorTextGlobal.text = "No input in clipboard!";
+    }
   }
 
   var sSearchQuery = oInText;
   if (sSearchQuery.length > 1)
-    QuizLib.openWwwPage("https://www.google.com/search?q=" + sSearchQuery, "Search for " + "\"" + sSearchQuery + "\"");
+    QuizLib.openWwwPage("https://www.startpage.com/sp/search?query=" + sSearchQuery, "Search for " + "\"" + sSearchQuery + "\"");
 }
 
 function playHangWord() {

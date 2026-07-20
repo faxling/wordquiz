@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-
+// RectRounded
 Rectangle {
   id: idDlgPopup
   property alias showClose: idBtnCancel.visible

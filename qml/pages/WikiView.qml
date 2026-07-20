@@ -10,7 +10,7 @@ Page {
   property string sTitle: idHeadLine.text
 
   Component.onCompleted: {
-    idWebView.viewportHeight = Screen.height
+    idWebView.viewportHeight = Screen.height - Theme.itemSizeLarge
   }
   Item {
     id: idHeader
@@ -36,8 +36,6 @@ Page {
 
   WebView {
     id: idWebView
-
-
     /*
     Component.onCompleted: {
       WebEngineSettings.useDownloadDir = true
@@ -49,7 +47,7 @@ Page {
       contextMenu: "qrc:/qml/pages/WebPopup.qml"
     }
 
-    anchors.fill: parent
-    anchors.topMargin: Theme.itemSizeLarge
+   anchors.fill: parent
+   anchors.topMargin: Theme.itemSizeLarge
   }
 }
