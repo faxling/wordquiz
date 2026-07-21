@@ -535,20 +535,17 @@ void Sound::onAudioOutputsChanged()
   auto oDefAudio = m_QMediaDevices.defaultAudioOutput().id();
   if (m_ocDefaultAudio == oDefAudio)
     return;
-
-
-  m_player.setMedia(audioOutput);
   m_ocDefaultAudio = oDefAudio;
   m_player.audioOutput()->setDevice(m_QMediaDevices.defaultAudioOutput());
 #endif
 }
 
-
+/*
 void Sound::onStateChanged(QMediaPlayer::State newState)
 {
   // qDebug() << newState;
 }
-
+*/
 
 void Sound::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
 {
@@ -584,9 +581,9 @@ Sound::Sound()
   connect(&m_QMediaDevices, &QMediaDevices::audioOutputsChanged, this, &Sound::onAudioOutputsChanged);
   m_player.setAudioOutput(new QAudioOutput());
 #endif
-  connect(&m_player, &QMediaPlayer::stateChanged, this, &Sound::onStateChanged);
+  // connect(&m_player, &QMediaPlayer::stateChanged, this, &Sound::onStateChanged);
   connect(&m_player, &QMediaPlayer::mediaStatusChanged, this, &Sound::onMediaStatusChanged);
-  connect(&m_player,  static_cast<void (QMediaPlayer::*)(QMediaPlayer::Error)>(&QMediaPlayer::error), this, &Sound::onError);
+  // connect(&m_player,  static_cast<void (QMediaPlayer::*)(QMediaPlayer::Error)>(&QMediaPlayer::error), this, &Sound::onError);
 }
 
 
@@ -600,8 +597,13 @@ void Sound::Play(const QString& sUrl)
 {
   // m_player.
   qDebug() << "play " << JustFileName(sUrl);
+#if QT_VERSION >= 0x060000
+  if (m_player.playbackState() == QMediaPlayer::PlaybackState::PausedState)
+    m_player.play();
+#else
   if (m_player.state() == QMediaPlayer::State::PausedState)
     m_player.play();
+#endif
   switch (m_player.mediaStatus()) {
     case QMediaPlayer::LoadingMedia:
     case QMediaPlayer::BufferingMedia:

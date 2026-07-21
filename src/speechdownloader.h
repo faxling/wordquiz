@@ -33,7 +33,7 @@ public:
   void setPlaybackRate(double rate);
   void QueAudio(QString);
   void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
-  void onStateChanged(QMediaPlayer::State newState);
+  // void onStateChanged(QMediaPlayer::State newState);
   void onAudioOutputsChanged();
   void onError(QMediaPlayer::Error error);
 private:
